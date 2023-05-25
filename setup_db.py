@@ -38,6 +38,29 @@ def create_schema():
         "CREATE DATABASE IF NOT EXISTS %s;" % DATABASE_SETTINGS['NAME']
     )
     
+def populate_countries():
+    """Populates the countries table from 'countries.json' in the base django directory
+    """
+    from json import load
+    from FlightProject.settings import BASE_DIR
+    from FlightsApi.apps import FlightsapiConfig
+    from FlightsApi.models import Country
+    
+    countries_json = {}
+    with open(BASE_DIR /  FlightsapiConfig.name + "/static/countries/countries.json") as file:
+        countries_json = load(file)
+
+    country_object_list = []
+    for country in countries_json['countries']:
+        country_object_list.append(
+            Country(
+                name=country['name'],
+                symbol=country['symbol'],
+                flag=country['flag']
+            )
+        )
+    Country.objects.bulk_create(country_object_list)
+    
     
 def redirect_cmdline(cmd_name: str):
     """Redirects a command to the right function
@@ -48,6 +71,8 @@ def redirect_cmdline(cmd_name: str):
     match cmd_name:
         case 'create_schema' | 'create_database':
             return create_schema
+        case 'populate_countries':
+            return populate_countries
         case other:
             return lambda:None
     
