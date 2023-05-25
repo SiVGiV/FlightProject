@@ -1,0 +1,8 @@
+/.log
+/.venv
+/countries.json
+/FlightProject
+/FlightsApi
+/manage.py
+/setup.sh
+/setup_db.py
