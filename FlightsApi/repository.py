@@ -1,4 +1,6 @@
-from models import models
+from models import models, Country, UserRole, User, Admin,\
+                   AirlineCompany, Customer, Flight, Ticket
+from datetime import datetime, timedelta
 import logging
 logger = logging.getLogger()
 class Repository():
@@ -101,3 +103,87 @@ class Repository():
         if item_to_remove:
             item_to_remove.delete()
     
+    @staticmethod
+    def get_airline_by_username(username: str):
+        airline = AirlineCompany.objects.get(user__username=username)
+        return airline
+    
+    @staticmethod
+    def get_customer_by_username(username: str):
+        customer = Customer.objects.get(user__username=username)
+        return customer
+    
+    @staticmethod
+    def get_user_by_username(username: str):
+        user = User.objects.get(username=username)
+        return user
+    
+    @staticmethod
+    def get_flights_by_parameters(origin_country_id: int, destination_country_id: int, date: datetime.date):
+        query = Flight.objects.filter(origin_country__id=origin_country_id)
+        query = query.filter(destination_country__id = destination_country_id)
+        query = query.filter(departure_datetime__date = date)
+        return query
+    
+    @staticmethod
+    def get_flights_by_airline_id(airline_id: int):
+        flights = Flight.objects.filter(airline__pk=airline_id)
+        return flights
+    
+    @staticmethod
+    def get_arrival_flights(country_id: int):
+        country = Country.objects.get(pk=country_id)
+        if not country:
+            return None
+        query = Flight.objects.filter(destination_country__id=country_id)
+        query = query.filter(arrival_datetime__gte=datetime.now())
+        query = query.filter(arrival_datetime__lte=datetime.now() + timedelta(hours=12))
+        return query
+    
+    @staticmethod
+    def get_departure_flights(country_id: int):
+        country = Country.objects.get(pk=country_id)
+        if not country:
+            return None
+        query = Flight.objects.filter(origin_country__id=country_id)
+        query = query.filter(departure_datetime__gte=datetime.now())
+        query = query.filter(departure_datetime__lte=datetime.now() + timedelta(hours=12))
+        return query
+    
+    @staticmethod
+    def get_tickets_by_customer(customer_id: int):
+        tickets = Ticket.objects.filter(customer__id=customer_id)
+        return tickets
+    
+    @staticmethod
+    def get_airlines_by_country(country_id: int):
+        country = Repository.get_by_id(Country, country_id)
+        return country.airlines
+    
+    @staticmethod
+    def get_flights_by_origin(country_id: int):
+        country = Repository.get_by_id(Country, country_id)
+        return country.origin_flights
+    
+    @staticmethod
+    def get_flights_by_destination(country_id: int):
+        country = Repository.get_by_id(Country, country_id)
+        return country.destination_flights
+    
+    @staticmethod
+    def get_flights_by_departure_date(date: datetime.date):
+        flights = Flight.objects.filter(departure_datetime__date=date)
+        return flights
+    
+    @staticmethod
+    def get_flights_by_arrival_date(date: datetime.date):
+        flights = Flight.objects.filter(arrival_datetime__date=date)
+        return flights
+    
+    @staticmethod
+    def get_flights_by_customer(customer_id: int):
+        query = Ticket.objects.filter(customer__id=customer_id)
+        flights = []
+        for ticket in query:
+            flights.append(ticket.flight)
+        return flights
