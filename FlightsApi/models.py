@@ -41,7 +41,7 @@ class Flight(models.Model):
 class Ticket(models.Model):
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name='tickets')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tickets')
-    seats = models.IntegerField()
+    seat_count = models.IntegerField()
 
     class Meta:
         unique_together = ('flight', 'customer',)
