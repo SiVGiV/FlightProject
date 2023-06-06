@@ -15,7 +15,6 @@ def get_connection():
     from FlightProject.settings import DATABASES
     from mysql.connector import connect
     DATABASE_SETTINGS = DATABASES['default']
-    
     connection = connect(
         host=DATABASE_SETTINGS['HOST'],
         port=DATABASE_SETTINGS['PORT'],
@@ -83,5 +82,3 @@ if __name__ == "__main__":
             create_schema()
         case 2:
             redirect_cmdline(sys.argv[1])()
-        case other:
-            pass
