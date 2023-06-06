@@ -10,7 +10,7 @@ class UserRole(models.Model):
     role_name = models.CharField(max_length=100, unique=True)
 
 class User(AbstractUser):
-    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, related_name='users')
+    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, related_name='users', null=True, blank=True)
 
 class Admin(models.Model):
     first_name = models.CharField(max_length=200)
