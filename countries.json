@@ -1,0 +1,1748 @@
+[
+{
+  "model": "FlightsApi.country",
+  "pk": 1,
+  "fields": {
+    "name": "Afghanistan",
+    "symbol": "af",
+    "flag": "/countries/flags/af.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 2,
+  "fields": {
+    "name": "Albania",
+    "symbol": "al",
+    "flag": "/countries/flags/al.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 3,
+  "fields": {
+    "name": "Algeria",
+    "symbol": "dz",
+    "flag": "/countries/flags/dz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 4,
+  "fields": {
+    "name": "Andorra",
+    "symbol": "ad",
+    "flag": "/countries/flags/ad.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 5,
+  "fields": {
+    "name": "Angola",
+    "symbol": "ao",
+    "flag": "/countries/flags/ao.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 6,
+  "fields": {
+    "name": "Antigua and Barbuda",
+    "symbol": "ag",
+    "flag": "/countries/flags/ag.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 7,
+  "fields": {
+    "name": "Argentina",
+    "symbol": "ar",
+    "flag": "/countries/flags/ar.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 8,
+  "fields": {
+    "name": "Armenia",
+    "symbol": "am",
+    "flag": "/countries/flags/am.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 9,
+  "fields": {
+    "name": "Australia",
+    "symbol": "au",
+    "flag": "/countries/flags/au.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 10,
+  "fields": {
+    "name": "Austria",
+    "symbol": "at",
+    "flag": "/countries/flags/at.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 11,
+  "fields": {
+    "name": "Azerbaijan",
+    "symbol": "az",
+    "flag": "/countries/flags/az.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 12,
+  "fields": {
+    "name": "Bahamas",
+    "symbol": "bs",
+    "flag": "/countries/flags/bs.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 13,
+  "fields": {
+    "name": "Bahrain",
+    "symbol": "bh",
+    "flag": "/countries/flags/bh.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 14,
+  "fields": {
+    "name": "Bangladesh",
+    "symbol": "bd",
+    "flag": "/countries/flags/bd.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 15,
+  "fields": {
+    "name": "Barbados",
+    "symbol": "bb",
+    "flag": "/countries/flags/bb.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 16,
+  "fields": {
+    "name": "Belarus",
+    "symbol": "by",
+    "flag": "/countries/flags/by.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 17,
+  "fields": {
+    "name": "Belgium",
+    "symbol": "be",
+    "flag": "/countries/flags/be.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 18,
+  "fields": {
+    "name": "Belize",
+    "symbol": "bz",
+    "flag": "/countries/flags/bz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 19,
+  "fields": {
+    "name": "Benin",
+    "symbol": "bj",
+    "flag": "/countries/flags/bj.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 20,
+  "fields": {
+    "name": "Bhutan",
+    "symbol": "bt",
+    "flag": "/countries/flags/bt.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 21,
+  "fields": {
+    "name": "Bolivia",
+    "symbol": "bo",
+    "flag": "/countries/flags/bo.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 22,
+  "fields": {
+    "name": "Bosnia and Herzegovina",
+    "symbol": "ba",
+    "flag": "/countries/flags/ba.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 23,
+  "fields": {
+    "name": "Botswana",
+    "symbol": "bw",
+    "flag": "/countries/flags/bw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 24,
+  "fields": {
+    "name": "Brazil",
+    "symbol": "br",
+    "flag": "/countries/flags/br.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 25,
+  "fields": {
+    "name": "Brunei",
+    "symbol": "bn",
+    "flag": "/countries/flags/bn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 26,
+  "fields": {
+    "name": "Bulgaria",
+    "symbol": "bg",
+    "flag": "/countries/flags/bg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 27,
+  "fields": {
+    "name": "Burkina Faso",
+    "symbol": "bf",
+    "flag": "/countries/flags/bf.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 28,
+  "fields": {
+    "name": "Burundi",
+    "symbol": "bi",
+    "flag": "/countries/flags/bi.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 29,
+  "fields": {
+    "name": "Cabo Verde",
+    "symbol": "cv",
+    "flag": "/countries/flags/cv.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 30,
+  "fields": {
+    "name": "Cambodia",
+    "symbol": "kh",
+    "flag": "/countries/flags/kh.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 31,
+  "fields": {
+    "name": "Cameroon",
+    "symbol": "cm",
+    "flag": "/countries/flags/cm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 32,
+  "fields": {
+    "name": "Canada",
+    "symbol": "ca",
+    "flag": "/countries/flags/ca.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 33,
+  "fields": {
+    "name": "Central African Republic",
+    "symbol": "cf",
+    "flag": "/countries/flags/cf.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 34,
+  "fields": {
+    "name": "Chad",
+    "symbol": "td",
+    "flag": "/countries/flags/td.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 35,
+  "fields": {
+    "name": "Chile",
+    "symbol": "cl",
+    "flag": "/countries/flags/cl.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 36,
+  "fields": {
+    "name": "China",
+    "symbol": "cn",
+    "flag": "/countries/flags/cn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 37,
+  "fields": {
+    "name": "Colombia",
+    "symbol": "co",
+    "flag": "/countries/flags/co.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 38,
+  "fields": {
+    "name": "Comoros",
+    "symbol": "km",
+    "flag": "/countries/flags/km.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 39,
+  "fields": {
+    "name": "Congo",
+    "symbol": "cg",
+    "flag": "/countries/flags/cg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 40,
+  "fields": {
+    "name": "Costa Rica",
+    "symbol": "cr",
+    "flag": "/countries/flags/cr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 41,
+  "fields": {
+    "name": "Croatia",
+    "symbol": "hr",
+    "flag": "/countries/flags/hr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 42,
+  "fields": {
+    "name": "Cuba",
+    "symbol": "cu",
+    "flag": "/countries/flags/cu.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 43,
+  "fields": {
+    "name": "Cyprus",
+    "symbol": "cy",
+    "flag": "/countries/flags/cy.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 44,
+  "fields": {
+    "name": "Czech Republic",
+    "symbol": "cz",
+    "flag": "/countries/flags/cz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 45,
+  "fields": {
+    "name": "Denmark",
+    "symbol": "dk",
+    "flag": "/countries/flags/dk.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 46,
+  "fields": {
+    "name": "Djibouti",
+    "symbol": "dj",
+    "flag": "/countries/flags/dj.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 47,
+  "fields": {
+    "name": "Dominica",
+    "symbol": "dm",
+    "flag": "/countries/flags/dm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 48,
+  "fields": {
+    "name": "Dominican Republic",
+    "symbol": "do",
+    "flag": "/countries/flags/do.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 49,
+  "fields": {
+    "name": "Ecuador",
+    "symbol": "ec",
+    "flag": "/countries/flags/ec.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 50,
+  "fields": {
+    "name": "Egypt",
+    "symbol": "eg",
+    "flag": "/countries/flags/eg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 51,
+  "fields": {
+    "name": "El Salvador",
+    "symbol": "sv",
+    "flag": "/countries/flags/sv.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 52,
+  "fields": {
+    "name": "Equatorial Guinea",
+    "symbol": "gq",
+    "flag": "/countries/flags/gq.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 53,
+  "fields": {
+    "name": "Eritrea",
+    "symbol": "er",
+    "flag": "/countries/flags/er.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 54,
+  "fields": {
+    "name": "Estonia",
+    "symbol": "ee",
+    "flag": "/countries/flags/ee.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 55,
+  "fields": {
+    "name": "Eswatini",
+    "symbol": "sz",
+    "flag": "/countries/flags/sz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 56,
+  "fields": {
+    "name": "Ethiopia",
+    "symbol": "et",
+    "flag": "/countries/flags/et.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 57,
+  "fields": {
+    "name": "Fiji",
+    "symbol": "fj",
+    "flag": "/countries/flags/fj.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 58,
+  "fields": {
+    "name": "Finland",
+    "symbol": "fi",
+    "flag": "/countries/flags/fi.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 59,
+  "fields": {
+    "name": "France",
+    "symbol": "fr",
+    "flag": "/countries/flags/fr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 60,
+  "fields": {
+    "name": "Gabon",
+    "symbol": "ga",
+    "flag": "/countries/flags/ga.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 61,
+  "fields": {
+    "name": "Gambia",
+    "symbol": "gm",
+    "flag": "/countries/flags/gm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 62,
+  "fields": {
+    "name": "Georgia",
+    "symbol": "ge",
+    "flag": "/countries/flags/ge.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 63,
+  "fields": {
+    "name": "Germany",
+    "symbol": "de",
+    "flag": "/countries/flags/de.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 64,
+  "fields": {
+    "name": "Ghana",
+    "symbol": "gh",
+    "flag": "/countries/flags/gh.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 65,
+  "fields": {
+    "name": "Greece",
+    "symbol": "gr",
+    "flag": "/countries/flags/gr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 66,
+  "fields": {
+    "name": "Grenada",
+    "symbol": "gd",
+    "flag": "/countries/flags/gd.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 67,
+  "fields": {
+    "name": "Guatemala",
+    "symbol": "gt",
+    "flag": "/countries/flags/gt.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 68,
+  "fields": {
+    "name": "Guinea",
+    "symbol": "gn",
+    "flag": "/countries/flags/gn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 69,
+  "fields": {
+    "name": "Guinea-Bissau",
+    "symbol": "gw",
+    "flag": "/countries/flags/gw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 70,
+  "fields": {
+    "name": "Guyana",
+    "symbol": "gy",
+    "flag": "/countries/flags/gy.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 71,
+  "fields": {
+    "name": "Haiti",
+    "symbol": "ht",
+    "flag": "/countries/flags/ht.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 72,
+  "fields": {
+    "name": "Honduras",
+    "symbol": "hn",
+    "flag": "/countries/flags/hn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 73,
+  "fields": {
+    "name": "Hungary",
+    "symbol": "hu",
+    "flag": "/countries/flags/hu.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 74,
+  "fields": {
+    "name": "Iceland",
+    "symbol": "is",
+    "flag": "/countries/flags/is.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 75,
+  "fields": {
+    "name": "India",
+    "symbol": "in",
+    "flag": "/countries/flags/in.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 76,
+  "fields": {
+    "name": "Indonesia",
+    "symbol": "id",
+    "flag": "/countries/flags/id.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 77,
+  "fields": {
+    "name": "Iran",
+    "symbol": "ir",
+    "flag": "/countries/flags/ir.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 78,
+  "fields": {
+    "name": "Iraq",
+    "symbol": "iq",
+    "flag": "/countries/flags/iq.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 79,
+  "fields": {
+    "name": "Ireland",
+    "symbol": "ie",
+    "flag": "/countries/flags/ie.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 80,
+  "fields": {
+    "name": "Israel",
+    "symbol": "il",
+    "flag": "/countries/flags/il.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 81,
+  "fields": {
+    "name": "Italy",
+    "symbol": "it",
+    "flag": "/countries/flags/it.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 82,
+  "fields": {
+    "name": "Jamaica",
+    "symbol": "jm",
+    "flag": "/countries/flags/jm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 83,
+  "fields": {
+    "name": "Japan",
+    "symbol": "jp",
+    "flag": "/countries/flags/jp.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 84,
+  "fields": {
+    "name": "Jordan",
+    "symbol": "jo",
+    "flag": "/countries/flags/jo.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 85,
+  "fields": {
+    "name": "Kazakhstan",
+    "symbol": "kz",
+    "flag": "/countries/flags/kz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 86,
+  "fields": {
+    "name": "Kenya",
+    "symbol": "ke",
+    "flag": "/countries/flags/ke.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 87,
+  "fields": {
+    "name": "Kiribati",
+    "symbol": "ki",
+    "flag": "/countries/flags/ki.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 88,
+  "fields": {
+    "name": "Kuwait",
+    "symbol": "kw",
+    "flag": "/countries/flags/kw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 89,
+  "fields": {
+    "name": "Kyrgyzstan",
+    "symbol": "kg",
+    "flag": "/countries/flags/kg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 90,
+  "fields": {
+    "name": "Laos",
+    "symbol": "la",
+    "flag": "/countries/flags/la.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 91,
+  "fields": {
+    "name": "Latvia",
+    "symbol": "lv",
+    "flag": "/countries/flags/lv.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 92,
+  "fields": {
+    "name": "Lebanon",
+    "symbol": "lb",
+    "flag": "/countries/flags/lb.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 93,
+  "fields": {
+    "name": "Lesotho",
+    "symbol": "ls",
+    "flag": "/countries/flags/ls.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 94,
+  "fields": {
+    "name": "Liberia",
+    "symbol": "lr",
+    "flag": "/countries/flags/lr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 95,
+  "fields": {
+    "name": "Libya",
+    "symbol": "ly",
+    "flag": "/countries/flags/ly.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 96,
+  "fields": {
+    "name": "Liechtenstein",
+    "symbol": "li",
+    "flag": "/countries/flags/li.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 97,
+  "fields": {
+    "name": "Lithuania",
+    "symbol": "lt",
+    "flag": "/countries/flags/lt.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 98,
+  "fields": {
+    "name": "Luxembourg",
+    "symbol": "lu",
+    "flag": "/countries/flags/lu.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 99,
+  "fields": {
+    "name": "Madagascar",
+    "symbol": "mg",
+    "flag": "/countries/flags/mg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 100,
+  "fields": {
+    "name": "Malawi",
+    "symbol": "mw",
+    "flag": "/countries/flags/mw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 101,
+  "fields": {
+    "name": "Malaysia",
+    "symbol": "my",
+    "flag": "/countries/flags/my.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 102,
+  "fields": {
+    "name": "Maldives",
+    "symbol": "mv",
+    "flag": "/countries/flags/mv.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 103,
+  "fields": {
+    "name": "Mali",
+    "symbol": "ml",
+    "flag": "/countries/flags/ml.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 104,
+  "fields": {
+    "name": "Malta",
+    "symbol": "mt",
+    "flag": "/countries/flags/mt.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 105,
+  "fields": {
+    "name": "Marshall Islands",
+    "symbol": "mh",
+    "flag": "/countries/flags/mh.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 106,
+  "fields": {
+    "name": "Mauritania",
+    "symbol": "mr",
+    "flag": "/countries/flags/mr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 107,
+  "fields": {
+    "name": "Mauritius",
+    "symbol": "mu",
+    "flag": "/countries/flags/mu.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 108,
+  "fields": {
+    "name": "Mexico",
+    "symbol": "mx",
+    "flag": "/countries/flags/mx.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 109,
+  "fields": {
+    "name": "Micronesia",
+    "symbol": "fm",
+    "flag": "/countries/flags/fm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 110,
+  "fields": {
+    "name": "Moldova",
+    "symbol": "md",
+    "flag": "/countries/flags/md.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 111,
+  "fields": {
+    "name": "Monaco",
+    "symbol": "mc",
+    "flag": "/countries/flags/mc.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 112,
+  "fields": {
+    "name": "Mongolia",
+    "symbol": "mn",
+    "flag": "/countries/flags/mn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 113,
+  "fields": {
+    "name": "Montenegro",
+    "symbol": "me",
+    "flag": "/countries/flags/me.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 114,
+  "fields": {
+    "name": "Morocco",
+    "symbol": "ma",
+    "flag": "/countries/flags/ma.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 115,
+  "fields": {
+    "name": "Mozambique",
+    "symbol": "mz",
+    "flag": "/countries/flags/mz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 116,
+  "fields": {
+    "name": "Myanmar",
+    "symbol": "mm",
+    "flag": "/countries/flags/mm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 117,
+  "fields": {
+    "name": "Namibia",
+    "symbol": "na",
+    "flag": "/countries/flags/na.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 118,
+  "fields": {
+    "name": "Nauru",
+    "symbol": "nr",
+    "flag": "/countries/flags/nr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 119,
+  "fields": {
+    "name": "Nepal",
+    "symbol": "np",
+    "flag": "/countries/flags/np.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 120,
+  "fields": {
+    "name": "Netherlands",
+    "symbol": "nl",
+    "flag": "/countries/flags/nl.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 121,
+  "fields": {
+    "name": "New Zealand",
+    "symbol": "nz",
+    "flag": "/countries/flags/nz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 122,
+  "fields": {
+    "name": "Nicaragua",
+    "symbol": "ni",
+    "flag": "/countries/flags/ni.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 123,
+  "fields": {
+    "name": "Niger",
+    "symbol": "ne",
+    "flag": "/countries/flags/ne.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 124,
+  "fields": {
+    "name": "Nigeria",
+    "symbol": "ng",
+    "flag": "/countries/flags/ng.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 125,
+  "fields": {
+    "name": "North Korea",
+    "symbol": "kp",
+    "flag": "/countries/flags/kp.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 126,
+  "fields": {
+    "name": "North Macedonia",
+    "symbol": "mk",
+    "flag": "/countries/flags/mk.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 127,
+  "fields": {
+    "name": "Norway",
+    "symbol": "no",
+    "flag": "/countries/flags/no.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 128,
+  "fields": {
+    "name": "Oman",
+    "symbol": "om",
+    "flag": "/countries/flags/om.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 129,
+  "fields": {
+    "name": "Pakistan",
+    "symbol": "pk",
+    "flag": "/countries/flags/pk.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 130,
+  "fields": {
+    "name": "Palau",
+    "symbol": "pw",
+    "flag": "/countries/flags/pw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 131,
+  "fields": {
+    "name": "Palestine",
+    "symbol": "ps",
+    "flag": "/countries/flags/ps.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 132,
+  "fields": {
+    "name": "Panama",
+    "symbol": "pa",
+    "flag": "/countries/flags/pa.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 133,
+  "fields": {
+    "name": "Papua New Guinea",
+    "symbol": "pg",
+    "flag": "/countries/flags/pg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 134,
+  "fields": {
+    "name": "Paraguay",
+    "symbol": "py",
+    "flag": "/countries/flags/py.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 135,
+  "fields": {
+    "name": "Peru",
+    "symbol": "pe",
+    "flag": "/countries/flags/pe.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 136,
+  "fields": {
+    "name": "Philippines",
+    "symbol": "ph",
+    "flag": "/countries/flags/ph.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 137,
+  "fields": {
+    "name": "Poland",
+    "symbol": "pl",
+    "flag": "/countries/flags/pl.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 138,
+  "fields": {
+    "name": "Portugal",
+    "symbol": "pt",
+    "flag": "/countries/flags/pt.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 139,
+  "fields": {
+    "name": "Qatar",
+    "symbol": "qa",
+    "flag": "/countries/flags/qa.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 140,
+  "fields": {
+    "name": "Romania",
+    "symbol": "ro",
+    "flag": "/countries/flags/ro.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 141,
+  "fields": {
+    "name": "Russia",
+    "symbol": "ru",
+    "flag": "/countries/flags/ru.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 142,
+  "fields": {
+    "name": "Rwanda",
+    "symbol": "rw",
+    "flag": "/countries/flags/rw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 143,
+  "fields": {
+    "name": "Saint Kitts and Nevis",
+    "symbol": "kn",
+    "flag": "/countries/flags/kn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 144,
+  "fields": {
+    "name": "Saint Lucia",
+    "symbol": "lc",
+    "flag": "/countries/flags/lc.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 145,
+  "fields": {
+    "name": "Saint Vincent and the Grenadines",
+    "symbol": "vc",
+    "flag": "/countries/flags/vc.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 146,
+  "fields": {
+    "name": "Samoa",
+    "symbol": "ws",
+    "flag": "/countries/flags/ws.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 147,
+  "fields": {
+    "name": "San Marino",
+    "symbol": "sm",
+    "flag": "/countries/flags/sm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 148,
+  "fields": {
+    "name": "Sao Tome and Principe",
+    "symbol": "st",
+    "flag": "/countries/flags/st.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 149,
+  "fields": {
+    "name": "Saudi Arabia",
+    "symbol": "sa",
+    "flag": "/countries/flags/sa.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 150,
+  "fields": {
+    "name": "Senegal",
+    "symbol": "sn",
+    "flag": "/countries/flags/sn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 151,
+  "fields": {
+    "name": "Serbia",
+    "symbol": "rs",
+    "flag": "/countries/flags/rs.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 152,
+  "fields": {
+    "name": "Seychelles",
+    "symbol": "sc",
+    "flag": "/countries/flags/sc.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 153,
+  "fields": {
+    "name": "Sierra Leone",
+    "symbol": "sl",
+    "flag": "/countries/flags/sl.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 154,
+  "fields": {
+    "name": "Singapore",
+    "symbol": "sg",
+    "flag": "/countries/flags/sg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 155,
+  "fields": {
+    "name": "Slovakia",
+    "symbol": "sk",
+    "flag": "/countries/flags/sk.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 156,
+  "fields": {
+    "name": "Slovenia",
+    "symbol": "si",
+    "flag": "/countries/flags/si.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 157,
+  "fields": {
+    "name": "Solomon Islands",
+    "symbol": "sb",
+    "flag": "/countries/flags/sb.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 158,
+  "fields": {
+    "name": "Somalia",
+    "symbol": "so",
+    "flag": "/countries/flags/so.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 159,
+  "fields": {
+    "name": "South Africa",
+    "symbol": "za",
+    "flag": "/countries/flags/za.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 160,
+  "fields": {
+    "name": "South Korea",
+    "symbol": "kr",
+    "flag": "/countries/flags/kr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 161,
+  "fields": {
+    "name": "South Sudan",
+    "symbol": "ss",
+    "flag": "/countries/flags/ss.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 162,
+  "fields": {
+    "name": "Spain",
+    "symbol": "es",
+    "flag": "/countries/flags/es.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 163,
+  "fields": {
+    "name": "Sri Lanka",
+    "symbol": "lk",
+    "flag": "/countries/flags/lk.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 164,
+  "fields": {
+    "name": "Sudan",
+    "symbol": "sd",
+    "flag": "/countries/flags/sd.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 165,
+  "fields": {
+    "name": "Suriname",
+    "symbol": "sr",
+    "flag": "/countries/flags/sr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 166,
+  "fields": {
+    "name": "Sweden",
+    "symbol": "se",
+    "flag": "/countries/flags/se.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 167,
+  "fields": {
+    "name": "Switzerland",
+    "symbol": "ch",
+    "flag": "/countries/flags/ch.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 168,
+  "fields": {
+    "name": "Syria",
+    "symbol": "sy",
+    "flag": "/countries/flags/sy.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 169,
+  "fields": {
+    "name": "Taiwan",
+    "symbol": "tw",
+    "flag": "/countries/flags/tw.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 170,
+  "fields": {
+    "name": "Tajikistan",
+    "symbol": "tj",
+    "flag": "/countries/flags/tj.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 171,
+  "fields": {
+    "name": "Tanzania",
+    "symbol": "tz",
+    "flag": "/countries/flags/tz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 172,
+  "fields": {
+    "name": "Thailand",
+    "symbol": "th",
+    "flag": "/countries/flags/th.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 173,
+  "fields": {
+    "name": "Timor-Leste",
+    "symbol": "tl",
+    "flag": "/countries/flags/tl.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 174,
+  "fields": {
+    "name": "Togo",
+    "symbol": "tg",
+    "flag": "/countries/flags/tg.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 175,
+  "fields": {
+    "name": "Tonga",
+    "symbol": "to",
+    "flag": "/countries/flags/to.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 176,
+  "fields": {
+    "name": "Trinidad and Tobago",
+    "symbol": "tt",
+    "flag": "/countries/flags/tt.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 177,
+  "fields": {
+    "name": "Tunisia",
+    "symbol": "tn",
+    "flag": "/countries/flags/tn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 178,
+  "fields": {
+    "name": "Turkey",
+    "symbol": "tr",
+    "flag": "/countries/flags/tr.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 179,
+  "fields": {
+    "name": "Turkmenistan",
+    "symbol": "tm",
+    "flag": "/countries/flags/tm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 180,
+  "fields": {
+    "name": "Tuvalu",
+    "symbol": "tv",
+    "flag": "/countries/flags/tv.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 181,
+  "fields": {
+    "name": "Uganda",
+    "symbol": "ug",
+    "flag": "/countries/flags/ug.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 182,
+  "fields": {
+    "name": "Ukraine",
+    "symbol": "ua",
+    "flag": "/countries/flags/ua.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 183,
+  "fields": {
+    "name": "United Arab Emirates",
+    "symbol": "ae",
+    "flag": "/countries/flags/ae.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 184,
+  "fields": {
+    "name": "United Kingdom",
+    "symbol": "gb",
+    "flag": "/countries/flags/gb.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 185,
+  "fields": {
+    "name": "United States",
+    "symbol": "us",
+    "flag": "/countries/flags/us.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 186,
+  "fields": {
+    "name": "Uruguay",
+    "symbol": "uy",
+    "flag": "/countries/flags/uy.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 187,
+  "fields": {
+    "name": "Uzbekistan",
+    "symbol": "uz",
+    "flag": "/countries/flags/uz.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 188,
+  "fields": {
+    "name": "Vanuatu",
+    "symbol": "vu",
+    "flag": "/countries/flags/vu.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 189,
+  "fields": {
+    "name": "Vatican City",
+    "symbol": "va",
+    "flag": "/countries/flags/va.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 190,
+  "fields": {
+    "name": "Venezuela",
+    "symbol": "ve",
+    "flag": "/countries/flags/ve.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 191,
+  "fields": {
+    "name": "Vietnam",
+    "symbol": "vn",
+    "flag": "/countries/flags/vn.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 192,
+  "fields": {
+    "name": "Yemen",
+    "symbol": "ye",
+    "flag": "/countries/flags/ye.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 193,
+  "fields": {
+    "name": "Zambia",
+    "symbol": "zm",
+    "flag": "/countries/flags/zm.png"
+  }
+},
+{
+  "model": "FlightsApi.country",
+  "pk": 194,
+  "fields": {
+    "name": "Zimbabwe",
+    "symbol": "zw",
+    "flag": "/countries/flags/zw.png"
+  }
+}
+]

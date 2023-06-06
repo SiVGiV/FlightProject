@@ -1,10 +1,12 @@
 import os
 import django
+import logging
 
 
 # Setup django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "FlightProject.settings") 
 django.setup()
+logger = logging.getLogger(__name__)
 
 def get_connection():
     """Creates and returns a Connection object (from mysql_connector_python) with the default django database settings
@@ -21,6 +23,8 @@ def get_connection():
         user=DATABASE_SETTINGS['USER'],
         password=DATABASE_SETTINGS['PASSWORD'],
     )
+    if connection:
+        logger.info(f"Successfully connected to database @ //{ DATABASE_SETTINGS['HOST'] }:{ DATABASE_SETTINGS['PORT'] }/")
     return connection
 
 
@@ -30,35 +34,21 @@ def create_schema():
     from FlightProject.settings import DATABASES
     
     DATABASE_SETTINGS = DATABASES['default']
+    try:
+        connection = get_connection()
+    except ConnectionError as e:
+        logger.error("Failed to connect to database.", exc_info=e)    
     
-    connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute(
-        "CREATE DATABASE IF NOT EXISTS %s;" % DATABASE_SETTINGS['NAME']
-    )
     
-def populate_countries():
-    """Populates the countries table from 'countries.json' in the base django directory
-    """
-    from json import load
-    from FlightProject.settings import BASE_DIR
-    from FlightsApi.apps import FlightsapiConfig
-    from FlightsApi.models import Country
-    
-    countries_json = {}
-    with open(BASE_DIR /  FlightsapiConfig.name + "/static/countries/countries.json") as file:
-        countries_json = load(file)
-
-    country_object_list = []
-    for country in countries_json['countries']:
-        country_object_list.append(
-            Country(
-                name=country['name'],
-                symbol=country['symbol'],
-                flag=country['flag']
-            )
+    try:
+        cursor.execute(
+            "CREATE DATABASE IF NOT EXISTS %s;" % DATABASE_SETTINGS['NAME']
         )
-    Country.objects.bulk_create(country_object_list)
+    except Exception as e:
+        logger.error("Schema creation failed.", exc_info=e)
+    else:
+        logger.info("%s schema creation successful." % DATABASE_SETTINGS['NAME'])
     
     
 def redirect_cmdline(cmd_name: str):
@@ -70,8 +60,6 @@ def redirect_cmdline(cmd_name: str):
     match cmd_name:
         case 'create_schema' | 'create_database':
             return create_schema
-        case 'populate_countries':
-            return populate_countries
         case other:
             return lambda:None
     
