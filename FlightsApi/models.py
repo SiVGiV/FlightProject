@@ -1,6 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-
+from django.utils import timezone
+from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.utils.translation import gettext_lazy as _
 
 class Country(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -16,22 +18,39 @@ class Country(models.Model):
     def __str__(self) -> str:
         return f"{self.name}"
     
-
-class UserRole(models.Model):
-    role_name = models.CharField(max_length=100, unique=True)
-                        
-    class Meta:
-        verbose_name = "User Role"
-            
-    def __repr__(self) -> str:
-        return f"<{self.role_name}>"
-
-    def __str__(self) -> str:
-        return f"{self.role_name}"
-
-
-class User(AbstractUser):
-    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, related_name='users', null=True, blank=True)
+class User(AbstractBaseUser, PermissionsMixin):
+    username_validator = UnicodeUsernameValidator()
+    username = models.CharField(
+        _("username"),
+        max_length=150,
+        unique=True,
+        help_text=_(
+            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        validators=[username_validator],
+        error_messages={
+            "unique": _("A user with that username already exists."),
+        },
+    )
+    email = models.EmailField(_("email address"), blank=True)
+    is_active = models.BooleanField(
+        _("active"),
+        default=True,
+        help_text=_(
+            "Designates whether this user should be treated as active. "
+            "Unselect this instead of deleting accounts."
+        ),
+    )
+    is_staff = models.BooleanField(
+        _("staff status"),
+        default=False,
+        help_text=_("Designates whether the user can log into this admin site."),
+    )
+    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    objects = UserManager()
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
 
 
 class Admin(models.Model):
