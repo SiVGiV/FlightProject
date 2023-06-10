@@ -1,29 +1,62 @@
-from models import models, Country, UserRole, User, Admin,\
+from django.db import models
+from django.core.exceptions import ValidationError
+
+from ..models import Country, User,\
                    AirlineCompany, Customer, Flight, Ticket
+from .errors import *
+                   
 from datetime import datetime, timedelta
 import logging
+
+from typing import Type
+from inspect import isclass
+
 logger = logging.getLogger()
+
+    
+def verify_model(func):
+    """A decorator to verify that the 1st argument passed to a function is of type Model
+
+    Args:
+        func (func): A function to decorate
+        
+    Raises:
+        WrongModelType for types that aren't Model
+    """
+    def wrapper(*args, **kwargs):
+        if not isclass(args[0]):
+            raise WrongModelType("model must be of type Model")
+        if not issubclass(args[0], models.Model):
+            raise WrongModelType("model must be of type Model")
+        return func(*args, **kwargs)
+    return wrapper
+
+
 class Repository():
     @staticmethod
-    def get_by_id(model: type[models.Model], id: int):
-        # TODO test existing id
-        # TODO test nonexisting id
-        # TODO test non-existing model
+    @verify_model
+    def get_by_id(model: Type[models.Model], id: int):
         """Get item of type model by id
 
         Args:
-            model (type[Model]): Model to get row from
+            model (type[models.Model]): Model to get row from
             id (int): id of the row to get
 
         Returns:
             Model object: An item or None if not found
+        
+        Raises:
+            FetchError for bad ID values
         """
+        if not isinstance(id, int):
+            raise FetchError("id must be an integer")
+        if id < 0:
+            raise FetchError("id must be larger or equal to 0")
         return model.objects.filter(pk=id).first()
     
     @staticmethod
-    def get_all(model: type[models.Model]):
-        # TODO test model
-        # TODO test different obj
+    @verify_model
+    def get_all(model: Type[models.Model]):
         """Get all rows from certain model
 
         Args:
@@ -35,64 +68,77 @@ class Repository():
         return model.objects.all()
         
     @staticmethod
-    def add(new_obj):
-        # TODO test missing fields
-        # TODO test wrong value types
-        # TODO test correct data
+    @verify_model
+    def add(model: Type[models.Model], **fields):
         """Saves a new row to a model
 
         Args:
             new_row (obj): A new object of the model's type
+        
+        Returns:
+            obj of Model
+            
+        Raises:
+            CreationError
         """
-        # Verify that the save method actually exists in the object
-        if not hasattr(new_obj, 'save'):
-            logger.error("Passed non-model object.")
-        elif not callable(new_obj.save):
-            logger.error("new_obj.save is not callable - is this the right object?")
+        try:
+            # Use the User .create_user function for creating users (hashes passwords)
+            if model == User:
+                new_obj = model.objects.create_user(**fields)
+            else:
+                new_obj = model.objects.create(**fields)
+        except (ValueError, TypeError) as e:
+            raise CreationError(e)
         else:
             new_obj.save()
+        return new_obj
+        
     
     @staticmethod
-    def update(model: type[models.Model], id: int, **updated_values):
-        # TODO test non existing fields
-        # TODO test wrong value types
-        # TODO test correct data
+    @verify_model
+    def update(model: Type[models.Model], id: int, **updated_values):
         """Update row from model with new data
 
         Args:
             model (type[Model]): Model to update a row in
             id (int): id of row to update
-        KeywordArgs:
+        KWArgs:
             Any updated values
+        Raises:
+            UpdateError for non existing attributes, bad attribute types
+            FetchError for not found rows
         """
         item = Repository.get_by_id(model, id)
-        for key, value in updated_values.items():
-            if hasattr(item, key):
-                setattr(item, key, value)
+        if not item:
+            raise FetchError("Failed to find an item of model with ID #%i" % id)
+        for field, value in updated_values.items():
+            if hasattr(item, field):
+                    setattr(item, field, value)
             else:
-                logger.warning("Attempted to edit a non existing attribute '%s'." % key)
-        item.save()
+                raise UpdateError("Attempted to edit a non existing attribute '%s'." % field)
+        try:
+            item.save()
+        except (ValueError, TypeError, ValidationError) as e:
+            raise UpdateError("Attempted to set attribute to bad data type/value", e)
+        return item
     
     @staticmethod
-    def add_all(new_rows: list[type[models.Model]]):
-        # TODO test bad types in list
-        # TODO test good insert
+    @verify_model
+    def add_all(model: Type[models.Model], entry_list: list[dict]):
         """Add all rows to database
 
         Args:
+            model: 
             new_rows (list): Model objects to add to the database
         """
-        for row in new_rows:
-            if not hasattr(row, 'save'):
-                continue
-            elif not callable(row.save):
-                continue
-            row.save()
+        returns = []
+        for fields in entry_list:
+            returns.append(Repository.add(model, **fields))
+        return returns
     
     @staticmethod
+    @verify_model
     def remove(model, id: int):
-        # TODO test nonexisting id
-        # TODO test successful removal
         """Remove a row from the database
 
         Args:
@@ -187,3 +233,4 @@ class Repository():
         for ticket in query:
             flights.append(ticket.flight)
         return flights
+
