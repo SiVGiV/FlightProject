@@ -1,22 +1,22 @@
+# Django imports
 from django.db import models
 from django.db.models import Model, QuerySet
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-
+# Local project imports
 from ..models import Country, User,\
                    AirlineCompany, Customer, Flight, Ticket
 from .errors import *
-                   
+# Date related imports
 from datetime import timedelta
 from datetime import date as Date
+# Python builtin imports
 import logging
-
 from typing import Type, Iterable, Union, List, Dict
 from inspect import isclass
 
 logger = logging.getLogger()
 
-    
 def verify_model(func):
     """A decorator to verify that the 1st argument passed to a function is of type Model
 
@@ -27,9 +27,13 @@ def verify_model(func):
         WrongModelType for types that aren't Model
     """
     def wrapper(*args, **kwargs):
-        if not isclass(args[0]):
+        # Get the model object from the function's arguments
+        modelObj = args[0]
+        # check if the modelObj is a class: necessary before checking issubclass()
+        if not isclass(modelObj): 
             raise WrongModelType("model must be of type Model")
-        if not issubclass(args[0], models.Model):
+        # Check if the modelObj is a subclass of Model
+        if not issubclass(modelObj, Model): 
             raise WrongModelType("model must be of type Model")
         return func(*args, **kwargs)
     return wrapper
@@ -51,10 +55,12 @@ class Repository():
         Raises:
             FetchError for bad ID values
         """
+        # Validate arguments
         if not isinstance(id, int):
             raise FetchError("id must be an integer")
         if id < 0:
             raise FetchError("id must be larger or equal to 0")
+        # Get and return item by id
         return model.objects.filter(pk=id).first()
     
     @staticmethod
@@ -69,28 +75,29 @@ class Repository():
             list: All rows from model
         """
         return model.objects.all()
-        
+
     @staticmethod
     @verify_model
     def add(model: Type[Model], **fields) -> Model:
-        """Saves a new row to a model
+        """Creates and saves an object of the passed model
 
         Args:
-            new_row (obj): A new object of the model's type
-        
-        Returns:
-            obj of Model
-            
+            model (Type[Model]): Model subclass to use for creation
+
         Raises:
-            CreationError
+            CreationError: If encounters an error during creation of object
+
+        Returns:
+            Model: Created object
         """
+        # Try creating the object - expect failure if a field has a mismatching type or value
         try:
-            # Use the User .create_user function for creating users (hashes passwords)
             if model == User:
+                # Use the .create_user() function for creating users (hashes passwords)
                 new_obj = model.objects.create_user(**fields)
             else:
                 new_obj = model.objects.create(**fields)
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, ValidationError) as e:
             raise CreationError(e)
         else:
             new_obj.save()
@@ -111,16 +118,20 @@ class Repository():
             UpdateError for non existing attributes, bad attribute types
             FetchError for not found rows
         """
+        # Validate argument
         if not isinstance(id, int):
             raise TypeError("id must be of type int.")
+        # Check if the item exists before updating it
         item = Repository.get_by_id(model, id)
         if not item:
             raise FetchError("Failed to find an item of model with ID #%i" % id)
+        # Update the item's attributes
         for field, value in updated_values.items():
             if hasattr(item, field):
                     setattr(item, field, value)
             else:
                 raise UpdateError("Attempted to edit a non existing attribute '%s'." % field)
+        # Try to save - this is usually where problems come up (database type validation happens at this stage)
         try:
             item.save()
         except (ValueError, TypeError, ValidationError) as e:
@@ -137,12 +148,12 @@ class Repository():
             new_rows (list): Model objects to add to the database
         
         Returns:
-            list of Model objects that were added
+            list of Model objects that were added (Recommended to check if the returned length is the same as the passed length)
         """
-        returns = []
+        created = []
         for fields in entry_list:
-            returns.append(Repository.add(model, **fields))
-        return returns
+                created.append(Repository.add(model, **fields))
+        return created
     
     @staticmethod
     @verify_model
