@@ -38,10 +38,21 @@ def verify_model(func):
         return func(*args, **kwargs)
     return wrapper
 
+def log_action(func):
+    """Logs function calls at the debug level
 
+    Args:
+        func (function): A function to decorate
+    """
+    def wrapper(*args, **kwargs):
+        logger.debug(f"Called {func.__name__} @ {__name__}")
+        func(*args, **kwargs)
+    return wrapper
+    
 class Repository():
     @staticmethod
     @verify_model
+    @log_action
     def get_by_id(model: Type[Model], id: int) -> Union[Model, None]:
         """Get item of type model by id
 
@@ -65,6 +76,7 @@ class Repository():
     
     @staticmethod
     @verify_model
+    @log_action
     def get_all(model: Type[Model]) -> QuerySet[Model]:
         """Get all rows from certain model
 
@@ -78,6 +90,7 @@ class Repository():
 
     @staticmethod
     @verify_model
+    @log_action
     def add(model: Type[Model], **fields) -> Model:
         """Creates and saves an object of the passed model
 
@@ -106,6 +119,7 @@ class Repository():
     
     @staticmethod
     @verify_model
+    @log_action
     def update(model: Type[Model], id: int, **updated_values) -> Model:
         """Update row from model with new data
 
@@ -140,6 +154,7 @@ class Repository():
     
     @staticmethod
     @verify_model
+    @log_action
     def add_all(model: Type[Model], entry_list: Iterable[Dict]) -> List[Model]:
         """Add all rows to database
 
@@ -157,6 +172,7 @@ class Repository():
     
     @staticmethod
     @verify_model
+    @log_action
     def remove(model: Type[Model], id: int) -> None:
         """Remove a row from the database
 
@@ -171,6 +187,7 @@ class Repository():
             item_to_remove.delete()
     
     @staticmethod
+    @log_action
     def get_airline_by_username(username: str) -> Union[AirlineCompany, None]:
         """Get an AirlineCompany from its username
 
@@ -186,6 +203,7 @@ class Repository():
         return airline or None
     
     @staticmethod
+    @log_action
     def get_customer_by_username(username: str) -> Union[Customer, None]:
         """Get a Customer from its username
 
@@ -201,6 +219,7 @@ class Repository():
         return customer or None
     
     @staticmethod
+    @log_action
     def get_user_by_username(username: str) -> Union[User, None]:
         """Get a user from its username
 
@@ -219,6 +238,7 @@ class Repository():
         return user or None
     
     @staticmethod
+    @log_action
     def get_flights_by_parameters(origin_country_id: int, destination_country_id: int, date: Date) -> Union[QuerySet[Flight], None]:
         """Returns a QuerySet for flights that fit the parameters
 
@@ -247,6 +267,7 @@ class Repository():
         return query.all()
     
     @staticmethod
+    @log_action
     def get_flights_by_airline_id(airline_id: int) -> QuerySet[Flight]:
         """Fetch 
 
@@ -265,6 +286,7 @@ class Repository():
         return flights
     
     @staticmethod
+    @log_action
     def get_arrival_flights(country_id: int) -> QuerySet[Flight]:
         """Get all flights arriving to a country in the next 12 hours
 
@@ -288,6 +310,7 @@ class Repository():
         return query.all()
     
     @staticmethod
+    @log_action
     def get_departure_flights(country_id: int) -> QuerySet[Flight]:
         """Get all flights leaving a country in the next 12 hours
 
@@ -311,6 +334,7 @@ class Repository():
         return query.all()
     
     @staticmethod
+    @log_action
     def get_tickets_by_customer(customer_id: int) -> QuerySet[Ticket]:
         """Fetches all tickets belonging to a customer
 
@@ -329,6 +353,7 @@ class Repository():
         return tickets.all()
     
     @staticmethod
+    @log_action
     def get_airlines_by_country(country_id: int) -> QuerySet[AirlineCompany]:
         """Get all airlines in a certain country
 
@@ -347,6 +372,7 @@ class Repository():
         return airlines.all()
     
     @staticmethod
+    @log_action
     def get_flights_by_origin(country_id: int) -> QuerySet[Flight]:
         """Get flights that take off from a certain country
 
@@ -365,6 +391,7 @@ class Repository():
         return results.all()
     
     @staticmethod
+    @log_action
     def get_flights_by_destination(country_id: int) -> QuerySet[Flight]:
         """Get flights that land in a certain country
 
@@ -383,6 +410,7 @@ class Repository():
         return results.all()
     
     @staticmethod
+    @log_action
     def get_flights_by_departure_date(date: Date) -> QuerySet[Flight]:
         """Get flights that depart on a certain date
 
@@ -401,6 +429,7 @@ class Repository():
         return flights.all()
     
     @staticmethod
+    @log_action
     def get_flights_by_arrival_date(date: Date) -> QuerySet[Flight]:
         """Get flights that arrive on a certain date
 
@@ -419,6 +448,7 @@ class Repository():
         return flights.all()
     
     @staticmethod
+    @log_action
     def get_flights_by_customer(customer_id: int) -> QuerySet[Flight]:
         """Fetch all flights for a customer
 
