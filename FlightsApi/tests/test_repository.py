@@ -129,6 +129,15 @@ class TestAddAll(TestCase):
         ]
         self.assertEqual(2, len(Repository.add_all(User, new_rows)))
     
+    def test_add_some_successfult(self):
+        failure = -999
+        new_rows = [
+            {'username': "test1", 'email': "a@a.com", 'password': "test1"},
+            {'username': failure, 'email': "b@b.com", 'password': "test2"},
+        ]
+        self.assertEqual(1, len(Repository.add_all(User, new_rows)))
+        
+    
     def test_add_all_empty(self):
         self.assertEqual(0, len(Repository.add_all(User, [])))
 

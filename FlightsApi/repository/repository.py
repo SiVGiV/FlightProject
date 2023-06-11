@@ -167,7 +167,11 @@ class Repository():
         """
         created = []
         for fields in entry_list:
+            try:
+                # Only appends the successful additions
                 created.append(Repository.add(model, **fields))
+            except CreationError as e:
+                logger.warning("Failed object creation.\n", exc_info=e)
         return created
     
     @staticmethod
