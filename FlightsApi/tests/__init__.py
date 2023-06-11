@@ -1,1 +1,1 @@
-from . import *
+from .test_repository import *
