@@ -67,7 +67,7 @@ class Admin(models.Model):
 
 class AirlineCompany(models.Model):
     name = models.CharField(max_length=200)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='airlines')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='airline', unique=True)
             
     class Meta:
