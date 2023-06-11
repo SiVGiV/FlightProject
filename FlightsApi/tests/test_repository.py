@@ -1,7 +1,10 @@
 from django.test import TestCase
 from ..repository.repository import Repository, verify_model
 from ..repository.errors import FetchError, CreationError, UpdateError, WrongModelType
-from ..models import User, Admin, AirlineCompany, Customer
+from ..models import User, Admin, AirlineCompany, Customer, Country, Flight, Ticket
+
+from django.utils import timezone
+from datetime import timedelta, date
 
 
 class TestVerifyModel(TestCase):
@@ -144,3 +147,320 @@ class TestRemove(TestCase):
             self.fail("Repository.remove() did not complete!")
 
 
+class TestQueries(TestCase):
+    def setUp(self) -> None:
+        return_value = super().setUp() or None
+        self.testing_data = {
+            'users': [],
+            'customers': [],
+            'countries': [],
+            'airlines': [],
+            'flights': [],
+            'tickets': []
+        }
+        
+        # Create customers
+        user1 = User.objects.create_user(username="customer1", email="user1@customer.com")
+        user2 = User.objects.create_user(username="customer2", email="user2@customer.com")
+        customer1 = Customer.objects.create(
+            first_name="some",
+            last_name="testing",
+            address="123 test ave.",
+            phone_number="+123 1234 1234",
+            credit_card_number="4580 1234 5678 1111",
+            user=user1
+        )
+        customer2 = Customer.objects.create(
+            first_name="more",
+            last_name="testing",
+            address="123 test ave.",
+            phone_number="+123 5678 5678",
+            credit_card_number="4580 1234 5678 2222",
+            user=user2
+        )
+        self.testing_data['users'].extend((user1, user2,))
+        self.testing_data['customers'].extend((customer1, customer2,))
+        
+        # Create countries
+        country1 = Country.objects.create(name="Israel", symbol="IL", flag="some/slug.jpg")
+        country2 = Country.objects.create(name="Kazakhstan", symbol="KZ", flag="other/slug.jpg")
+        self.testing_data['countries'].extend((country1, country2,))
+        
+        # Create airlines
+        user3 = User.objects.create_user(username="airline1", email="user3@airline.com")
+        user4 = User.objects.create_user(username="airline2", email="user4@airline.com")
+        airline1 = AirlineCompany.objects.create(name="", country=country1, user=user3)
+        airline2 = AirlineCompany.objects.create(name="", country=country2, user=user4)
+        self.testing_data['users'].extend((user3, user4,))
+        self.testing_data['airlines'].extend((airline1, airline2,))
+
+        # Create flights
+        flight1 = Flight.objects.create(
+            airline=airline1,
+            origin_country=country1,
+            destination_country=country2,
+            departure_datetime=timezone.now() + timedelta(hours=1),
+            arrival_datetime=timezone.now() + timedelta(hours=2),
+            remaining_seats=1
+        )
+        flight2 = Flight.objects.create(
+            airline=airline2,
+            origin_country=country2,
+            destination_country=country1,
+            departure_datetime=timezone.now() + timedelta(weeks=1),
+            arrival_datetime=timezone.now() + timedelta(weeks=1, days=1),
+            remaining_seats=1
+        )
+        self.testing_data['flights'].extend((flight1, flight2,))
+        
+        # Create tickets
+        ticket1 = Ticket.objects.create(flight=flight1, customer=customer1, seat_count=1)
+        ticket2 = Ticket.objects.create(flight=flight1, customer=customer2, seat_count=1)
+        ticket3 = Ticket.objects.create(flight=flight2, customer=customer1, seat_count=1)
+        self.testing_data['tickets'].extend((ticket1, ticket2, ticket3,))
+        
+        return return_value
+    
+    def test_get_airline_by_username(self):
+        with self.subTest("Success"):
+            airline_id = self.testing_data['airlines'][0].id
+            airline_username = self.testing_data['airlines'][0].user.username
+            
+            airline_from_repo = Repository.get_airline_by_username(airline_username)
+            self.assertEqual(
+                airline_id,
+                airline_from_repo.id
+            )
+        
+        with self.subTest("Empty result"):
+            self.assertIsNone(Repository.get_airline_by_username("NonExistent"))
+            
+        with self.subTest("Wrong type"):
+            self.assertRaises(TypeError, lambda: Repository.get_airline_by_username(-1))
+    
+    def test_get_customer_by_username(self):
+        with self.subTest("Success"):
+            customer = self.testing_data['customers'][0]
+            customer_id = customer.id
+            customer_username = customer.user.username
+            
+            customer_from_repo = Repository.get_customer_by_username(customer_username)
+            self.assertEqual(
+                customer_id,
+                customer_from_repo.id
+            )
+        
+        with self.subTest("Empty result"):
+            self.assertIsNone(Repository.get_customer_by_username("NonExistent"))
+            
+        with self.subTest("Wrong Type"):
+            self.assertRaises(TypeError, lambda: Repository.get_customer_by_username(-1))
+    
+    def test_get_user_by_username(self):
+        with self.subTest("Success"):
+            user_id = self.testing_data['users'][0].id
+            user_username = self.testing_data['users'][0].username
+            
+            user_from_repo = Repository.get_user_by_username(user_username)
+            self.assertEqual(
+                user_id,
+                user_from_repo.id
+            )
+        
+        with self.subTest("Empty result"):
+            self.assertIsNone(Repository.get_user_by_username("NonExistent"))
+            
+        with self.subTest("Wrong type"):
+            self.assertRaises(TypeError, lambda: Repository.get_user_by_username(-1))
+    
+    def test_get_flights_by_parameters(self):
+        flight = self.testing_data['flights'][0]
+        origin = flight.origin_country
+        destination = flight.destination_country
+        origin_datetime = flight.departure_datetime
+        
+        with self.subTest("Success"):
+            result = Repository.get_flights_by_parameters(
+                origin_country_id=origin.id,
+                destination_country_id=destination.id,
+                date=origin_datetime.date()
+            )
+            self.assertEqual(flight.id, result.first().id)
+                
+        with self.subTest("Empty result"):
+            result = Repository.get_flights_by_parameters(
+                origin_country_id=origin.id,
+                destination_country_id=destination.id,
+                date=(timezone.now() + timedelta(weeks=100)).date()
+            )
+            self.assertCountEqual([], result)
+        
+        with self.subTest("TypeError @ origin_country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_parameters("error", 1, date(2000, 1, 1)))
+        
+        with self.subTest("TypeError @ destination_country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_parameters(1, "error", date(2000, 1 ,1)))
+        
+        with self.subTest("TypeError @ date"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_parameters(1, 1, "error"))
+    
+    def test_get_flights_by_airline_id(self):
+        airline = self.testing_data['airlines'][0]
+        flight_list = [flight for flight in airline.flights.all()]
+        
+        with self.subTest("Success"):
+            result = Repository.get_flights_by_airline_id(airline.id)
+            result_list = [flight for flight in result]
+            self.assertListEqual(flight_list, result_list)
+        
+        with self.subTest("Empty result"):
+            result = Repository.get_flights_by_airline_id(999)
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ airline_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_airline_id("err"))
+        
+    def test_get_arrival_flights(self):
+        soon_flight = self.testing_data['flights'][0] # This flight arrives in 2 hours
+        soon_country_id = soon_flight.destination_country.id
+        
+        not_soon_flight = self.testing_data['flights'][1] # This flight arrives in a week
+        not_soon_country_id = not_soon_flight.destination_country.id
+
+        with self.subTest("Success"):
+            self.assertIn(soon_flight, Repository.get_arrival_flights(soon_country_id))
+        
+        with self.subTest("Empty result"):
+            self.assertNotIn(
+                not_soon_flight,
+                Repository.get_arrival_flights(not_soon_country_id)    
+            )
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_arrival_flights("err"))
+    
+    def test_get_departure_flights(self):
+        soon_flight = self.testing_data['flights'][0] # This flight leaves in an hour
+        soon_country_id = soon_flight.origin_country.id
+        
+        not_soon_flight = self.testing_data['flights'][1] # This flight leaves in a week
+        not_soon_country_id = not_soon_flight.origin_country.id
+
+        with self.subTest("Success"):
+            self.assertIn(soon_flight, Repository.get_departure_flights(soon_country_id))
+        
+        with self.subTest("Empty result"):
+            self.assertNotIn(
+                not_soon_flight,
+                Repository.get_departure_flights(not_soon_country_id)    
+            )
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_departure_flights("err"))
+    
+    def test_get_tickets_by_customer(self):
+        customer = self.testing_data['customers'][0]
+        customer_tickets = [ticket for ticket in customer.tickets.all()]
+        
+        with self.subTest("Success"):
+            result = [ticket for ticket in Repository.get_tickets_by_customer(customer.id)]
+            self.assertListEqual(customer_tickets, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_tickets_by_customer(999)
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ customer_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_tickets_by_customer("err"))
+            
+    def test_get_airlines_by_country(self):
+        country = self.testing_data['countries'][0]
+        airlines = [airline for airline in country.airlines.all()]
+        
+        with self.subTest("Success"):
+            result = [airline for airline in Repository.get_airlines_by_country(country.id)]
+            self.assertListEqual(airlines, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_airlines_by_country(999)
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_airlines_by_country("err"))
+            
+    def test_get_flights_by_origin(self):
+        country = self.testing_data['countries'][0]
+        flights = [flight for flight in country.origin_flights.all()]
+        
+        with self.subTest("Success"):
+            result = [flight for flight in Repository.get_flights_by_origin(country.id)]
+            self.assertListEqual(flights, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_flights_by_origin(999)
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_origin("err"))
+            
+    def test_get_flights_by_destination(self):
+        country = self.testing_data['countries'][0]
+        flights = [flight for flight in country.destination_flights.all()]
+        
+        with self.subTest("Success"):
+            result = [flight for flight in Repository.get_flights_by_destination(country.id)]
+            self.assertListEqual(flights, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_flights_by_destination(999)
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_destination("err"))
+    
+    def test_get_flights_by_departure_date(self):
+        flight = self.testing_data['flights'][0]
+        departure_date = flight.departure_datetime.date()
+        
+        with self.subTest("Success"):
+            result = Repository.get_flights_by_departure_date(departure_date)
+            self.assertIn(flight, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_flights_by_departure_date(date(2000, 1, 1))
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_departure_date("err"))  
+    
+    def test_get_flights_by_arrival_date(self):
+        flight = self.testing_data['flights'][0]
+        arrival_date = flight.arrival_datetime.date()
+        
+        with self.subTest("Success"):
+            result = Repository.get_flights_by_arrival_date(arrival_date)
+            self.assertIn(flight, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_flights_by_arrival_date(date(2000, 1, 1))
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_arrival_date("err"))  
+    
+    def test_get_flights_by_customer(self):
+        ticket = self.testing_data['tickets'][0]
+        customer_id = ticket.customer.id
+        flight = ticket.flight
+        
+        with self.subTest("Success"):
+            result = Repository.get_flights_by_customer(customer_id)
+            self.assertIn(flight, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_flights_by_customer(999)
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ country_id"):
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_customer("err"))  
+    
