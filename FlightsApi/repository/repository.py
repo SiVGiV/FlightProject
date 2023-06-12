@@ -29,12 +29,15 @@ def verify_model(func):
     def wrapper(*args, **kwargs):
         # Get the model object from the function's arguments
         modelObj = args[0]
+        
         # check if the modelObj is a class: necessary before checking issubclass()
         if not isclass(modelObj): 
             raise WrongModelType("model must be of type Model")
+        
         # Check if the modelObj is a subclass of Model
         if not issubclass(modelObj, Model): 
             raise WrongModelType("model must be of type Model")
+        # Run the decorated function
         return func(*args, **kwargs)
     return wrapper
 
@@ -71,6 +74,7 @@ class Repository():
             raise FetchError("id must be an integer")
         if id < 0:
             raise FetchError("id must be larger or equal to 0")
+        
         # Get and return item by id
         return model.objects.filter(pk=id).first()
     
@@ -104,18 +108,17 @@ class Repository():
             Model: Created object
         """
         # Try creating the object - expect failure if a field has a mismatching type or value
+        new_obj = None
         try:
             if model == User:
                 # Use the .create_user() function for creating users (hashes passwords)
                 new_obj = model.objects.create_user(**fields)
             else:
                 new_obj = model.objects.create(**fields)
+            new_obj.save()
         except (ValueError, TypeError, ValidationError) as e:
             raise CreationError(e)
-        else:
-            new_obj.save()
         return new_obj
-        
     
     @staticmethod
     @verify_model
@@ -135,16 +138,19 @@ class Repository():
         # Validate argument
         if not isinstance(id, int):
             raise TypeError("id must be of type int.")
+        
         # Check if the item exists before updating it
         item = Repository.get_by_id(model, id)
         if not item:
             raise FetchError("Failed to find an item of model with ID #%i" % id)
+        
         # Update the item's attributes
         for field, value in updated_values.items():
             if hasattr(item, field):
                     setattr(item, field, value)
             else:
                 raise UpdateError("Attempted to edit a non existing attribute '%s'." % field)
+        
         # Try to save - this is usually where problems come up (database type validation happens at this stage)
         try:
             item.save()
@@ -163,7 +169,8 @@ class Repository():
             new_rows (list): Model objects to add to the database
         
         Returns:
-            list of Model objects that were added (Recommended to check if the returned length is the same as the passed length)
+            list of Model objects that were added 
+            It is recommended to check if the returned length is the same as the passed length
         """
         created = []
         for fields in entry_list:
@@ -184,9 +191,18 @@ class Repository():
             model (Model): the model to remove from
             id (int): The id of the row to remove
         """
+        # Verify arguments
         if not isinstance(id, int):
             raise TypeError("id must be of type int.")
-        item_to_remove = Repository.get_by_id(model, id)
+        
+        # Get the item to remove
+        try:
+            item_to_remove = Repository.get_by_id(model, id)
+        except FetchError as e:
+            logger.warning("Couldn't fetch item to delete.", exc_info=e)
+            item_to_remove = None
+            
+        # If an item was found, delete it
         if item_to_remove:
             item_to_remove.delete()
     
@@ -201,8 +217,11 @@ class Repository():
         Returns:
             AirlineCompany, None: An AirlineCompany object if found, otherwise None
         """
+        # Verify arguments
         if not isinstance(username, str):
             raise TypeError("'username' must be of type str.")
+        
+        # Fetch airline
         airline = AirlineCompany.objects.filter(user__username=username).first()
         return airline or None
     
@@ -217,8 +236,11 @@ class Repository():
         Returns:
             Customer, None: A Customer object if found, otherwise None
         """
+        # Verify arguments
         if not isinstance(username, str):
             raise TypeError("'username' must be of type str.")
+        
+        # fetch customer
         customer = Customer.objects.filter(user__username=username).first()
         return customer or None
     
@@ -236,8 +258,10 @@ class Repository():
         Returns:
             : _description_
         """
+        # verify arguments
         if not isinstance(username, str):
             raise TypeError("'username' must be of type str.")
+        
         user = User.objects.filter(username=username).first()
         return user or None
     
@@ -259,15 +283,21 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet object containing all query results
         """
+        # Verify arguments
         if not isinstance(origin_country_id, int):
             raise TypeError("'origin_country_id' must be of type int")
         if not isinstance(destination_country_id, int):
             raise TypeError("'destination_country_id' must be of type int")
         if not isinstance(date, Date):
             raise TypeError("'date' must be of type Date")
+        
+        # Get all flights that take off from origin_country
         query = Flight.objects.filter(origin_country__id=origin_country_id)
+        # Of those flights, get the ones that go to destination_country
         query = query.filter(destination_country__id = destination_country_id)
+        # Finally, of those fflights get any that depart on the specified date
         query = query.filter(departure_datetime__date = date)
+        
         return query.all()
     
     @staticmethod
@@ -284,10 +314,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet manager containing flights owned by the airline
         """
+        # verify arguments
         if not isinstance(airline_id, int):
             raise TypeError("'airline_id' must be of type 'int'.")
-        flights = Flight.objects.filter(airline__pk=airline_id).all()
-        return flights
+        
+        flights = Flight.objects.filter(airline__pk=airline_id)
+        return flights.all()
     
     @staticmethod
     @log_action
@@ -303,11 +335,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: Collection of flights
         """
+        # verify arguments
         if not isinstance(country_id, int):
             raise TypeError("'country_id' must be of type 'int'.")
-        country = Country.objects.filter(pk=country_id).first()
-        if not country:
-            return [] # Return empty iterable as to not crash iterators
+        # TODO check argument positifity
+        
+        # Find 
         query = Flight.objects.filter(destination_country__id=country_id)
         query = query.filter(arrival_datetime__gte=timezone.now())
         query = query.filter(arrival_datetime__lte=timezone.now() + timedelta(hours=12))
