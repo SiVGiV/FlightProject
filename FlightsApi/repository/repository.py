@@ -79,7 +79,6 @@ class Repository():
                 new_obj = model.objects.create_user(**fields)
             else:
                 new_obj = model.objects.create(**fields)
-            new_obj.save()
         except (ValueError, TypeError, ValidationError) as e:
             raise CreationError(e)
         return new_obj
