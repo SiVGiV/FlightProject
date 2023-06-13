@@ -1,5 +1,6 @@
 from django.test import TestCase
-from ..repository.repository import Repository, verify_model
+from ..repository.repository import Repository
+from ..repository.typechecking import verify_model, accepts
 from ..repository.errors import FetchError, CreationError, UpdateError, WrongModelType
 from ..models import User, Admin, AirlineCompany, Customer, Country, Flight, Ticket
 

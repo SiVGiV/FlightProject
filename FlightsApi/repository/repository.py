@@ -7,51 +7,17 @@ from django.utils import timezone
 from ..models import Country, User,\
                    AirlineCompany, Customer, Flight, Ticket
 from .errors import *
+from .typechecking import accepts, verify_model
+from .utils import log_action
 # Date related imports
 from datetime import timedelta
 from datetime import date as Date
 # Python builtin imports
 import logging
 from typing import Type, Iterable, Union, List, Dict
-from inspect import isclass
 
 logger = logging.getLogger()
 
-def verify_model(func):
-    """A decorator to verify that the 1st argument passed to a function is of type Model
-
-    Args:
-        func (func): A function to decorate
-        
-    Raises:
-        WrongModelType for types that aren't Model
-    """
-    def wrapper(*args, **kwargs):
-        # Get the model object from the function's arguments
-        modelObj = args[0]
-        
-        # check if the modelObj is a class: necessary before checking issubclass()
-        if not isclass(modelObj): 
-            raise WrongModelType("model must be of type Model")
-        
-        # Check if the modelObj is a subclass of Model
-        if not issubclass(modelObj, Model): 
-            raise WrongModelType("model must be of type Model")
-        # Run the decorated function
-        return func(*args, **kwargs)
-    return wrapper
-
-def log_action(func):
-    """Logs function calls at the debug level
-
-    Args:
-        func (function): A function to decorate
-    """
-    def wrapper(*args, **kwargs):
-        logger.debug(f"Called {func.__name__} @ {__name__}")
-        func(*args, **kwargs)
-    return wrapper
-    
 class Repository():
     @staticmethod
     @verify_model
