@@ -20,8 +20,8 @@ logger = logging.getLogger()
 
 class Repository():
     @staticmethod
-    @verify_model
     @log_action
+    @accepts(int, model=True, throw=FetchError)
     def get_by_id(model: Type[Model], id: int) -> Union[Model, None]:
         """Get item of type model by id
 
@@ -36,8 +36,6 @@ class Repository():
             FetchError for bad ID values
         """
         # Validate arguments
-        if not isinstance(id, int):
-            raise FetchError("id must be an integer")
         if id < 0:
             raise FetchError("id must be larger or equal to 0")
         
@@ -45,8 +43,8 @@ class Repository():
         return model.objects.filter(pk=id).first()
     
     @staticmethod
-    @verify_model
     @log_action
+    @accepts(model=True, throw=FetchError)
     def get_all(model: Type[Model]) -> QuerySet[Model]:
         """Get all rows from certain model
 
@@ -59,8 +57,8 @@ class Repository():
         return model.objects.all()
 
     @staticmethod
-    @verify_model
     @log_action
+    @accepts(model=True, throw=CreationError)
     def add(model: Type[Model], **fields) -> Model:
         """Creates and saves an object of the passed model
 
@@ -87,8 +85,8 @@ class Repository():
         return new_obj
     
     @staticmethod
-    @verify_model
     @log_action
+    @accepts(int, model=True, throw=UpdateError)
     def update(model: Type[Model], id: int, **updated_values) -> Model:
         """Update row from model with new data
 
@@ -100,11 +98,7 @@ class Repository():
         Raises:
             UpdateError for non existing attributes, bad attribute types
             FetchError for not found rows
-        """
-        # Validate argument
-        if not isinstance(id, int):
-            raise TypeError("id must be of type int.")
-        
+        """        
         # Check if the item exists before updating it
         item = Repository.get_by_id(model, id)
         if not item:
@@ -125,8 +119,8 @@ class Repository():
         return item
     
     @staticmethod
-    @verify_model
     @log_action
+    @accepts(model=True)
     def add_all(model: Type[Model], entry_list: Iterable[Dict]) -> List[Model]:
         """Add all rows to database
 
@@ -148,8 +142,8 @@ class Repository():
         return created
     
     @staticmethod
-    @verify_model
     @log_action
+    @accepts(int, model=True)
     def remove(model: Type[Model], id: int) -> None:
         """Remove a row from the database
 
@@ -157,10 +151,6 @@ class Repository():
             model (Model): the model to remove from
             id (int): The id of the row to remove
         """
-        # Verify arguments
-        if not isinstance(id, int):
-            raise TypeError("id must be of type int.")
-        
         # Get the item to remove
         try:
             item_to_remove = Repository.get_by_id(model, id)
@@ -174,6 +164,7 @@ class Repository():
     
     @staticmethod
     @log_action
+    @accepts(str)
     def get_airline_by_username(username: str) -> Union[AirlineCompany, None]:
         """Get an AirlineCompany from its username
 
@@ -183,16 +174,13 @@ class Repository():
         Returns:
             AirlineCompany, None: An AirlineCompany object if found, otherwise None
         """
-        # Verify arguments
-        if not isinstance(username, str):
-            raise TypeError("'username' must be of type str.")
-        
         # Fetch airline
         airline = AirlineCompany.objects.filter(user__username=username).first()
         return airline or None
     
     @staticmethod
     @log_action
+    @accepts(str)
     def get_customer_by_username(username: str) -> Union[Customer, None]:
         """Get a Customer from its username
 
@@ -202,16 +190,13 @@ class Repository():
         Returns:
             Customer, None: A Customer object if found, otherwise None
         """
-        # Verify arguments
-        if not isinstance(username, str):
-            raise TypeError("'username' must be of type str.")
-        
         # fetch customer
         customer = Customer.objects.filter(user__username=username).first()
         return customer or None
     
     @staticmethod
     @log_action
+    @accepts(str)
     def get_user_by_username(username: str) -> Union[User, None]:
         """Get a user from its username
 
@@ -222,17 +207,14 @@ class Repository():
             TypeError: If passed anything other than a str
 
         Returns:
-            : _description_
+            User: A User model object (or None)
         """
-        # verify arguments
-        if not isinstance(username, str):
-            raise TypeError("'username' must be of type str.")
-        
         user = User.objects.filter(username=username).first()
         return user or None
     
     @staticmethod
     @log_action
+    @accepts(int, int, Date)
     def get_flights_by_parameters(origin_country_id: int, destination_country_id: int, date: Date) -> Union[QuerySet[Flight], None]:
         """Returns a QuerySet for flights that fit the parameters
 
@@ -249,14 +231,6 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet object containing all query results
         """
-        # Verify arguments
-        if not isinstance(origin_country_id, int):
-            raise TypeError("'origin_country_id' must be of type int")
-        if not isinstance(destination_country_id, int):
-            raise TypeError("'destination_country_id' must be of type int")
-        if not isinstance(date, Date):
-            raise TypeError("'date' must be of type Date")
-        
         # Get all flights that take off from origin_country
         query = Flight.objects.filter(origin_country__id=origin_country_id)
         # Of those flights, get the ones that go to destination_country
@@ -268,6 +242,7 @@ class Repository():
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_flights_by_airline_id(airline_id: int) -> QuerySet[Flight]:
         """Fetch 
 
@@ -280,15 +255,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet manager containing flights owned by the airline
         """
-        # verify arguments
-        if not isinstance(airline_id, int):
-            raise TypeError("'airline_id' must be of type 'int'.")
-        
         flights = Flight.objects.filter(airline__pk=airline_id)
         return flights.all()
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_arrival_flights(country_id: int) -> QuerySet[Flight]:
         """Get all flights arriving to a country in the next 12 hours
 
@@ -301,12 +273,6 @@ class Repository():
         Returns:
             QuerySet[Flight]: Collection of flights
         """
-        # verify arguments
-        if not isinstance(country_id, int):
-            raise TypeError("'country_id' must be of type 'int'.")
-        # TODO check argument positifity
-        
-        # Find 
         query = Flight.objects.filter(destination_country__id=country_id)
         query = query.filter(arrival_datetime__gte=timezone.now())
         query = query.filter(arrival_datetime__lte=timezone.now() + timedelta(hours=12))
@@ -314,6 +280,7 @@ class Repository():
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_departure_flights(country_id: int) -> QuerySet[Flight]:
         """Get all flights leaving a country in the next 12 hours
 
@@ -326,8 +293,6 @@ class Repository():
         Returns:
             QuerySet[Flight]: Collection of flights
         """
-        if not isinstance(country_id, int):
-            raise TypeError("'country_id' must be of type 'int'.")
         country = Country.objects.filter(pk=country_id).first()
         if not country:
             return None
@@ -338,6 +303,7 @@ class Repository():
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_tickets_by_customer(customer_id: int) -> QuerySet[Ticket]:
         """Fetches all tickets belonging to a customer
 
@@ -350,13 +316,12 @@ class Repository():
         Returns:
             QuerySet[Ticket]: Collection of tickets
         """
-        if not isinstance(customer_id, int):
-            raise TypeError("'customer_id' must be of type 'int'.")
         tickets = Ticket.objects.filter(customer__id=customer_id)
         return tickets.all()
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_airlines_by_country(country_id: int) -> QuerySet[AirlineCompany]:
         """Get all airlines in a certain country
 
@@ -369,13 +334,12 @@ class Repository():
         Returns:
             QuerySet[AirlineCompany]: A QuerySet of AirlineCompany objects
         """
-        if not isinstance(country_id, int):
-            raise TypeError("'country_id' must be of type 'int'.")
         airlines = AirlineCompany.objects.filter(country__id=country_id)
         return airlines.all()
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_flights_by_origin(country_id: int) -> QuerySet[Flight]:
         """Get flights that take off from a certain country
 
@@ -388,13 +352,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
-        if not isinstance(country_id, int):
-            raise TypeError("'country_id' must be of type 'int'.")
         results = Flight.objects.filter(origin_country__id=country_id)
         return results.all()
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_flights_by_destination(country_id: int) -> QuerySet[Flight]:
         """Get flights that land in a certain country
 
@@ -407,13 +370,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
-        if not isinstance(country_id, int):
-            raise TypeError("'country_id' must be of type 'int'.")
         results = Flight.objects.filter(destination_country__id=country_id)
         return results.all()
     
     @staticmethod
     @log_action
+    @accepts(Date)
     def get_flights_by_departure_date(date: Date) -> QuerySet[Flight]:
         """Get flights that depart on a certain date
 
@@ -426,13 +388,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: QuerySet of Flight objects
         """
-        if not isinstance(date, Date):
-            raise TypeError("'date' must be of type 'datetime.date'.")
         flights = Flight.objects.filter(departure_datetime__date=date)
         return flights.all()
     
     @staticmethod
     @log_action
+    @accepts(Date)
     def get_flights_by_arrival_date(date: Date) -> QuerySet[Flight]:
         """Get flights that arrive on a certain date
 
@@ -445,13 +406,12 @@ class Repository():
         Returns:
             QuerySet[Flight]: QuerySet of Flight objects
         """
-        if not isinstance(date, Date):
-            raise TypeError("'date' must be of type 'datetime.date'.")
         flights = Flight.objects.filter(arrival_datetime__date=date)
         return flights.all()
     
     @staticmethod
     @log_action
+    @accepts(int)
     def get_flights_by_customer(customer_id: int) -> QuerySet[Flight]:
         """Fetch all flights for a customer
 
@@ -464,7 +424,5 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
-        if not isinstance(customer_id, int):
-            raise TypeError()
         flights = Flight.objects.filter(tickets__customer__id=customer_id)
         return flights.all()
