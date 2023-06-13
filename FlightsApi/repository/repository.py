@@ -1,5 +1,4 @@
 # Django imports
-from django.db import models
 from django.db.models import Model, QuerySet
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -7,7 +6,7 @@ from django.utils import timezone
 from ..models import Country, User,\
                    AirlineCompany, Customer, Flight, Ticket
 from .errors import *
-from .typechecking import accepts, verify_model
+from .typechecking import accepts
 from .utils import log_action
 # Date related imports
 from datetime import timedelta
@@ -71,7 +70,7 @@ class Repository():
         Returns:
             Model: Created object
         """
-        # Try creating the object - expect failure if a field has a mismatching type or value
+        # Try creating the object - expects failure if a field has a mismatching type or value
         new_obj = None
         try:
             if model == User:
@@ -97,8 +96,8 @@ class Repository():
         Raises:
             UpdateError for non existing attributes, bad attribute types
             FetchError for not found rows
-        """        
-        # Check if the item exists before updating it
+        """
+        # Get the item
         item = Repository.get_by_id(model, id)
         if not item:
             raise FetchError("Failed to find an item of model with ID #%i" % id)
@@ -138,6 +137,7 @@ class Repository():
                 created.append(Repository.add(model, **fields))
             except CreationError as e:
                 logger.warning("Failed object creation.\n", exc_info=e)
+        # Return all created objects
         return created
     
     @staticmethod
@@ -150,7 +150,7 @@ class Repository():
             model (Model): the model to remove from
             id (int): The id of the row to remove
         """
-        # Get the item to remove
+        # Get the item
         try:
             item_to_remove = Repository.get_by_id(model, id)
         except FetchError as e:
@@ -173,7 +173,6 @@ class Repository():
         Returns:
             AirlineCompany, None: An AirlineCompany object if found, otherwise None
         """
-        # Fetch airline
         airline = AirlineCompany.objects.filter(user__username=username).first()
         return airline or None
     
@@ -189,7 +188,6 @@ class Repository():
         Returns:
             Customer, None: A Customer object if found, otherwise None
         """
-        # fetch customer
         customer = Customer.objects.filter(user__username=username).first()
         return customer or None
     
@@ -201,9 +199,6 @@ class Repository():
 
         Args:
             username (str): A username to search for
-
-        Raises:
-            TypeError: If passed anything other than a str
 
         Returns:
             User: A User model object (or None)
@@ -221,11 +216,6 @@ class Repository():
             origin_country_id (int): id field of the origin country
             destination_country_id (int): id field of the destination country
             date (date): date of departure
-
-        Raises:
-            TypeError: for 'origin_country_id' that isn't an int
-            TypeError: for 'destination_country_id' that isn't an int
-            TypeError: for 'date' that isn't a date object
 
         Returns:
             QuerySet[Flight]: A QuerySet object containing all query results
@@ -248,9 +238,6 @@ class Repository():
         Args:
             airline_id (int): An airline ID
 
-        Raises:
-            TypeError: In case of a non-integer airline_id
-
         Returns:
             QuerySet[Flight]: A QuerySet manager containing flights owned by the airline
         """
@@ -265,9 +252,6 @@ class Repository():
 
         Args:
             country_id (int): ID of the country
-
-        Raises:
-            TypeError: if country_id is not int
 
         Returns:
             QuerySet[Flight]: Collection of flights
@@ -285,9 +269,6 @@ class Repository():
 
         Args:
             country_id (int): ID of the country
-
-        Raises:
-            TypeError: if country_id is not int
 
         Returns:
             QuerySet[Flight]: Collection of flights
@@ -309,9 +290,6 @@ class Repository():
         Args:
             customer_id (int): Id of the customer
 
-        Raises:
-            TypeError: If customer_id is not 'int'
-
         Returns:
             QuerySet[Ticket]: Collection of tickets
         """
@@ -326,9 +304,6 @@ class Repository():
 
         Args:
             country_id (int): The country's ID
-
-        Raises:
-            TypeError: If 'country_id' is not of type 'int'
 
         Returns:
             QuerySet[AirlineCompany]: A QuerySet of AirlineCompany objects
@@ -345,9 +320,6 @@ class Repository():
         Args:
             country_id (int): ID of the country
 
-        Raises:
-            TypeError: if 'country_id' is not an 'int'
-
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
@@ -363,9 +335,6 @@ class Repository():
         Args:
             country_id (int): ID of the country
 
-        Raises:
-            TypeError: if 'country_id' is not an 'int'
-
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
@@ -379,10 +348,7 @@ class Repository():
         """Get flights that depart on a certain date
 
         Args:
-            date (Date): a date object to check on 
-
-        Raises:
-            TypeError: If 'date' is not of type 'datetime.date'
+            date (Date): a date object to check on
 
         Returns:
             QuerySet[Flight]: QuerySet of Flight objects
@@ -397,10 +363,7 @@ class Repository():
         """Get flights that arrive on a certain date
 
         Args:
-            date (Date): a date object to check on 
-
-        Raises:
-            TypeError: If 'date' is not of type 'datetime.date' 
+            date (Date): a date object to check on
 
         Returns:
             QuerySet[Flight]: QuerySet of Flight objects
@@ -416,9 +379,6 @@ class Repository():
 
         Args:
             customer_id (int): ID of the customer
-
-        Raises:
-            TypeError: If 'customer_id' is not of type 'int'
 
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
