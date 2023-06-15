@@ -2,7 +2,7 @@ from django.test import TestCase
 from unittest import TestCase as BasicTestCase
 
 from ..repository.repository import Repository
-from ..repository.typechecking import verify_model, accepts
+from ..utils.typechecking import verify_model, accepts
 from ..repository.errors import FetchError, CreationError, UpdateError, WrongModelType
 from ..models import User, Admin, AirlineCompany, Customer, Country, Flight, Ticket
 

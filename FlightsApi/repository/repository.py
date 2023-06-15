@@ -6,8 +6,7 @@ from django.utils import timezone
 from ..models import Country, User,\
                    AirlineCompany, Customer, Flight, Ticket
 from .errors import *
-from .typechecking import accepts
-from .utils import log_action
+from ..utils import accepts, log_action
 # Date related imports
 from datetime import timedelta
 from datetime import date as Date

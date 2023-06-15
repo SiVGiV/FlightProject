@@ -1,7 +1,7 @@
 from django.db.models import Model
 from functools import wraps
 from inspect import isclass, getargs
-from .errors import WrongModelType
+from ..repository.errors import WrongModelType
 from .utils import ordinal
 
 def verify_model(func):
