@@ -47,7 +47,8 @@ def accepts(*types, throw: Exception = TypeError, model: bool = False):
 
             Raises:
                 throw: An exception received from the decorator. Defaults to TypeError.
-
+                ValueError: if an argument is missing
+                
             Returns:
                 The result of the decorated function.
             """
@@ -60,7 +61,12 @@ def accepts(*types, throw: Exception = TypeError, model: bool = False):
             # Make a new list of arguments including any that were missed
             arg_list = [*args]
             for arg_index in range(actual_arg_count, expected_arg_count):
+                if expected_args[arg_index] not in kwargs:
+                    continue
                 arg_list.append(kwargs[expected_args[arg_index]])
+            
+            if not expected_arg_count == len(arg_list):
+                raise ValueError("Missing a variable from the expected variables. Have you misspelleed/missed an argument?")
             
             skip_model = 1 if model else 0
             # Compare actual types with expected types
