@@ -117,7 +117,7 @@ class Repository():
     
     @staticmethod
     @log_action
-    @accepts(model=True)
+    @accepts(Iterable, model=True)
     def add_all(model: Type[Model], entry_list: Iterable[Dict]) -> List[Model]:
         """Add all rows to database
 
