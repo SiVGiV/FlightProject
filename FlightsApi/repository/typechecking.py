@@ -2,6 +2,7 @@ from django.db.models import Model
 from functools import wraps
 from inspect import isclass, getargs
 from .errors import WrongModelType
+from .utils import ordinal
 
 def verify_model(func):
     """A decorator to verify that the 1st argument passed to a function is of type Model
