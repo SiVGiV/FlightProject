@@ -312,6 +312,22 @@ class Repository():
     
     @staticmethod
     @log_action
+    @accepts(str)
+    def get_airlines_by_name(name: str) -> QuerySet[AirlineCompany]:
+        """Get all airlines whos name contains a str
+
+        Args:
+            name (str): A search string
+
+        Returns:
+            QuerySet[AirlineCompany]: A QuerySet of AirlineCompany objects
+        """
+        airlines = AirlineCompany.objects.filter(name__icontains=name)
+        return airlines.all()
+    
+    
+    @staticmethod
+    @log_action
     @accepts(int)
     def get_flights_by_origin(country_id: int) -> QuerySet[Flight]:
         """Get flights that take off from a certain country

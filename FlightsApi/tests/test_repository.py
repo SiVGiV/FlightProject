@@ -244,8 +244,8 @@ class TestQueries(TestCase):
         # Create airlines
         user3 = User.objects.create_user(username="airline1", email="user3@airline.com")
         user4 = User.objects.create_user(username="airline2", email="user4@airline.com")
-        airline1 = AirlineCompany.objects.create(name="", country=country1, user=user3)
-        airline2 = AirlineCompany.objects.create(name="", country=country2, user=user4)
+        airline1 = AirlineCompany.objects.create(name="Django Airlines", country=country1, user=user3)
+        airline2 = AirlineCompany.objects.create(name="React Airlines", country=country2, user=user4)
         self.testing_data['users'].extend((user3, user4,))
         self.testing_data['airlines'].extend((airline1, airline2,))
 
@@ -442,6 +442,26 @@ class TestQueries(TestCase):
             
         with self.subTest("TypeError @ country_id"):
             self.assertRaises(TypeError, lambda: Repository.get_airlines_by_country("err"))
+            
+ 
+    def test_get_airlines_by_name(self):
+        airlines = [self.testing_data['airlines'][0]]
+        
+        with self.subTest("Full search"):
+            result = [airline for airline in Repository.get_airlines_by_name("Django Airlines")]
+            self.assertListEqual(airlines, result)
+            
+        with self.subTest("Partial search"):
+            result = [airline for airline in Repository.get_airlines_by_name("django")]
+            self.assertListEqual(airlines, result)
+        
+        with self.subTest("Empty list"):
+            result = Repository.get_airlines_by_name("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            self.assertCountEqual([], result)
+            
+        with self.subTest("TypeError @ name"):
+            self.assertRaises(TypeError, lambda: Repository.get_airlines_by_name(False))
+            
             
     def test_get_flights_by_origin(self):
         country = self.testing_data['countries'][0]
