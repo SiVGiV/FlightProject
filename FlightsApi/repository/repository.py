@@ -1,5 +1,6 @@
 # Django imports
 from django.db.models import Model, QuerySet
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 # Local project imports
@@ -39,6 +40,13 @@ class Repository():
         
         # Get and return item by id
         return model.objects.filter(pk=id).first()
+    
+    @staticmethod
+    @log_action
+    @accepts(str)
+    def get_or_create_group(name: str): # TESTME
+        group = Group.objects.get_or_create(name=name)
+        return group
     
     @staticmethod
     @log_action
