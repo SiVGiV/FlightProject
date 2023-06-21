@@ -1,72 +1,14 @@
 from django.test import TestCase
-from unittest import TestCase as BasicTestCase
 
-from ..repository.repository import Repository
-from ..utils.typechecking import verify_model, accepts
-from ..repository.errors import FetchError, CreationError, UpdateError, WrongModelType
+from ..repository.repository import Repository, DBTables
+from ..repository.errors import *
+
+from ..utils.exceptions import IncorrectTypePassedToFunctionException
 from ..models import User, Admin, AirlineCompany, Customer, Country, Flight, Ticket
-
 
 from django.utils import timezone
 from datetime import timedelta, date
 
-
-class TestVerifyModel(BasicTestCase):
-    def test_model_class(self):
-        test_func = verify_model(lambda x: True)
-        self.assertTrue(test_func(User))
-    
-    def test_other_class(self):
-        test_func = verify_model(lambda x: True)
-        self.assertRaises(WrongModelType, lambda: test_func(int))
-    
-    def test_non_class(self):
-        test_func = verify_model(lambda x: True)
-        self.assertRaises(WrongModelType, lambda: test_func(1))
-
-
-class TestAccepts(BasicTestCase):
-    @staticmethod
-    @accepts(int, str, bool)
-    def dummy_func(integer, string, boolean):
-        if  (type(integer) is not int) or \
-            (type(string) is not str) or \
-            (type(boolean) is not bool):
-            return "Failure"
-        else:
-            return "Success"
-                    
-    def test_accepts_empty_variables(self):
-        @accepts()
-        def local_dummy():
-            return "Success"
-        self.assertEqual("Success", local_dummy())
-                    
-    def test_accepts_correct_types(self):
-        self.assertEqual("Success", self.dummy_func(1, "1", True))
-    
-    def test_accepts_blocked_variables(self):
-        with self.subTest("Bad int"):
-            self.assertRaises(TypeError, lambda: self.dummy_func("err", "1", True))
-        with self.subTest("Bad string"):
-            self.assertRaises(TypeError, lambda: self.dummy_func(1, 1, True))
-        with self.subTest("Bad bool"):
-            self.assertRaises(TypeError, lambda: self.dummy_func(1, "1", "err"))
-            
-    def test_accepts_kwarg_mix(self):
-        with self.subTest("Half kwargs"):
-            self.assertEqual("Success", self.dummy_func(1, "1", boolean=True))
-            self.assertRaises(TypeError, lambda: self.dummy_func("err", "1", boolean=True))
-            self.assertRaises(TypeError, lambda: self.dummy_func(1, "1", boolean="err"))
-        
-        with self.subTest("Only kwargs"):
-            self.assertEqual("Success", self.dummy_func(integer=1, string="1", boolean=True))
-            self.assertEqual("Success", self.dummy_func(integer=1, boolean=True, string="1")) # Shuffled
-            self.assertRaises(TypeError, lambda: self.dummy_func(integer="err", string="1", boolean=True))
-            self.assertRaises(TypeError, lambda: self.dummy_func(integer=1, string="1", boolean="err"))
-            self.assertRaises(TypeError, lambda: self.dummy_func(string="1", integer=1, boolean="err")) # Shuffled
-            
-            
 
 class TestGetById(TestCase):
     def test_get_by_id_success(self):
@@ -79,93 +21,101 @@ class TestGetById(TestCase):
             credit_card_number="1234 1234 1234 1234",
             user=user
         )
-        user.save()
-        customer.save()
         
         with self.subTest("User by ID"):
-            user_from_repo = Repository.get_by_id(User, user.id)
-            self.assertEqual(user_from_repo.id, user.id)
+            user_from_repo = Repository.get_by_id(DBTables.USER, user.id)
+            self.assertEqual(user_from_repo['id'], user.id)
         with self.subTest("Customer by ID"):
-            customer_from_repo = Repository.get_by_id(Customer, customer.id)
-            self.assertEqual(customer_from_repo.id, customer.id)
+            customer_from_repo = Repository.get_by_id(DBTables.CUSTOMER, customer.id)
+            self.assertEqual(customer_from_repo['id'], customer.id)
         
     def test_get_by_id_with_non_existing_id(self):
-        self.assertIsNone(Repository.get_by_id(AirlineCompany, 1))
+        self.assertDictEqual({}, Repository.get_by_id(DBTables.AIRLINECOMPANY, 1))
     
     def test_get_by_id_bad_id_type(self):
-        self.assertRaises(FetchError, lambda: Repository.get_by_id(User, "jeff"))
+        self.assertRaises(IncorrectTypePassedToFunctionException, lambda: Repository.get_by_id(DBTables.USER, "jeff"))
+    
+    def test_get_by_id_bad_model(self):
+        self.assertRaises(IncorrectTypePassedToFunctionException, lambda: Repository.get_by_id(User, 1))
     
     def test_get_by_id_bad_id_value(self):
-        self.assertRaises(FetchError, lambda: Repository.get_by_id(User, -1))
+        self.assertRaises(OutOfBoundsException, lambda: Repository.get_by_id(DBTables.USER, -1))
+        
+
     
     
 class TestGetAll(TestCase):
     def test_get_all_success(self):
         users = []
         with self.subTest("Empty database"):
-            self.assertCountEqual(users, Repository.get_all(User))
+            self.assertEqual(len(users), len(Repository.get_all(DBTables.USER)))
             
         user1 = User.objects.create_user("testUser1", "test1@a.com", "test1234")
-        user1.save()
         users.append(user1)
         with self.subTest("Single entry"):
-            self.assertCountEqual(users, Repository.get_all(User))
-            self.assertEqual(user1.pk, Repository.get_all(User)[0].pk) # Check content of an entry
+            repo_result = Repository.get_all(DBTables.USER)
+            self.assertEqual(len(users), len(repo_result))
+            self.assertEqual(user1.pk, repo_result[0]['id']) # Check content of an entry
             
         user2 = User.objects.create_user("testUser2", "test2@a.com", "test2345")
-        user2.save()
         users.append(user2)
         with self.subTest("Multiple Entries"):
-            self.assertCountEqual(users, Repository.get_all(User))
+            self.assertEqual(len(users), len(Repository.get_all(DBTables.USER)))
     
 
 class TestAdd(TestCase):
     def test_add_success(self):
         user = None
         with self.subTest("User creation"):
-            user = Repository.add(User,
-                                  username="testUser",
-                                  email="test@a.com",
-                                  password="test1234")
-            self.assertEqual(user.username, "testUser")
+            user = Repository.add( 
+                DBTables.USER,
+                username="testUser",
+                email="test@a.com",
+                password="test1234"
+            )[0]
+            self.assertEqual(user['username'], "testUser")
         with self.subTest("Customer creation"):
-            customer = Repository.add(Customer,
-                                      first_name="testy",
-                                      last_name="testson",
-                                      address="123 test st.",
-                                      phone_number="+972 1231212",
-                                      credit_card_number="1234 1234 1234 1234",
-                                      user=user
-            )
-            self.assertEqual(customer.first_name, "testy")
+            customer = Repository.add(
+                DBTables.CUSTOMER,
+                first_name="testy",
+                last_name="testson",
+                address="123 test st.",
+                phone_number="+972 1231212",
+                credit_card_number="1234 1234 1234 1234",
+                user=user['id']
+            )[0]
+            self.assertEqual(customer['first_name'], "testy")
             
     def test_bad_data(self):
         with self.subTest("Missing Fields"):
-            self.assertRaises(CreationError, lambda: Repository.add(User, email="a@a.com", password="test123"))
+            self.assertEqual(False, Repository.add(DBTables.USER, email="a@a.com", password="test123")[1])
         with self.subTest("Wrong field type"):
-            self.assertRaises(CreationError, lambda: Repository.add(Admin, first_name="admin", last_name="admin", user="bad field"))
+            self.assertEqual(False, Repository.add(DBTables.ADMIN, first_name="admin", last_name="admin", user="bad field")[1])
 
 
 class TestUpdate(TestCase):
     def test_update_success(self):
         user = User.objects.create_user("test", "a@a.com", "1234")
-        Repository.update(User, user.id, email="b@b.com")
-        updated_user = User.objects.get(pk=user.id)
+        repo_result = Repository.update(DBTables.USER, user.id, email="b@b.com")
+        updated_user = User.objects.get(id=user.id)
         self.assertEqual(updated_user.email, "b@b.com")
+        self.assertEqual(repo_result[0]['email'], "b@b.com")
 
     def test_update_non_existing_id(self):
-        self.assertRaises(FetchError, lambda: Repository.update(User, 1, email="b@b.com"))
+        self.assertRaises(FetchError, lambda: Repository.update(DBTables.USER, 1, email="b@b.com"))
         
     def test_update_no_fields(self):
         user = User.objects.create_user("test", "a@a.com", "1234")
-        self.assertEqual(user.username, Repository.update(User, user.id).username)
+        self.assertEqual(user.username, Repository.update(DBTables.USER, user.id)[0]['username'])
         
     def test_update_attribute_errors(self):
         user = User.objects.create_user("test", "a@a.com", "1234")
         with self.subTest("Non existing attribute"):
-            self.assertRaises(UpdateError, lambda: Repository.update(User, user.id, fakefield="fakevalue"))
+            repo_result = Repository.update(DBTables.USER, user.id, fakefield="fakevalue")
+            self.assertEqual(True, repo_result[1])
         with self.subTest("Bad type"):
-            self.assertRaises(UpdateError, lambda: Repository.update(User, user.id, is_active="not bool"))
+            repo_result = Repository.update(DBTables.USER, user.id, is_active="not bool")
+            self.assertEqual(False, repo_result[1])
 
 
 class TestAddAll(TestCase):
@@ -174,30 +124,42 @@ class TestAddAll(TestCase):
             {'username': "test1", 'email': "a@a.com", 'password': "test1"},
             {'username': "test2", 'email': "b@b.com", 'password': "test2"}
         ]
-        self.assertEqual(2, len(Repository.add_all(User, new_rows)))
+        repo_result = Repository.add_all(DBTables.USER, new_rows)
+        with self.subTest("Successfully added"):
+            self.assertEqual(2, len(repo_result[0]))
+        with self.subTest("Failed addition"):
+            self.assertEqual(0, len(repo_result[1]))
     
     def test_add_some_successful(self):
         new_rows = [
             {'username': "test1", 'email': "a@a.com", 'password': "test1"},
             {'email': "b@b.com", 'password': "test2"},
         ]
-        self.assertEqual(1, len(Repository.add_all(User, new_rows)))
+        repo_result = Repository.add_all(DBTables.USER, new_rows)
+        with self.subTest("Successfully added"):
+            self.assertEqual(1, len(repo_result[0]))
+        with self.subTest("Failed addition"): 
+            self.assertEqual(1, len(repo_result[1]))
         
     
     def test_add_all_empty(self):
-        self.assertEqual(0, len(Repository.add_all(User, [])))
+        repo_result = Repository.add_all(DBTables.USER, [{},{}])
+        with self.subTest("Successfully added"):
+            self.assertEqual(0, len(repo_result[0]))
+        with self.subTest("Failed addition"):
+            self.assertEqual(2, len(repo_result[1]))
 
 
 class TestRemove(TestCase):
     def test_remove_success(self):
         user = User.objects.create_user("test1", "a@a.com", "1234")
         id = user.id
-        Repository.remove(User, id)
+        Repository.remove(DBTables.USER, id)
         self.assertEqual(0, len(User.objects.filter(pk=id)))
         
     def test_remove_non_existing(self):
         try:
-            Repository.remove(User, 1)
+            Repository.remove(DBTables.USER, 1)
         except Exception as e:
             self.fail("Repository.remove() did not complete!")
 
@@ -284,11 +246,11 @@ class TestQueries(TestCase):
             airline_from_repo = Repository.get_airline_by_username(airline_username)
             self.assertEqual(
                 airline_id,
-                airline_from_repo.id
+                airline_from_repo[0]['id']
             )
         
         with self.subTest("Empty result"):
-            self.assertIsNone(Repository.get_airline_by_username("NonExistent"))
+            self.assertFalse(Repository.get_airline_by_username("NonExistent")[1])
             
         with self.subTest("Wrong type"):
             self.assertRaises(TypeError, lambda: Repository.get_airline_by_username(-1))
@@ -302,11 +264,11 @@ class TestQueries(TestCase):
             customer_from_repo = Repository.get_customer_by_username(customer_username)
             self.assertEqual(
                 customer_id,
-                customer_from_repo.id
+                customer_from_repo[0]['id']
             )
         
         with self.subTest("Empty result"):
-            self.assertIsNone(Repository.get_customer_by_username("NonExistent"))
+            self.assertFalse(Repository.get_customer_by_username("NonExistent")[1])
             
         with self.subTest("Wrong Type"):
             self.assertRaises(TypeError, lambda: Repository.get_customer_by_username(-1))
@@ -319,11 +281,11 @@ class TestQueries(TestCase):
             user_from_repo = Repository.get_user_by_username(user_username)
             self.assertEqual(
                 user_id,
-                user_from_repo.id
+                user_from_repo[0]['id']
             )
         
         with self.subTest("Empty result"):
-            self.assertIsNone(Repository.get_user_by_username("NonExistent"))
+            self.assertFalse(Repository.get_user_by_username("NonExistent")[1])
             
         with self.subTest("Wrong type"):
             self.assertRaises(TypeError, lambda: Repository.get_user_by_username(-1))
@@ -340,7 +302,7 @@ class TestQueries(TestCase):
                 destination_country_id=destination.id,
                 date=origin_datetime.date()
             )
-            self.assertEqual(flight.id, result.first().id)
+            self.assertEqual(flight.id, result[0]['id'])
                 
         with self.subTest("Empty result"):
             result = Repository.get_flights_by_parameters(
@@ -362,11 +324,12 @@ class TestQueries(TestCase):
     def test_get_flights_by_airline_id(self):
         airline = self.testing_data['airlines'][0]
         flight_list = [flight for flight in airline.flights.all()]
+        flight_ids = [flight.id for flight in flight_list]
         
         with self.subTest("Success"):
             result = Repository.get_flights_by_airline_id(airline.id)
-            result_list = [flight for flight in result]
-            self.assertListEqual(flight_list, result_list)
+            result_ids = [flight['id'] for flight in result]
+            self.assertListEqual(flight_ids, result_ids)
         
         with self.subTest("Empty result"):
             result = Repository.get_flights_by_airline_id(999)
@@ -377,17 +340,21 @@ class TestQueries(TestCase):
         
     def test_get_arrival_flights(self):
         soon_flight = self.testing_data['flights'][0] # This flight arrives in 2 hours
+        soon_flight_id = self.testing_data['flights'][0].id
         soon_country_id = soon_flight.destination_country.id
         
         not_soon_flight = self.testing_data['flights'][1] # This flight arrives in a week
+        not_soon_flight_id = self.testing_data['flights'][1].id
         not_soon_country_id = not_soon_flight.destination_country.id
 
         with self.subTest("Success"):
-            self.assertIn(soon_flight, Repository.get_arrival_flights(soon_country_id))
+            results = Repository.get_arrival_flights(soon_country_id)
+            self.assertIn(soon_flight_id, [flight['id'] for flight in results])
         
         with self.subTest("Empty result"):
+            results = Repository.get_arrival_flights(soon_country_id)
             self.assertNotIn(
-                not_soon_flight,
+                not_soon_flight_id,
                 Repository.get_arrival_flights(not_soon_country_id)    
             )
             
@@ -396,18 +363,22 @@ class TestQueries(TestCase):
     
     def test_get_departure_flights(self):
         soon_flight = self.testing_data['flights'][0] # This flight leaves in an hour
+        soon_flight_id = soon_flight.id
         soon_country_id = soon_flight.origin_country.id
         
         not_soon_flight = self.testing_data['flights'][1] # This flight leaves in a week
+        not_soon_flight_id = not_soon_flight.id
         not_soon_country_id = not_soon_flight.origin_country.id
 
         with self.subTest("Success"):
-            self.assertIn(soon_flight, Repository.get_departure_flights(soon_country_id))
+            results = Repository.get_departure_flights(soon_country_id)
+            self.assertIn(soon_flight_id, [flight['id'] for flight in results])
         
         with self.subTest("Empty result"):
+            results = Repository.get_departure_flights(not_soon_country_id)
             self.assertNotIn(
-                not_soon_flight,
-                Repository.get_departure_flights(not_soon_country_id)    
+                not_soon_flight_id,
+                [flight['id'] for flight in results]
             )
             
         with self.subTest("TypeError @ country_id"):
@@ -415,10 +386,10 @@ class TestQueries(TestCase):
     
     def test_get_tickets_by_customer(self):
         customer = self.testing_data['customers'][0]
-        customer_tickets = [ticket for ticket in customer.tickets.all()]
+        customer_tickets = [ticket.id for ticket in customer.tickets.all()]
         
         with self.subTest("Success"):
-            result = [ticket for ticket in Repository.get_tickets_by_customer(customer.id)]
+            result = [ticket['id'] for ticket in Repository.get_tickets_by_customer(customer.id)]
             self.assertListEqual(customer_tickets, result)
         
         with self.subTest("Empty list"):
@@ -430,10 +401,10 @@ class TestQueries(TestCase):
             
     def test_get_airlines_by_country(self):
         country = self.testing_data['countries'][0]
-        airlines = [airline for airline in country.airlines.all()]
+        airlines = [airline.id for airline in country.airlines.all()]
         
         with self.subTest("Success"):
-            result = [airline for airline in Repository.get_airlines_by_country(country.id)]
+            result = [airline['id'] for airline in Repository.get_airlines_by_country(country.id)]
             self.assertListEqual(airlines, result)
         
         with self.subTest("Empty list"):
@@ -443,16 +414,15 @@ class TestQueries(TestCase):
         with self.subTest("TypeError @ country_id"):
             self.assertRaises(TypeError, lambda: Repository.get_airlines_by_country("err"))
             
- 
     def test_get_airlines_by_name(self):
-        airlines = [self.testing_data['airlines'][0]]
+        airlines = [self.testing_data['airlines'][0].id]
         
         with self.subTest("Full search"):
-            result = [airline for airline in Repository.get_airlines_by_name("Django Airlines")]
+            result = [airline['id'] for airline in Repository.get_airlines_by_name("Django Airlines")]
             self.assertListEqual(airlines, result)
             
         with self.subTest("Partial search"):
-            result = [airline for airline in Repository.get_airlines_by_name("django")]
+            result = [airline['id'] for airline in Repository.get_airlines_by_name("django")]
             self.assertListEqual(airlines, result)
         
         with self.subTest("Empty list"):
@@ -465,26 +435,26 @@ class TestQueries(TestCase):
             
     def test_get_flights_by_origin(self):
         country = self.testing_data['countries'][0]
-        flights = [flight for flight in country.origin_flights.all()]
+        flights = [flight.id for flight in country.origin_flights.all()]
         
         with self.subTest("Success"):
-            result = [flight for flight in Repository.get_flights_by_origin(country.id)]
-            self.assertListEqual(flights, result)
+            results = [flight['id'] for flight in Repository.get_flights_by_origin(country.id)]
+            self.assertListEqual(flights, results)
         
         with self.subTest("Empty list"):
-            result = Repository.get_flights_by_origin(999)
-            self.assertCountEqual([], result)
+            results = Repository.get_flights_by_origin(999)
+            self.assertCountEqual([], results)
             
         with self.subTest("TypeError @ country_id"):
             self.assertRaises(TypeError, lambda: Repository.get_flights_by_origin("err"))
             
     def test_get_flights_by_destination(self):
         country = self.testing_data['countries'][0]
-        flights = [flight for flight in country.destination_flights.all()]
+        flights = [flight.id for flight in country.destination_flights.all()]
         
         with self.subTest("Success"):
-            result = [flight for flight in Repository.get_flights_by_destination(country.id)]
-            self.assertListEqual(flights, result)
+            results = [flight['id'] for flight in Repository.get_flights_by_destination(country.id)]
+            self.assertListEqual(flights, results)
         
         with self.subTest("Empty list"):
             result = Repository.get_flights_by_destination(999)
@@ -495,26 +465,28 @@ class TestQueries(TestCase):
     
     def test_get_flights_by_departure_date(self):
         flight = self.testing_data['flights'][0]
+        flight_id = flight.id
         departure_date = flight.departure_datetime.date()
         
         with self.subTest("Success"):
-            result = Repository.get_flights_by_departure_date(departure_date)
-            self.assertIn(flight, result)
+            results = [flight['id'] for flight in Repository.get_flights_by_departure_date(departure_date)]
+            self.assertIn(flight_id, results)
         
         with self.subTest("Empty list"):
-            result = Repository.get_flights_by_departure_date(date(2000, 1, 1))
-            self.assertCountEqual([], result)
+            results = Repository.get_flights_by_departure_date(date(2000, 1, 1))
+            self.assertCountEqual([], results)
             
         with self.subTest("TypeError @ country_id"):
             self.assertRaises(TypeError, lambda: Repository.get_flights_by_departure_date("err"))  
     
     def test_get_flights_by_arrival_date(self):
         flight = self.testing_data['flights'][0]
+        flight_id = flight.id 
         arrival_date = flight.arrival_datetime.date()
         
         with self.subTest("Success"):
-            result = Repository.get_flights_by_arrival_date(arrival_date)
-            self.assertIn(flight, result)
+            results = [flight['id'] for flight in Repository.get_flights_by_arrival_date(arrival_date)]
+            self.assertIn(flight_id, results)
         
         with self.subTest("Empty list"):
             result = Repository.get_flights_by_arrival_date(date(2000, 1, 1))
@@ -527,15 +499,16 @@ class TestQueries(TestCase):
         ticket = self.testing_data['tickets'][0]
         customer_id = ticket.customer.id
         flight = ticket.flight
+        flight_id = flight.id
         
         with self.subTest("Success"):
-            result = Repository.get_flights_by_customer(customer_id)
-            self.assertIn(flight, result)
+            result = [flight['id'] for flight in Repository.get_flights_by_customer(customer_id)]
+            self.assertIn(flight_id, result)
         
         with self.subTest("Empty list"):
             result = Repository.get_flights_by_customer(999)
             self.assertCountEqual([], result)
             
         with self.subTest("TypeError @ country_id"):
-            self.assertRaises(TypeError, lambda: Repository.get_flights_by_customer("err"))  
+            self.assertRaises(TypeError, lambda: Repository.get_flights_by_customer("err"))
     

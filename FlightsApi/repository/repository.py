@@ -1,102 +1,201 @@
+# Python builtins
+import logging
+from datetime import timedelta
+from datetime import date as Date
+from typing import Type, Iterable, Union, List, Dict, Tuple
+from enum import Enum, unique
+
 # Django imports
 from django.db.models import Model, QuerySet
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-# Local project imports
+
+# [L] Models
 from ..models import Country, User,\
-                   AirlineCompany, Customer, Flight, Ticket
+                    Admin, AirlineCompany, Customer, \
+                    Flight, Ticket
+
+# [L] Repository
+from .serializers import CountrySerializer, UserSerializer,\
+                        AdminSerializer, AirlineCompanySerializer, CustomerSerializer, \
+                        FlightSerializer, TicketSerializer, GroupSerializer
 from .errors import *
+
+# [L] Utilities
 from ..utils import accepts, log_action
-# Date related imports
-from datetime import timedelta
-from datetime import date as Date
-# Python builtin imports
-import logging
-from typing import Type, Iterable, Union, List, Dict
+
+@unique
+class DBTables(Enum):
+    """
+    A Class representing a table in the repository:
+    
+    Country=0, User=1, Group=2, Admin=3, AirlineCompany=4, Customer=5, Flight=6, Ticket=7
+    """
+    COUNTRY = 0
+    USER = 1
+    GROUP = 2
+    ADMIN = 3
+    AIRLINECOMPANY = 4
+    CUSTOMER = 5
+    FLIGHT = 6
+    TICKET = 7
+    
+    @property
+    def model(self):
+        match (self.value):
+            case DBTables.COUNTRY.value:
+                return Country
+            case DBTables.USER.value:
+                return User
+            case DBTables.GROUP.value:
+                return Group
+            case DBTables.ADMIN.value:
+                return Admin
+            case DBTables.AIRLINECOMPANY.value:
+                return AirlineCompany
+            case DBTables.CUSTOMER.value:
+                return Customer
+            case DBTables.FLIGHT.value:
+                return Flight
+            case DBTables.TICKET.value:
+                return Ticket
+            case other:
+                message = f"Model could not be found for {self.name}."
+                logger.error(message)
+                raise NotFoundModelOrSerializerException(message)
+            
+    @property
+    def serializer(self):
+        match (self.value):
+            case DBTables.COUNTRY.value:
+                return CountrySerializer
+            case DBTables.USER.value:
+                return UserSerializer
+            case DBTables.GROUP.value:
+                return GroupSerializer
+            case DBTables.ADMIN.value:
+                return AdminSerializer
+            case DBTables.AIRLINECOMPANY.value:
+                return AirlineCompanySerializer
+            case DBTables.CUSTOMER.value:
+                return CustomerSerializer
+            case DBTables.FLIGHT.value:
+                return FlightSerializer
+            case DBTables.TICKET.value:
+                return TicketSerializer
+            case other:
+                message = f"Serializer could not be found for {self.name}."
+                logger.error(message)
+                raise NotFoundModelOrSerializerException(message)
+    
+    @staticmethod
+    @accepts(str)
+    def from_string(input: str):
+        if input.isdecimal():
+            try:
+                return DBTables(int(input))
+            except ValueError:
+                message = f"No table found with the value '{input}'."
+                logger.error(message, exc_info=True)
+                raise DBTAbleDoesNotExistException(message)
+        elif input.isascii() and input.isalpha():
+            try:
+                return DBTables[input.upper()]
+            except (ValueError, KeyError):
+                message = f"No table found named '{input}'."
+                logger.error(message, exc_info=True)
+                raise DBTAbleDoesNotExistException(message)
+        else:
+            message = f"Cannot convert '{input}' to a DBTables object."
+            logger.warning(message)
+            raise UnacceptableInput(message)
+
 
 logger = logging.getLogger()
 
 class Repository():
     @staticmethod
     @log_action
-    @accepts(int, model=True, throw=FetchError)
-    def get_by_id(model: Type[Model], id: int) -> Union[Model, None]:
+    @accepts(DBTables, int)
+    def get_by_id(dbtable: DBTables, id: int) -> Union[Model, None]:
         """Get item of type model by id
 
         Args:
-            model (type[models.Model]): Model to get row from
+            dbtable (DBTables): A DBTables objects corresponding with the right table/model
             id (int): id of the row to get
 
         Returns:
-            Model object: An item or None if not found
+            Dict: A serialized dictionary of the row
         
         Raises:
-            FetchError for bad ID values
+            OutOfBoundsException for bad ID values
         """
         # Validate arguments
-        if id < 0:
-            raise FetchError("id must be larger or equal to 0")
+        if id <= 0:
+            raise OutOfBoundsException("ID must be larger than 0.")
         
         # Get and return item by id
-        return model.objects.filter(pk=id).first()
-    
+        query = dbtable.model.objects.filter(pk=id).first()
+        if query:
+            result = dbtable.serializer(query).data
+            if result:
+                return result
+        return {}
+
     @staticmethod
     @log_action
     @accepts(str)
-    def get_or_create_group(name: str): # TESTME
+    def get_or_create_group(name: str): # DOCME Docstring
         group = Group.objects.get_or_create(name=name)
-        return group
+        return DBTables.GROUP.serializer(group).data
     
     @staticmethod
     @log_action
-    @accepts(model=True, throw=FetchError)
-    def get_all(model: Type[Model]) -> QuerySet[Model]:
-        """Get all rows from certain model
+    @accepts(DBTables)
+    def get_all(dbtable: DBTables) -> List[Dict]:
+        """Get all rows from certain table
 
         Args:
-            model (type[Model]): The model to fetch rows from
+            dbtable (DBTables): A DBTables objects corresponding with the right table/model
+
 
         Returns:
-            list: All rows from model
+            list[dict]: List of all serialized rows from model
         """
-        return model.objects.all()
+        all_objects = dbtable.model.objects.all()
+        result = [dbtable.serializer(obj).data for obj in all_objects]
+        return result
 
     @staticmethod
     @log_action
-    @accepts(model=True, throw=CreationError)
-    def add(model: Type[Model], **fields) -> Model:
-        """Creates and saves an object of the passed model
+    @accepts(DBTables)
+    def add(dbtable: DBTables, **fields) -> Tuple[Dict, bool]: # DOCME
+        """Creates and saves an object
 
         Args:
-            model (Type[Model]): Model subclass to use for creation
-
-        Raises:
-            CreationError: If encounters an error during creation of object
+            dbtable (DBTables): A DBTables objects corresponding with the right table/model
 
         Returns:
-            Model: Created object
+            Tuple[Dict, bool]: (Result, Success), 'Result' being a dictionary of the instance
         """
         # Try creating the object - expects failure if a field has a mismatching type or value
-        new_obj = None
-        try:
-            if model == User:
-                # Use the .create_user() function for creating users (hashes passwords)
-                new_obj = model.objects.create_user(**fields)
-            else:
-                new_obj = model.objects.create(**fields)
-        except (ValueError, TypeError, ValidationError) as e:
-            raise CreationError(e)
-        return new_obj
+        deserialized_data = dbtable.serializer(data=fields)
+        if deserialized_data.is_valid():
+            new_obj = deserialized_data.save()
+            return dbtable.serializer(new_obj).data, True
+        else:
+            errors = deserialized_data.errors
+            return errors, False
     
     @staticmethod
     @log_action
-    @accepts(int, model=True, throw=UpdateError)
-    def update(model: Type[Model], id: int, **updated_values) -> Model:
+    @accepts(DBTables, int)
+    def update(dbtable: DBTables, id: int, **updated_values) -> Dict: # DOCME
         """Update row from model with new data
 
         Args:
-            model (type[Model]): Model to update a row in
+            model (DBTables): Model to update a row in
             id (int): id of row to update
         KWArgs:
             Any updated values
@@ -105,28 +204,22 @@ class Repository():
             FetchError for not found rows
         """
         # Get the item
-        item = Repository.get_by_id(model, id)
-        if not item:
-            raise FetchError("Failed to find an item of model with ID #%i" % id)
+        instance = dbtable.model.objects.filter(id=id).first()
+        if not instance:
+            raise FetchError(f"Failed to find an instance of '{dbtable.name}' with ID #{id}")
         
-        # Update the item's attributes
-        for field, value in updated_values.items():
-            if hasattr(item, field):
-                    setattr(item, field, value)
-            else:
-                raise UpdateError("Attempted to edit a non existing attribute '%s'." % field)
-        
-        # Try to save - this is usually where problems come up (database type validation happens at this stage)
-        try:
-            item.save()
-        except (ValueError, TypeError, ValidationError) as e:
-            raise UpdateError("Attempted to set attribute to bad data type/value", e)
-        return item
+        deserialized_data = dbtable.serializer(instance=instance, data=updated_values, partial=True)
+        if deserialized_data.is_valid():
+            new_obj = deserialized_data.save()
+            return dbtable.serializer(new_obj).data, True
+        else:
+            errors = deserialized_data.errors
+            return errors, False
     
     @staticmethod
     @log_action
-    @accepts(Iterable, model=True)
-    def add_all(model: Type[Model], entry_list: Iterable[Dict]) -> List[Model]:
+    @accepts(DBTables)
+    def add_all(dbtable: DBTables, entry_list: Iterable[Dict]) -> Tuple[List[Dict], List[Dict]]: # DOCME
         """Add all rows to database
 
         Args:
@@ -136,21 +229,23 @@ class Repository():
         Returns:
             list of Model objects that were added 
             It is recommended to check if the returned length is the same as the passed length
+            # DOCME Add documentation for failed
         """
         created = []
+        failed = []
         for fields in entry_list:
-            try:
-                # Only appends the successful additions
-                created.append(Repository.add(model, **fields))
-            except CreationError as e:
-                logger.warning("Failed object creation.\n", exc_info=e)
+            new_instance = Repository.add(dbtable, **fields)
+            if new_instance[1]:
+                created.append(new_instance[0])
+            else:
+                failed.append((fields, new_instance[0]))
         # Return all created objects
-        return created
+        return created, failed
     
     @staticmethod
     @log_action
-    @accepts(int, model=True)
-    def remove(model: Type[Model], id: int) -> None:
+    @accepts(DBTables, int)
+    def remove(dbtable: DBTables, id: int) -> bool: # DOCME
         """Remove a row from the database
 
         Args:
@@ -158,20 +253,23 @@ class Repository():
             id (int): The id of the row to remove
         """
         # Get the item
-        try:
-            item_to_remove = Repository.get_by_id(model, id)
-        except FetchError as e:
-            logger.warning("Couldn't fetch item to delete.", exc_info=e)
-            item_to_remove = None
+        instance = dbtable.model.objects.filter(id=id).first()
             
         # If an item was found, delete it
-        if item_to_remove:
-            item_to_remove.delete()
-    
+        if instance:
+            deleted = instance.delete()
+            if deleted[0] > 0:
+                return True
+            else:
+                return False
+        else:
+            return False
+            
+        
     @staticmethod
     @log_action
     @accepts(str)
-    def get_airline_by_username(username: str) -> Union[AirlineCompany, None]:
+    def get_airline_by_username(username: str) -> Tuple[Dict, bool]: # TESTME # DOCME
         """Get an AirlineCompany from its username
 
         Args:
@@ -181,12 +279,15 @@ class Repository():
             AirlineCompany, None: An AirlineCompany object if found, otherwise None
         """
         airline = AirlineCompany.objects.filter(user__username=username).first()
-        return airline or None
+        if airline:
+            return DBTables.AIRLINECOMPANY.serializer(instance=airline).data, True
+        else:
+            return {}, False
     
     @staticmethod
     @log_action
     @accepts(str)
-    def get_customer_by_username(username: str) -> Union[Customer, None]:
+    def get_customer_by_username(username: str) -> Union[Customer, None]: # TESTME # DOCME
         """Get a Customer from its username
 
         Args:
@@ -196,12 +297,15 @@ class Repository():
             Customer, None: A Customer object if found, otherwise None
         """
         customer = Customer.objects.filter(user__username=username).first()
-        return customer or None
+        if customer:
+            return DBTables.CUSTOMER.serializer(instance=customer).data, True
+        else:
+            return {}, False
     
     @staticmethod
     @log_action
     @accepts(str)
-    def get_user_by_username(username: str) -> Union[User, None]:
+    def get_user_by_username(username: str) -> Union[User, None]: # TESTME # DOCME
         """Get a user from its username
 
         Args:
@@ -211,7 +315,10 @@ class Repository():
             User: A User model object (or None)
         """
         user = User.objects.filter(username=username).first()
-        return user or None
+        if user:
+            return DBTables.USER.serializer(instance=user).data, True
+        else:
+            return {}, False
     
     @staticmethod
     @log_action
@@ -231,10 +338,11 @@ class Repository():
         query = Flight.objects.filter(origin_country__id=origin_country_id)
         # Of those flights, get the ones that go to destination_country
         query = query.filter(destination_country__id = destination_country_id)
-        # Finally, of those fflights get any that depart on the specified date
+        # Finally, of those flights get any that depart on the specified date
         query = query.filter(departure_datetime__date = date)
         
-        return query.all()
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -248,8 +356,10 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet manager containing flights owned by the airline
         """
-        flights = Flight.objects.filter(airline__pk=airline_id)
-        return flights.all()
+        query = Flight.objects.filter(airline__pk=airline_id)
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -266,7 +376,9 @@ class Repository():
         query = Flight.objects.filter(destination_country__id=country_id)
         query = query.filter(arrival_datetime__gte=timezone.now())
         query = query.filter(arrival_datetime__lte=timezone.now() + timedelta(hours=12))
-        return query.all()
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -286,7 +398,9 @@ class Repository():
         query = Flight.objects.filter(origin_country__id=country_id)
         query = query.filter(departure_datetime__gte=timezone.now())
         query = query.filter(departure_datetime__lte=timezone.now() + timedelta(hours=12))
-        return query.all()
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -300,8 +414,10 @@ class Repository():
         Returns:
             QuerySet[Ticket]: Collection of tickets
         """
-        tickets = Ticket.objects.filter(customer__id=customer_id)
-        return tickets.all()
+        query = Ticket.objects.filter(customer__id=customer_id)
+        
+        tickets = [DBTables.TICKET.serializer(ticket).data for ticket in query.all()]
+        return tickets
     
     @staticmethod
     @log_action
@@ -315,8 +431,10 @@ class Repository():
         Returns:
             QuerySet[AirlineCompany]: A QuerySet of AirlineCompany objects
         """
-        airlines = AirlineCompany.objects.filter(country__id=country_id)
-        return airlines.all()
+        query = AirlineCompany.objects.filter(country__id=country_id)
+        
+        airlines = [DBTables.AIRLINECOMPANY.serializer(airline).data for airline in query.all()]
+        return airlines
     
     @staticmethod
     @log_action
@@ -330,8 +448,10 @@ class Repository():
         Returns:
             QuerySet[AirlineCompany]: A QuerySet of AirlineCompany objects
         """
-        airlines = AirlineCompany.objects.filter(name__icontains=name)
-        return airlines.all()
+        query = AirlineCompany.objects.filter(name__icontains=name)
+        
+        airlines = [DBTables.AIRLINECOMPANY.serializer(airline).data for airline in query.all()]
+        return airlines
     
     
     @staticmethod
@@ -346,8 +466,10 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
-        results = Flight.objects.filter(origin_country__id=country_id)
-        return results.all()
+        query = Flight.objects.filter(origin_country__id=country_id)
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -361,8 +483,10 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
-        results = Flight.objects.filter(destination_country__id=country_id)
-        return results.all()
+        query = Flight.objects.filter(destination_country__id=country_id)
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -376,8 +500,10 @@ class Repository():
         Returns:
             QuerySet[Flight]: QuerySet of Flight objects
         """
-        flights = Flight.objects.filter(departure_datetime__date=date)
-        return flights.all()
+        query = Flight.objects.filter(departure_datetime__date=date)
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -391,8 +517,10 @@ class Repository():
         Returns:
             QuerySet[Flight]: QuerySet of Flight objects
         """
-        flights = Flight.objects.filter(arrival_datetime__date=date)
-        return flights.all()
+        query = Flight.objects.filter(arrival_datetime__date=date)
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
     
     @staticmethod
     @log_action
@@ -406,5 +534,7 @@ class Repository():
         Returns:
             QuerySet[Flight]: A QuerySet of Flight objects
         """
-        flights = Flight.objects.filter(tickets__customer__id=customer_id)
-        return flights.all()
+        query = Flight.objects.filter(tickets__customer__id=customer_id)
+        
+        flights = [DBTables.FLIGHT.serializer(flight).data for flight in query.all()]
+        return flights
