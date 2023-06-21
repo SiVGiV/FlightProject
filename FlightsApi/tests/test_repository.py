@@ -256,7 +256,7 @@ class TestQueries(TestCase):
             destination_country=country2,
             departure_datetime=timezone.now() + timedelta(hours=1),
             arrival_datetime=timezone.now() + timedelta(hours=2),
-            remaining_seats=1
+            total_seats=1
         )
         flight2 = Flight.objects.create(
             airline=airline2,
@@ -264,7 +264,7 @@ class TestQueries(TestCase):
             destination_country=country1,
             departure_datetime=timezone.now() + timedelta(weeks=1),
             arrival_datetime=timezone.now() + timedelta(weeks=1, days=1),
-            remaining_seats=1
+            total_seats=1
         )
         self.testing_data['flights'].extend((flight1, flight2,))
         

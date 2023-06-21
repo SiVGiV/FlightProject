@@ -102,7 +102,8 @@ class Flight(models.Model):
     destination_country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='destination_flights')
     departure_datetime = models.DateTimeField()
     arrival_datetime = models.DateTimeField()
-    remaining_seats = models.IntegerField()
+    total_seats = models.IntegerField()
+    is_canceled = models.BooleanField(default=False)
     
     def __repr__(self) -> str:
         return f"<Flight #{self.pk}: {self.origin_country}->{self.destination_country} @ {self.departure_datetime}>"
@@ -115,6 +116,7 @@ class Ticket(models.Model):
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name='tickets')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tickets')
     seat_count = models.IntegerField()
+    is_canceled = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('flight', 'customer',)
