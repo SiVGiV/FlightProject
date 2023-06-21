@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 logger = logging.getLogger(__name__)
 
 def ordinal(n: int):
@@ -23,6 +24,7 @@ def log_action(func):
     Args:
         func (function): A function to decorate
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         logger.debug(f"Called {func.__name__} @ {__name__}")
         res = func(*args, **kwargs)
