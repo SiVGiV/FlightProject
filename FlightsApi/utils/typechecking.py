@@ -4,7 +4,9 @@ from .exceptions import IncorrectTypePassedToFunctionException
 from .utils import ordinal
 
 def accepts(*types, throw: Exception = IncorrectTypePassedToFunctionException):
-    """Adds a layer of type checking to a function. Expects as arguments the types of the decorated function's arguments.
+    """
+    Adds a layer of type checking to a function.
+    Expects as arguments the types of the decorated function's arguments - do not include kwarg types or args with a default value.
 
     Args:
         *types: The types expected by the function (In identical order)
@@ -36,9 +38,6 @@ def accepts(*types, throw: Exception = IncorrectTypePassedToFunctionException):
             for arg_index in range(actual_arg_count, expected_arg_count):
                 if expected_args[arg_index] in kwargs:
                     arg_list.append(kwargs[expected_args[arg_index]])
-            
-            if not expected_arg_count == len(arg_list):
-                raise ValueError("Missing a variable from the expected variables. Have you misspelleed/forgot to pass an argument?")
             
             # Compare actual types with expected types
             for type_index in range(len(types)):
