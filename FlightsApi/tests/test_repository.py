@@ -42,8 +42,6 @@ class TestGetById(TestCase):
         self.assertRaises(OutOfBoundsException, lambda: Repository.get_by_id(DBTables.USER, -1))
         
 
-    
-    
 class TestGetAll(TestCase):
     def test_get_all_success(self):
         users = []
