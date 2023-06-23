@@ -59,6 +59,14 @@ class TestGetAll(TestCase):
         users.append(user2)
         with self.subTest("Multiple Entries"):
             self.assertEqual(len(users), len(Repository.get_all(DBTables.USER)))
+            
+        user3 = User.objects.create_user("testUser3", "test3@a.com", "test3456")
+        users.append(user3)
+        with self.subTest("Paginated Entries"):
+            page1 = Repository.get_all(DBTables.USER, Paginate(2,1))
+            self.assertEqual(2, len(page1))
+            page2 = Repository.get_all(DBTables.USER, Paginate(2,2))
+            self.assertEqual(1, len(page2))
     
 
 class TestAdd(TestCase):
