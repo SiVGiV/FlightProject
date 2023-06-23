@@ -71,17 +71,13 @@ class TestGetAll(TestCase):
 
 class TestAdd(TestCase):
     def test_add_success(self):
-        user = None
-        with self.subTest("User creation"):
-            user = Repository.add( 
+        user = Repository.add( 
                 DBTables.USER,
                 username="testUser",
                 email="test@a.com",
                 password="test1234"
             )[0]
-            self.assertEqual(user['username'], "testUser")
-        with self.subTest("Customer creation"):
-            customer = Repository.add(
+        customer = Repository.add(
                 DBTables.CUSTOMER,
                 first_name="testy",
                 last_name="testson",
@@ -90,7 +86,12 @@ class TestAdd(TestCase):
                 credit_card_number="1234 1234 1234 1234",
                 user=user['id']
             )[0]
-            self.assertEqual(customer['first_name'], "testy")
+        with self.subTest("User creation"):
+            user_from_db = User.objects.filter(id=user["id"]).first()
+            self.assertEqual(user['username'], user_from_db.username)
+        with self.subTest("Customer creation"):
+            customer_from_db = Customer.objects.filter(id=customer["id"]).first()
+            self.assertEqual(customer['first_name'], customer_from_db.first_name)
             
     def test_bad_data(self):
         with self.subTest("Missing Fields"):
