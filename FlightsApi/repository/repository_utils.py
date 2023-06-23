@@ -21,9 +21,9 @@ class Paginate():
         Returns:
             Type[slice]: A slice objects with the pagination parameters.
         """
-        if self.__per_page or self.__page_number == 0:
+        if self.__per_page == 0 or self.__page_number == 0:
             return slice(None, None)
         start = (self.__page_number - 1) * self.__per_page
-        stop = self.__page_number * self.__per_page - 1
+        stop = self.__page_number * self.__per_page
         return slice(start, stop)
     
