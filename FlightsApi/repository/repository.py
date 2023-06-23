@@ -141,7 +141,7 @@ class Repository():
             id (int): id of the row to get.
 
         Returns:
-            Dict: A dictionary of the row.
+            Dict: A dictionary of the row. Blank dictionary if not found.
         
         Raises:
             OutOfBoundsException for bad ID values.

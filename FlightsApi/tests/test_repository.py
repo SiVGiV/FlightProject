@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from ..repository.repository import Repository, DBTables
 from ..repository.errors import *
+from ..repository.repository_utils import Paginate
 
 from ..utils.exceptions import IncorrectTypePassedToFunctionException
 from ..models import User, Admin, AirlineCompany, Customer, Country, Flight, Ticket
@@ -12,6 +13,7 @@ from datetime import timedelta, date
 
 class TestGetById(TestCase):
     def test_get_by_id_success(self):
+        # Test a full success
         user = User.objects.create_user("testUser", "test@a.com")
         customer = Customer.objects.create(
             first_name="testy",
@@ -30,39 +32,49 @@ class TestGetById(TestCase):
             self.assertEqual(customer_from_repo['id'], customer.id)
         
     def test_get_by_id_with_non_existing_id(self):
+        # Test non existing ID - Expects an empty dict
         self.assertDictEqual({}, Repository.get_by_id(DBTables.AIRLINECOMPANY, 1))
     
     def test_get_by_id_bad_id_type(self):
+        # Test wrong type passed as ID - expects an error thrown by the '@accepts' decorator
         self.assertRaises(IncorrectTypePassedToFunctionException, lambda: Repository.get_by_id(DBTables.USER, "jeff"))
     
     def test_get_by_id_bad_model(self):
+        # Test wrong type passed as dbtable - expects an error thrown by the '@accepts' decorator
         self.assertRaises(IncorrectTypePassedToFunctionException, lambda: Repository.get_by_id(User, 1))
     
     def test_get_by_id_bad_id_value(self):
+        # Test ID outside of normal parameters (Negative or Zero) - expects an OutOfBoundsException error
         self.assertRaises(OutOfBoundsException, lambda: Repository.get_by_id(DBTables.USER, -1))
         
 
 class TestGetAll(TestCase):
     def test_get_all_success(self):
+        # Test success
         users = []
         with self.subTest("Empty database"):
+            # Checks that the result is empty when the database is.
             self.assertEqual(len(users), len(Repository.get_all(DBTables.USER)))
             
         user1 = User.objects.create_user("testUser1", "test1@a.com", "test1234")
         users.append(user1)
         with self.subTest("Single entry"):
             repo_result = Repository.get_all(DBTables.USER)
+            # Check that the amount of retrieved results is correct.
             self.assertEqual(len(users), len(repo_result))
-            self.assertEqual(user1.pk, repo_result[0]['id']) # Check content of an entry
+            # Check one of the entries to see that it is returned properly.
+            self.assertEqual(user1.pk, repo_result[0]['id'])
             
         user2 = User.objects.create_user("testUser2", "test2@a.com", "test2345")
         users.append(user2)
         with self.subTest("Multiple Entries"):
+            # Check that the amount of retrieved results is correct.
             self.assertEqual(len(users), len(Repository.get_all(DBTables.USER)))
             
         user3 = User.objects.create_user("testUser3", "test3@a.com", "test3456")
         users.append(user3)
         with self.subTest("Paginated Entries"):
+            # Check that the amount of paginated results is correct.
             page1 = Repository.get_all(DBTables.USER, Paginate(2,1))
             self.assertEqual(2, len(page1))
             page2 = Repository.get_all(DBTables.USER, Paginate(2,2))
