@@ -27,3 +27,11 @@ class Paginate():
         stop = self.__page_number * self.__per_page
         return slice(start, stop)
     
+    def __getitem__(self, key):
+        if key == "page":
+            return self.__page_number
+        elif key == "limit":
+            return self.__per_page
+        
+    def keys(self):
+        return ('page', 'limit')
