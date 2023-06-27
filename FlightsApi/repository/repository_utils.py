@@ -10,8 +10,8 @@ class Paginate():
             per_page (int, optional): Number of items per page. Defaults to 0.
             page_number (int, optional): Page number. Defaults to 0.
         """
-        self.__per_page = per_page if per_page > 0 else 0
-        self.__page_number = page_number if page_number > 0 else 0
+        self.__per_page = per_page if per_page > 0 else 50
+        self.__page_number = page_number if page_number > 0 else 1
         
     @property
     def slice(self):

@@ -1,5 +1,6 @@
 import logging
 from functools import wraps
+from ..models import User
 logger = logging.getLogger(__name__)
 
 def ordinal(n: int):
@@ -31,3 +32,12 @@ def log_action(func):
         logger.debug(f"{func.__name__} finished @ {__name__}")
         return res
     return wrapper
+
+def is_admin(user: User):
+    return user.groups.filter(name='admin').exists()
+
+def is_customer(user: User):
+    return user.groups.filter(name='customer').exists()
+
+def is_airline(user: User):
+    return user.groups.filter(name='airline').exists()

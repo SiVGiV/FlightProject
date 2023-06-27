@@ -179,13 +179,6 @@ class Repository():
         """
         # Get/create the group
         group, created = Group.objects.get_or_create(name=name)
-        # Create a permission for the group
-        if created:
-            permission = Permission.objects.create(
-                codename='is_%s' % name,
-                name="Is %s?" % name.title()
-            )
-            group.permissions.add(permission)
         # Return a serialized instance
         return DBTables.GROUP.serializer(group).data
     
@@ -748,6 +741,11 @@ class Repository():
             
         user.save()
         
+        return DBTables.USER.serializer(user).data
+
+    @staticmethod
+    @accepts(User)
+    def serialize_user(user: User):
         return DBTables.USER.serializer(user).data
 
     @staticmethod

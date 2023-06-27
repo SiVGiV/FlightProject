@@ -1,1 +1,1 @@
-from .facades import AnonymousFacade
+from .facades import AnonymousFacade, CustomerFacade, AirlineFacade, AdministratorFacade
