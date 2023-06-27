@@ -1,27 +1,27 @@
-class RepositoryExceptions(Exception):
+class RepositoryException(Exception):
     # A Base Exception to be inherited from
     # Always attach exception information to this exception and any exception that inherits from it.
     pass
 
-class CreationError(RepositoryExceptions):
+class CreationError(RepositoryException):
     # An exception to be raised when there was an error creating an object
     pass
 
-class UpdateError(RepositoryExceptions):
+class UpdateError(RepositoryException):
     # An exception to be raised when there was an error updating an object
     pass
 
-class FetchError(RepositoryExceptions):
+class FetchError(RepositoryException):
     """
     An exception to be raised when there was an error fetching an object
     """
 
-class DeletionError(RepositoryExceptions):
+class DeletionError(RepositoryException):
     """
     An exception to be raised when there was an error deleting an object
     """
 
-class DBExceptions(RepositoryExceptions):
+class DBExceptions(RepositoryException):
     """
     A Generic Exception class that describes exceptions between the repository and the database
     """
@@ -51,7 +51,7 @@ class FailedCreationException(DBExceptions):
     An exception to raise when failed to create an instance in the database
     """
     
-class UnacceptableInput(RepositoryExceptions):
+class UnacceptableInput(RepositoryException):
     """
     An exception to raise when the input is not acceptable by the method.
     """
@@ -59,4 +59,9 @@ class UnacceptableInput(RepositoryExceptions):
 class OutOfBoundsException(UnacceptableInput):
     """
     An exception to raise when attempting to access the database with data that exceeds the accepted input
+    """
+
+class UserAlreadyInGroupException(RepositoryException):
+    """
+    An exceptions to raise when attempted to add a group to an already assigned user.
     """
