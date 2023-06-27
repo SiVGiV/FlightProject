@@ -3,12 +3,16 @@ import logging
 from datetime import timedelta
 from datetime import date as Date
 
-from typing import Type, Iterable, List, Dict, Tuple
+from functools import reduce
+
+from typing import Union, Type, Iterable, List, Dict, Tuple
 from enum import Enum, unique
 
 # Django imports
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
+from django.contrib.auth import authenticate
 from django.utils import timezone
+
 
 # [L] Models
 from ..models import Country, User,\
@@ -132,7 +136,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(DBTables, int)
-    def get_by_id(dbtable: DBTables, id: int) -> Type[Dict]:
+    def get_by_id(dbtable: DBTables, id: int) -> dict:
         """
         Get item from a certain table by id.
 
@@ -174,7 +178,14 @@ class Repository():
             Type[Dict]: A dictionary of the group.
         """
         # Get/create the group
-        group = Group.objects.get_or_create(name=name)
+        group, created = Group.objects.get_or_create(name=name)
+        # Create a permission for the group
+        if created:
+            permission = Permission.objects.create(
+                codename='is_%s' % name,
+                name="Is %s?" % name.title()
+            )
+            group.permissions.add(permission)
         # Return a serialized instance
         return DBTables.GROUP.serializer(group).data
     
@@ -374,26 +385,30 @@ class Repository():
     
     @staticmethod
     @log_action
-    @accepts(int, int, Date)
-    def get_flights_by_parameters(origin_country_id: int, destination_country_id: int, date: Date, paginator: Paginate = Paginate()) -> List[Dict]:
+    @accepts((int, type(None)), (int, type(None)), (Date, type(None)))
+    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], paginator: Paginate = Paginate()) -> List[Dict]:
         """
         Returns a list of flights that fit the parameters.
 
         Args:
-            origin_country_id (int): id field of the origin country.
-            destination_country_id (int): id field of the destination country.
-            date (date): date of departure.
+            origin_country_id (int): id field of the origin country. If None ignores this while filtering.
+            destination_country_id (int): id field of the destination country. If None ignores this while filtering.
+            date (date): date of departure. If None ignores this while filtering.
             paginator (Paginate): A Paginate object if required.
 
         Returns:
             List[Dict]: A list of dictionaries of flights.
         """
-        # Get all flights that take off from origin_country
-        query = Flight.objects.filter(origin_country__id=origin_country_id)
-        # Of those flights, get the ones that go to destination_country
-        query = query.filter(destination_country__id = destination_country_id)
-        # Finally, of those flights get any that depart on the specified date
-        query = query.filter(departure_datetime__date = date)
+        query = Flight.objects.all()
+        if origin_country_id:
+            # Get all flights that take off from origin_country
+            query = query.filter(origin_country__id=origin_country_id)
+        if destination_country_id:
+            # Of those flights, get the ones that go to destination_country
+            query = query.filter(destination_country__id = destination_country_id)
+        if date:
+            # Finally, of those flights get any that depart on the specified date
+            query = query.filter(departure_datetime__date = date)
         # Paginate the results
         query = query.all()[paginator.slice]
         # Serialize the results
@@ -646,3 +661,104 @@ class Repository():
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
         return flights
+
+    @staticmethod
+    @log_action
+    @accepts(int)
+    def get_tickets_by_flight(flight_id: int):
+        """Get all tickets from a flight
+
+        Args:
+            flight_id (int): Flight ID
+
+        Returns:
+            list[dict]: A list of all tickets
+        """
+        query = Ticket.objects.filter(flight__id=flight_id).all()
+        tickets = [DBTables.TICKET.serializer(ticket).data for ticket in query]
+        return tickets
+        
+
+    @staticmethod
+    @log_action
+    @accepts(DBTables, int)
+    def instance_exists(dbtable: DBTables, id: int) -> bool:
+        """Check if an instance exists
+
+        Args:
+            dbtable (DBTables): A database table to check
+            id (int): An id to check for instance
+
+        Returns:
+            bool: True if exsits, False otherwise
+        """
+        exists = dbtable.model.objects.filter(pk=id).exists()
+        return exists
+    
+    @staticmethod
+    @accepts(int)
+    def is_flight_bookable(id: int, seat_count: int = 1) -> Tuple[bool, str]:
+        """Checks if it's possible to book a certain amount of seats on a specific flight.
+
+        Args:
+            id (int): id of the flight
+            seat_count (int, optional): Amount of seats wanted for booking. Defaults to 1.
+
+        Returns:
+            Tuple[bool, str]: A Tuple of Bookable(bool), Reason(str)
+        """
+        flight_exists = Repository.instance_exists(id)
+        if not flight_exists:
+            return False, 'the flight does not exist'
+        
+        flight = Flight.objects.get(pk=id)
+        if flight.is_canceled:
+            return False, 'the flight was canceled'
+        
+        flight_happened = flight.departure_datetime <= timezone.now()
+        if flight_happened:
+            return False, 'the flight has already taken off'
+                
+        all_tickets = Repository.get_tickets_by_flight(id)
+        total_booked_seats = 0
+        for ticket in all_tickets:
+            total_booked_seats += ticket['seat_count'] if not ticket['is_canceled'] else 0
+        
+        if total_booked_seats + seat_count > flight.total_seats:
+            return False, f'the flight only has {flight.total_seats - total_booked_seats} seat(s) left'
+        
+        return True, 'the flight can be booked'
+    
+    @staticmethod
+    @accepts(int, str)
+    def assign_group_to_user(user_id: int, group_name: str):
+        # Check if the user is already in a group
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            raise EntityNotFoundException('This user does not exist.')
+        
+        if len(user.groups.all()) > 0:
+            raise UserAlreadyInGroupException()
+        
+        if group_name:
+            group = Group.objects.get_or_create(group_name)
+            user.groups.add(group)
+        else:
+            user.groups.clear()
+            
+        user.save()
+        
+        return DBTables.USER.serializer(user).data
+
+    @staticmethod
+    @log_action
+    def authenticate(request, username: str, password: str):
+        user = authenticate(request, username=username, password=password)
+        if user:
+            return DBTables.USER.serializer(user).data
+        else:
+            return {}
+        
+    def is_authenticated(user_id):
+        user = Repository.get_by_id(DBTables.USER, user_id)
+        return user.is_authenticated()
