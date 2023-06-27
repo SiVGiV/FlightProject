@@ -86,7 +86,6 @@ class Customer(models.Model):
     last_name = models.CharField(max_length=200)
     address = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=200, unique=True)
-    credit_card_number = models.CharField(max_length=200, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer', unique=True)
     
     def __repr__(self) -> str:
