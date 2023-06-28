@@ -161,7 +161,7 @@ class AnonymousFacade(FacadeBase):
         elif is_customer(user):
             return CustomerFacade(R.serialize_user(user))
         else:
-            return None
+            return AnonymousFacade()
         
     @staticmethod
     def login(request) -> Union[FacadeBase, str]:
@@ -176,7 +176,7 @@ class AnonymousFacade(FacadeBase):
         else:
             return AnonymousFacade(), 'A user with this combination of user/password does not exist.'
     
-    def register_customer(self, request, username, password, email, first_name, last_name, address, phone_number):
+    def register_customer(self, username, password, email, first_name, last_name, address, phone_number):
         # Create user
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
@@ -186,7 +186,7 @@ class AnonymousFacade(FacadeBase):
         if not user_created:
             return status.HTTP_400_BAD_REQUEST, {'errors': user}
         
-        user_id = user['id']    
+        user_id = user['id']
         
         # Add user to customer group
         try:
@@ -217,8 +217,9 @@ class AnonymousFacade(FacadeBase):
         if not customer_created:
             return status.HTTP_400_BAD_REQUEST, {'errors': customer}
         
-        # Make Response
-        return status.HTTP_200_OK, {'data': customer}
+        # Make Response        
+        return status.HTTP_200_OK, {'data': {'customer': customer, 'user': user}}
+
     
 
 
@@ -472,19 +473,17 @@ class AdministratorFacade(FacadeBase):
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
         
         
-    def add_airline(self, request, name: str, country_id: int, user_id: int):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors':['Missing permissions.']}
+    def add_airline(self, username, password, email, name: str, country_id: int, user_id: int):
+        # Create user
+        try:
+            user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except Exception as e:
+            return handle_unexpected_exception(e)
         
-        # Retrieve Data and Handle Errors
-        country_exists = R.instance_exists(DBTables.COUNTRY, country_id)
-        if not country_exists:
-            return status.HTTP_400_BAD_REQUEST, {'errors':[f'Country ID {country_id} not found.']}
+        if not user_created:
+            return status.HTTP_400_BAD_REQUEST, {'errors': user}
         
-        user_exists = R.instance_exists(DBTables.USER, user_id)
-        if not user_exists:
-            return status.HTTP_400_BAD_REQUEST, {'errors':[f'User ID {user_id} not found.']}
+        user_id = user['id']
         
         # Add user to airline group
         try:
@@ -495,9 +494,18 @@ class AdministratorFacade(FacadeBase):
             return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
         except Exception as e:
             return handle_unexpected_exception(e)
+                
+        # Retrieve Data and Handle Errors
+        country_exists = R.instance_exists(DBTables.COUNTRY, country_id)
+        if not country_exists:
+            return status.HTTP_400_BAD_REQUEST, {'errors':[f'Country ID {country_id} not found.']}
+        
+        user_exists = R.instance_exists(DBTables.USER, user_id)
+        if not user_exists:
+            return status.HTTP_400_BAD_REQUEST, {'errors':[f'User ID {user_id} not found.']}
         
         try:
-            data, success = R.add(
+            airline, success = R.add(
                 DBTables.AIRLINECOMPANY,
                 name=name,
                 country_id=country_id,
@@ -511,19 +519,23 @@ class AdministratorFacade(FacadeBase):
             return handle_unexpected_exception(e)
         
         if not success:
-            return status.HTTP_400_BAD_REQUEST, {'errors': data}
+            return status.HTTP_400_BAD_REQUEST, {'errors': airline}
         
         # Make Response
-        return status.HTTP_200_OK, {'data': data}
+        return status.HTTP_200_OK, {'data': {'airline': airline, 'user': user}}
     
-    def add_customer(self, request, user_id: int, first_name: str, last_name: str, address: str, phone_number: str):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    
+    def add_customer(self, username: str, password: str, email: str, first_name: str, last_name: str, address: str, phone_number: str):
+        # Create user
+        try:
+            user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except Exception as e:
+            return handle_unexpected_exception(e)
         
-        user_exists = R.instance_exists(DBTables.USER, user_id)
-        if not user_exists:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [f'User ID {user_id} not found.']}
+        if not user_created:
+            return status.HTTP_400_BAD_REQUEST, {'errors': user}
+        
+        user_id = user['id']
         
         # Add user to customer group
         try:
@@ -536,7 +548,7 @@ class AdministratorFacade(FacadeBase):
             return handle_unexpected_exception(e)
         
         try:
-            data, success = R.add(
+            customer, customer_created = R.add(
                 DBTables.CUSTOMER,
                 first_name=first_name,
                 last_name=last_name,
@@ -551,21 +563,24 @@ class AdministratorFacade(FacadeBase):
             R.assign_group_to_user(user_id, '') # undo the addition of a group
             return handle_unexpected_exception(e)
         
-        if not success:
-            return status.HTTP_400_BAD_REQUEST, {'errors': data}
+        if not customer_created:
+            return status.HTTP_400_BAD_REQUEST, {'errors': customer}
         
         # Make Response
-        return status.HTTP_200_OK, {'data': data}
+        return status.HTTP_200_OK, {'data': {'customer': customer, 'user': user}}
     
     
-    def add_administrator(self, request, user_id: int, first_name: str, last_name: str):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def add_administrator(self, username: str, password: str, email: str, first_name: str, last_name: str):
+        # Create user
+        try:
+            user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except Exception as e:
+            return handle_unexpected_exception(e)
         
-        user_exists = R.instance_exists(DBTables.USER, user_id)
-        if not user_exists:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [f'User ID {user_id} not found.']}
+        if not user_created:
+            return status.HTTP_400_BAD_REQUEST, {'errors': user}
+        
+        user_id = user['id']
         
         # Add user to admin group
         try:
@@ -578,7 +593,7 @@ class AdministratorFacade(FacadeBase):
             return handle_unexpected_exception(e)
         
         try:
-            data, success = R.add(
+            admin, success = R.add(
                 DBTables.ADMIN,
                 first_name=first_name,
                 last_name=last_name,
@@ -592,10 +607,10 @@ class AdministratorFacade(FacadeBase):
             return handle_unexpected_exception(e)
         
         if not success:
-            return status.HTTP_400_BAD_REQUEST, {'errors': data}
+            return status.HTTP_400_BAD_REQUEST, {'errors': admin}
         
         # Make Response
-        return status.HTTP_200_OK, {'data': data}
+        return status.HTTP_200_OK, {'data': {'admin': admin, 'user': user}}
     
     def deactivate_airline(self, request, airline_id):
         # Verify Permissions

@@ -4,4 +4,4 @@ from .models import User
 class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ['username', 'password', 'email']
