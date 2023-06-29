@@ -1,34 +1,128 @@
-from django.views import View
-from ..facades import AnonymousFacade
+from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, AdministratorFacade
 
-class Airlines(View): # /airlines
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+class AirlinesView(APIView): # /airlines
     def get(self, request):
-        pass
+        """
+        GET /airlines - Get all airlines / filter by name
+        """
+        # Get correct facade
+        facade, error_msg = AnonymousFacade.login(request)
+        if error_msg:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        
+        # Get all the details
+        name = request.GET.get('name', '')
+        
+        # Validate pagination inputs
+        try:
+            limit = int(request.GET.get('limit', 50))
+            page = int(request.GET.get('page', 1))
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Pagination limit or page are not integers.']})
+        
+        # Call facade and return response
+        code, data = facade.get_airlines_by_name(
+            name=name,
+            limit=limit,
+            page=page
+        )
+        return Response(status=code, data=data)
     
     def post(self, request):
-        pass
+        """
+        POST /airlines - Add a new airline
+        """
+        # Get correct facade
+        facade, error_msg = AnonymousFacade.login(request)
+        if error_msg:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        
+        # Check if the user has the right permissions
+        if not isinstance(facade, AdministratorFacade):
+            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+        
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        name = request.POST.get('name')
+        country_id = request.POST.get('country_id')
+        
+        code, data = facade.add_airline(
+            username=username,
+            password=password,
+            email=email,
+            name=name,
+            country_id=country_id
+        )
+        return Response(status=code, data=data)
     
-    def put(self, request):
-        pass
     
-    def patch(self, request):
-        pass
     
-    def delete(self, request):
-        pass
+class AirlineView(APIView): # /airline/<id>
+    def get(self, request, id):
+        """
+        GET /airline/<id> - Get airline by id
+        """
+        # Get correct facade
+        facade, error_msg = AnonymousFacade.login(request)
+        if error_msg:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        
+        # Get all the details
+        id = request.GET.get('id', 0)
+        
+        # Call facade and return response
+        code, data = facade.get_airline_by_id(id)
+        return Response(status=code, data=data)
     
-class Airline(View): # /airline/<id>
-    def get(self, request):
-        pass
+    def delete(self, request, id):
+        """
+        DELETE /airline/<id> - Deactivate airline account
+        """
+        # Get correct facade
+        facade, error_msg = AnonymousFacade.login(request)
+        if error_msg:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        
+        # Check if the user has the right permissions
+        if not isinstance(facade, AdministratorFacade):
+            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+        
+        # Call facade and return response
+        code, data = facade.deactivate_airline(id)
+        return Response(status=code, data=data)
+        
+        
+@api_view(['PATCH'])
+def update_airline_view(request):
+    """
+    PATCH /airline/<id> - Update an airline
+    """
+    # Get correct facade
+    facade, error_msg = AnonymousFacade.login(request)
+    if error_msg:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
     
-    def post(self, request):
-        pass
+    # Check if the user has the right permissions
+    if not isinstance(facade, AirlineFacade):
+        return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
     
-    def put(self, request):
-        pass
-    
-    def patch(self, request):
-        pass
-    
-    def delete(self, request):
-        pass
+    update_fields = {}
+    name = request.PATCH.get('name', '')
+    if name:
+        update_fields['name'] = name
+    try:
+        country_id = int(request.PATCH.get('country_id', ''))
+    except ValueError:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Country ID must be an integer.']})
+    if country_id:
+        update_fields['country_id'] = country_id
+
+    code, data = facade.update_airline(**update_fields)
+    return Response(status=code, data=data)

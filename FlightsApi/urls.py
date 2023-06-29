@@ -18,6 +18,23 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('customer/', Customer.as_view(), name="customer"),
-    path('customers/', Customers.as_view(), name="customers"),
+    path('admins/', AdminsView.as_view(), name="admins"),
+    path('admin/<int:id>/', AdminView.as_view(), name="admin"),
+    
+    path('airlines/', AirlinesView.as_view(), name="airlines"),
+    path('airline/<int:id>/', AirlineView.as_view(), name="airline"),
+    path('airline/', update_airline_view, name="update_airline"),
+    
+    path('countries/', CountriesView.as_view(), name="countries"),
+    path('country/<int:id>/', CountryView.as_view(), name="country"),
+    
+    path('customers/', CustomersView.as_view(), name="customers"),
+    path('customer/<int:id>/', CustomerView.as_view(), name="customer"),
+    path('customer/', update_customer_view, name="update_customer"),
+    
+    path('flights/', FlightsView.as_view(), name="flights"),
+    path('flight/<int:id>/', FlightView.as_view(), name="flight"),
+    
+    path('tickets/', TicketsView.as_view(), name="tickets"),
+    path('ticket/<int:id>/', TicketView.as_view(), name="ticket"),
 ]

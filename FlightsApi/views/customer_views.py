@@ -1,16 +1,15 @@
-from django.views import View
 from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, AdministratorFacade
+
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 import logging
 logger = logging.getLogger(__name__)
 
-class Customers(APIView): # /customers
-    
+class CustomersView(APIView): # /customers
     @permission_classes([IsAuthenticated,])
     def get(self, request):
         # Get correct facade
@@ -24,8 +23,8 @@ class Customers(APIView): # /customers
         
         # Validate pagination inputs
         try:
-            limit = int(request.GET.get('limit', 0))
-            page = int(request.GET.get('page', 0))
+            limit = int(request.GET.get('limit', 50))
+            page = int(request.GET.get('page', 1))
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Pagination limit or page are not integers.']})
         
@@ -43,7 +42,6 @@ class Customers(APIView): # /customers
         if not isinstance(facade, (AdministratorFacade, AnonymousFacade)):
             return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
         
-        # Validate pagination inputs
         username = request.POST.get('username')
         password = request.POST.get('password')
         email = request.POST.get('email')
@@ -52,28 +50,65 @@ class Customers(APIView): # /customers
         address = request.POST.get('address')
         phone_number = request.POST.get('phone_number')
         
-        code, data = facade.add_customer()
+        code, data = facade.add_customer(
+            username=username,
+            password=password,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            address=address,
+            phone_number=phone_number
+        )
         return Response(status=code, data=data)
     
-    def put(self, request):
-        pass
-    
-    def patch(self, request):
-        pass
-    
-class Customer(View): # /customer/<id>
+class CustomerView(APIView): # /customer/<id>
     permission_classes = [IsAuthenticated,]
-    def get(self, request):
-        pass
+    def delete(self, request, id):
+        """
+        DELETE /customer/<id> - Deactivate customer account
+        """
+        # Get correct facade
+        facade, error_msg = AnonymousFacade.login(request)
+        if error_msg:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        
+        # Check if the user has the right permissions
+        if not isinstance(facade, AdministratorFacade):
+            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+        
+        # Call facade and return response
+        code, data = facade.deactivate_customer(id)
+        return Response(status=code, data=data)
+        
     
-    def post(self, request):
-        pass
+@api_view(['PATCH'])
+def update_customer_view(request):
+    """
+    PATCH /customer/<id> - Update a customer
+    """
+    # Get correct facade
+    facade, error_msg = AnonymousFacade.login(request)
+    if error_msg:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
     
-    def put(self, request):
-        pass
+    # Check if the user has the right permissions
+    if not isinstance(facade, CustomerFacade):
+        return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
     
-    def patch(self, request):
-        pass
+    update_fields = {}
     
-    def delete(self, request):
-        pass
+    first_name = request.POST.get('first_name')
+    if first_name:
+        update_fields['first_name'] = first_name
+    last_name = request.POST.get('last_name')
+    if last_name:
+        update_fields['last_name'] = last_name
+    address = request.POST.get('address')
+    if address:
+        update_fields['address'] = address
+    phone_number = request.POST.get('phone_number')
+    if phone_number:
+        update_fields['phone_number'] = phone_number
+
+    code, data = facade.update_customer(**update_fields)
+    return Response(status=code, data=data)

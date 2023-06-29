@@ -73,25 +73,20 @@
         CUSTOMER: add_ticket(self, request, flight_id: int, seat_count: int)
     update
     delete
+
+/ticket/<id>
+    get
+    post
+    update
+    delete
         CUSTOMER: cancel_ticket(self, request, ticket_id)
 
-/tickets/<id>
-    get
+
+
+/admins - DONE
     post
-    update
-    delete
-
-
-
-/admins
-    post
-        ADMIN: add_administrator(self, request, user_id: int, first_name: str, last_name: str)
-    update
-    delete
-        ADMIN: deactivate_administrator(self, request, admin_id)
+        ADMIN: add_administrator(user_id: int, first_name: str, last_name: str)
 
 /admin/<id>
-    get
-    post
-    update
     delete
+        ADMIN: deactivate_administrator(admin_id)

@@ -69,15 +69,8 @@ class FacadeBase():
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
         
     def get_all_airlines(self,  limit: int = 100, page: int = 1):
-        # Retrieve Data and Handle Errors
-        pagination = Paginate(per_page=limit, page_number=page)
-        try:
-            data = R.get_all(DBTables.AIRLINECOMPANY, pagination)
-        except Exception as e:
-            return handle_unexpected_exception(e)
-        
         # Make response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return FacadeBase.get_airlines_by_name(self, name='', limit=limit, page=page)
     
     
     def get_airline_by_id(self, id: int):
@@ -220,8 +213,23 @@ class AnonymousFacade(FacadeBase):
         # Make Response        
         return status.HTTP_200_OK, {'data': {'customer': customer, 'user': user}}
 
-    
+    def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1):
+        """Overrides FacadeBase's function and removes the user information from it.
 
+        Args:
+            name (str, optional): Name to filter by. Defaults to empty string ("")
+            limit (int, optional): Maximum results per page. Defaults to 50.
+            page (int, optional): Page number. Defaults to 1.
+
+        Returns:
+            _type_: _description_
+        """
+        code, data =  super().get_airlines_by_name(name, limit, page)
+        if code != 200:
+            return code, data
+        for airline in data['data']:
+            airline.pop('user', None)
+        return code, data
 
 class CustomerFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -233,13 +241,7 @@ class CustomerFacade(FacadeBase):
     def required_group(self):
         return self.__required_group
         
-    def update_customer(self, request, id, **updated_fields):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
-        if not self.__user['customer']['id'] == id:
-            return status.HTTP_403_FORBIDDEN, {'errors': ["You cannot edit another user's details."]}
-        
+    def update_customer(self, id, **updated_fields):
         # Retrieve Data and Handle Errors
         try:
             data = R.update(DBTables.CUSTOMER, id, **updated_fields)
@@ -256,11 +258,7 @@ class CustomerFacade(FacadeBase):
         return res
 
 
-    def add_ticket(self, request, flight_id: int, seat_count: int):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
-        
+    def add_ticket(self, flight_id: int, seat_count: int):
         # Retrieve Data and Handle Errors
         is_bookable, reason = R.is_flight_bookable(flight_id, seat_count)
         if not is_bookable:
@@ -280,10 +278,7 @@ class CustomerFacade(FacadeBase):
             return status.HTTP_400_BAD_REQUEST, {'errors': data}
 
 
-    def cancel_ticket(self, request, ticket_id):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def cancel_ticket(self, ticket_id):
         # Retrieve Data and Handle Errors
         try:
             ticket = R.get_by_id(DBTables, ticket_id)
@@ -307,10 +302,7 @@ class CustomerFacade(FacadeBase):
         else:
             return status.HTTP_403_FORBIDDEN, {'errors': ['You cannot modify this ticket since it belongs to a different customer.']}
 
-    def get_my_tickets(self, request, limit: int = 100, page: int = 0):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def get_my_tickets(self, limit: int = 100, page: int = 0):
         # Retrieve Data and Handle Errors
         paginator = Paginate(limit, page)
         # Make Response
@@ -319,7 +311,31 @@ class CustomerFacade(FacadeBase):
         except Exception as e:
             return handle_unexpected_exception(e)
         return status.HTTP_200_OK, {'data': data, 'pagination': {**paginator}}
+    
+    def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1):
+        """Overrides FacadeBase's function and removes the user information from it.
 
+        Args:
+            name (str, optional): Name to filter by. Defaults to empty string ("")
+            limit (int, optional): Maximum results per page. Defaults to 50.
+            page (int, optional): Page number. Defaults to 1.
+
+        Returns:
+            _type_: _description_
+        """
+        code, data =  super().get_airlines_by_name(name, limit, page)
+        if code != 200:
+            return code, data
+        for airline in data['data']:
+            airline.pop('user', None)
+        return code, data
+    
+    def get_airline_by_id(self, id: int):
+        code, data =  super().get_airline_by_id(id)
+        if code != 200:
+            return code, data
+        data['data'].pop('user', None)
+        return code, data
 
 class AirlineFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -331,13 +347,7 @@ class AirlineFacade(FacadeBase):
     def required_group(self):
         return self.__required_group
 
-    def get_my_flights(self, request, limit: int = 100, page: int = 0):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
-        if not request.user.is_authenticated() or not self.__user['id'] == request.user.id:
-            return status.HTTP_401_UNAUTHORIZED, {'errors': ['Not authorized.']}
-        
+    def get_my_flights(self, limit: int = 100, page: int = 0):
         # Retrieve Data and Handle Errors
         try:
             data = R.get_flights_by_airline_id(self.__user['airline'])
@@ -347,10 +357,7 @@ class AirlineFacade(FacadeBase):
         pagination = Paginate(limit, page)
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
 
-    def update_airline(self, request, name: Union[str, None] = None, country_id: Union[int, None] = None):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def update_airline(self, name: Union[str, None] = None, country_id: Union[int, None] = None):
         # Retrieve Data and Handle Errors
         updated_fields = {}
         if name:
@@ -370,11 +377,7 @@ class AirlineFacade(FacadeBase):
         # Make Response
         return status.HTTP_200_OK, {'data': data}
 
-    def add_flight(self, request, origin_id: int, destination_id: int, departure_datetime: datetime, arrival_datetime: datetime, total_seats: int):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
-
+    def add_flight(self, origin_id: int, destination_id: int, departure_datetime: datetime, arrival_datetime: datetime, total_seats: int):
         # Retrieve Data and Handle Errors
         try:
             data, success = R.add(
@@ -395,10 +398,7 @@ class AirlineFacade(FacadeBase):
         # Make Response
         return status.HTTP_200_OK, {'data': data}
 
-    def update_flight(self, request, flight_id: int, **updated_fields):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def update_flight(self, flight_id: int, **updated_fields):
         # Retrieve Data and Handle Errors
         try:
             updated_flight = R.update(DBTables.FLIGHT, id=flight_id, **updated_fields)
@@ -411,10 +411,7 @@ class AirlineFacade(FacadeBase):
         # Make Response
         return status.HTTP_200_OK, {'data': updated_flight}
 
-    def cancel_flight(self, request, flight_id):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions']}
+    def cancel_flight(self, flight_id):
         # Retrieve Data and Handle Errors
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
@@ -437,7 +434,31 @@ class AirlineFacade(FacadeBase):
             return status.HTTP_200_OK, {'data': data}
         else:
             return status.HTTP_403_FORBIDDEN, {'errors': ['You cannot modify this flight since it belongs to a different airline.']}
+        
+    def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1):
+        """Overrides FacadeBase's function and removes the user information from it.
 
+        Args:
+            name (str, optional): Name to filter by. Defaults to empty string ("")
+            limit (int, optional): Maximum results per page. Defaults to 50.
+            page (int, optional): Page number. Defaults to 1.
+
+        Returns:
+            _type_: _description_
+        """
+        code, data =  super().get_airlines_by_name(name, limit, page)
+        if code != 200:
+            return code, data
+        for airline in data['data']:
+            airline.pop('user', None)
+        return code, data
+    
+    def get_airline_by_id(self, id: int):
+        code, data =  super().get_airline_by_id(id)
+        if code != 200:
+            return code, data
+        data['data'].pop('user', None)
+        return code, data
 
 class AdministratorFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -449,7 +470,7 @@ class AdministratorFacade(FacadeBase):
     def required_group(self):
         return self.__required_group
     
-    def get_all_customers(self, request, limit: int = 100, page: int = 1):
+    def get_all_customers(self, limit: int = 100, page: int = 1):
         """Returns a JsonResponse object
 
         Args:
@@ -458,10 +479,6 @@ class AdministratorFacade(FacadeBase):
         Returns:
             JsonResponse: An object to return from the View
         """
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
-        
         # Retrieve Data
         pagination = Paginate(per_page=limit, page_number=page)
         try:
@@ -612,10 +629,7 @@ class AdministratorFacade(FacadeBase):
         # Make Response
         return status.HTTP_200_OK, {'data': {'admin': admin, 'user': user}}
     
-    def deactivate_airline(self, request, airline_id):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def deactivate_airline(self, airline_id):
         # Retrieve Data and Handle Errors
         try:
             airline = R.get_by_id(DBTables.AIRLINECOMPANY, airline_id)
@@ -638,10 +652,7 @@ class AdministratorFacade(FacadeBase):
         else:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {'data': {'success': False}}
     
-    def deactivate_customer(self, request, customer_id):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def deactivate_customer(self, customer_id):
         # Retrieve Data and Handle Errors
         try:
             customer = R.get_by_id(DBTables.CUSTOMER, customer_id)
@@ -665,10 +676,7 @@ class AdministratorFacade(FacadeBase):
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {'data': {'success': False}}
         
     
-    def deactivate_administrator(self, request, admin_id):
-        # Verify Permissions
-        if not has_permission(self, request):
-            return status.HTTP_403_FORBIDDEN, {'errors': ['Missing permissions.']}
+    def deactivate_administrator(self, admin_id):
         # Retrieve Data and Handle Errors
         try:
             admin = R.get_by_id(DBTables.ADMIN, admin_id)
@@ -691,13 +699,6 @@ class AdministratorFacade(FacadeBase):
         else:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {'data': {'success': False}}
     
-
-def has_permission(facade, request):
-    if request.user.has_perm('is_' + facade.required_group['name']):
-        return True
-    else:
-        return False
-
 
 def handle_unexpected_exception(exception):
     return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ["The server encountered an unexpected error.", str(exception)]}

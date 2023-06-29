@@ -1,6 +1,6 @@
-from .admin_views import Admin, Admins
-from .airline_views import Airline, Airlines
-from .customer_views import Customer, Customers
-from .flight_views import Flight, Flights
-from .ticket_views import Ticket, Tickets
-from .country_views import Country, Countries
+from .admin_views import AdminView, AdminsView
+from .airline_views import AirlineView, AirlinesView, update_airline_view
+from .customer_views import CustomerView, CustomersView, update_customer_view
+from .flight_views import FlightView, FlightsView
+from .ticket_views import TicketView, TicketsView
+from .country_views import CountryView, CountriesView
