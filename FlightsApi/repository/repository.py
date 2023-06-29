@@ -3,14 +3,11 @@ import logging
 from datetime import timedelta
 from datetime import date as Date
 
-from functools import reduce
-
-from typing import Union, Type, Iterable, List, Dict, Tuple
+from typing import Union, Iterable, List, Dict, Tuple
 from enum import Enum, unique
 
 # Django imports
-from django.contrib.auth.models import Group, Permission
-from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group
 from django.utils import timezone
 
 
@@ -95,41 +92,6 @@ class DBTables(Enum):
                 message = f"Serializer could not be found for {self.name}."
                 logger.error(message)
                 raise NotFoundModelOrSerializerException(message)
-    
-    @staticmethod
-    @accepts(str)
-    def from_string(input: str):
-        """
-        Returns a DBTables object with the name specified.
-
-        Args:
-            input (str): A name of a table, or the value(index) of said table in string form.
-
-        Raises:
-            DBTAbleDoesNotExistException: If a table doesn't exist that matches the input.
-            UnacceptableInput: If the input contains impossible characters or character combinations.
-
-        Returns:
-            Type[DBTables]: A DBTables object.
-        """
-        if input.isdecimal():
-            try:
-                return DBTables(int(input))
-            except ValueError:
-                message = f"No table found with the value '{input}'."
-                logger.error(message, exc_info=True)
-                raise DBTAbleDoesNotExistException(message)
-        elif input.isascii() and input.isalpha():
-            try:
-                return DBTables[input.upper()]
-            except (ValueError, KeyError):
-                message = f"No table found named '{input}'."
-                logger.error(message, exc_info=True)
-                raise DBTAbleDoesNotExistException(message)
-        else:
-            message = f"Cannot convert '{input}' to a DBTables object."
-            logger.warning(message)
-            raise UnacceptableInput(message)
 
 
 class Repository():
@@ -145,7 +107,7 @@ class Repository():
             id (int): id of the row to get.
 
         Returns:
-            Dict: A dictionary of the row. Blank dictionary if not found.
+            dict: A dictionary of the row. Blank dictionary if not found.
         
         Raises:
             OutOfBoundsException for bad ID values.
@@ -167,7 +129,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(str)
-    def get_or_create_group(name: str) -> Type[Dict]:
+    def get_or_create_group(name: str) -> dict:
         """
         Returns a dictionary of a group with the specified name, creates if doesn't exist.
 
@@ -185,14 +147,13 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(DBTables)
-    def get_all(dbtable: DBTables, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_all(dbtable: DBTables, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Get all rows from certain table
 
         Args:
             dbtable (DBTables): A DBTables objects corresponding with the right table/model.
-            paginator (Paginate): A Paginate object if required.
-
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
             list[dict]: List of all serialized rows from model.
@@ -206,7 +167,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(DBTables)
-    def add(dbtable: DBTables, **fields) -> Tuple[Dict, bool]:
+    def add(dbtable: DBTables, **fields) -> Tuple[dict, bool]:
         """
         Creates and saves an item.
 
@@ -214,7 +175,7 @@ class Repository():
             dbtable (DBTables): A DBTables objects corresponding with the right table/model.
 
         Returns:
-            Tuple[Dict, bool]: (Result, Success), 'Result' being a dictionary of the instance.
+            Tuple[dict, bool]: (Result, Success), 'Result' being a dictionary of the instance.
         """
         # Create the object
         deserialized_data = dbtable.serializer(data=fields)
@@ -260,7 +221,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(DBTables)
-    def add_all(dbtable: DBTables, new_rows: Iterable[Dict]) -> Tuple[List[Dict], List[Dict]]:
+    def add_all(dbtable: DBTables, new_rows: Iterable[dict]) -> Tuple[List[dict], List[dict]]:
         """
         Add all rows to database.
 
@@ -269,7 +230,7 @@ class Repository():
             new_rows (list): Model objects to add to the database.
         
         Returns:
-            Tuple[List[Dict], List[Dict]]: A tuple of successfully added and failed additions.
+            Tuple[List[dict], List[dict]]: A tuple of successfully added and failed additions.
         """
         created = []
         failed = []
@@ -344,7 +305,7 @@ class Repository():
             username (str): A username to search for.
 
         Returns:
-            Tuple[Dict, bool]: A tuple of a result, success.
+            Tuple[dict, bool]: A tuple of a result, success.
         """
         # Fetch the customer
         customer = Customer.objects.filter(user__username=username).first()
@@ -358,7 +319,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(str)
-    def get_user_by_username(username: str) -> Tuple[Dict, bool]:
+    def get_user_by_username(username: str) -> Tuple[dict, bool]:
         """
         Get a user from its username.
 
@@ -366,7 +327,7 @@ class Repository():
             username (str): A username to search for.
 
         Returns:
-            Tuple[Dict, bool]: A tuple of a result, success.
+            Tuple[dict, bool]: A tuple of a result, success.
         """
         user = User.objects.filter(username=username).first()
         if user:
@@ -379,18 +340,18 @@ class Repository():
     @staticmethod
     @log_action
     @accepts((int, type(None)), (int, type(None)), (Date, type(None)))
-    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], paginator: Paginate = Paginate()) -> List[dict]:
         """
         Returns a list of flights that fit the parameters.
 
         Args:
-            origin_country_id (int): id field of the origin country. If None ignores this while filtering.
-            destination_country_id (int): id field of the destination country. If None ignores this while filtering.
-            date (date): date of departure. If None ignores this while filtering.
-            paginator (Paginate): A Paginate object if required.
+            origin_country_id (int - Optional): id field of the origin country. If None ignores this while filtering.
+            destination_country_id (int - Optional): id field of the destination country. If None ignores this while filtering.
+            date (date - Optional): date of departure. If None ignores this while filtering.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A list of dictionaries of flights.
+            List[dict]: A list of dictionaries of flights.
         """
         query = Flight.objects.all()
         if origin_country_id:
@@ -411,16 +372,16 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_airline_id(airline_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_airline_id(airline_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Returns a list of flights that are owned by the specified airline.
         
         Args:
             airline_id (int): An airline ID.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            list[Dict]: A list of dictionaries of flights.
+            list[dict]: A list of dictionaries of flights.
         """
         # Create the query
         query = Flight.objects.filter(airline__pk=airline_id)
@@ -433,16 +394,16 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_arrival_flights(country_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_arrival_flights(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Get all flights arriving to a country in the next 12 hours.
 
         Args:
             country_id (int): ID of the country.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A list of dictionaries of flights.
+            List[dict]: A list of dictionaries of flights.
         """
         # Create a query
         query = Flight.objects.filter(destination_country__id=country_id)
@@ -458,16 +419,16 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_departure_flights(country_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_departure_flights(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Get all flights leaving a country in the next 12 hours.
 
         Args:
             country_id (int): ID of the country.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A list of dictionaries of flights.
+            List[dict]: A list of dictionaries of flights.
         """
         # Fetch the country
         country = Country.objects.filter(pk=country_id).first()
@@ -486,16 +447,16 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_tickets_by_customer(customer_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_tickets_by_customer(customer_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Fetches all tickets belonging to a customer.
 
         Args:
             customer_id (int): Id of the customer.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A list of dictionaries of tickets.
+            List[dict]: A list of dictionaries of tickets.
         """
         # Create the query
         query = Ticket.objects.filter(customer__id=customer_id)
@@ -508,16 +469,16 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_airlines_by_country(country_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_airlines_by_country(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Get all airlines in a certain country.
 
         Args:
             country_id (int): The country's ID.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of airline dictionaries.
+            List[dict]: A List of airline dictionaries.
         """
         # Create the query
         query = AirlineCompany.objects.filter(country__id=country_id)
@@ -530,19 +491,19 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(str)
-    def get_airlines_by_name(name: str, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_airlines_by_name(name: str, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Get all airlines whos name contains a str.
 
         Args:
             name (str): A search string.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of airline dictionaries.
+            List[dict]: A List of airline dictionaries.
         """
         # Create the query
-        query = Dict.objects.filter(name__icontains=name)
+        query = AirlineCompany.objects.filter(name__icontains=name)
         # Paginate the results
         query = query.all()[paginator.slice]
         # Serialized the results
@@ -553,15 +514,15 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_origin(country_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_origin(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """Get flights that take off from a certain country.
 
         Args:
             country_id (int): ID of the country.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of flight dictionaries.
+            List[dict]: A List of flight dictionaries.
         """
         # Create the query
         query = Flight.objects.filter(origin_country__id=country_id)
@@ -574,15 +535,15 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_destination(country_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_destination(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """Get flights that land in a certain country.
 
         Args:
             country_id (int): ID of the country.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of flight dictionaries.
+            List[dict]: A List of flight dictionaries.
         """
         # Create the query
         query = Flight.objects.filter(destination_country__id=country_id)
@@ -595,15 +556,15 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(Date)
-    def get_flights_by_departure_date(date: Date, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_departure_date(date: Date, paginator: Paginate = Paginate()) -> List[dict]:
         """Get flights that depart on a certain date.
 
         Args:
             date (Date): a date object to check on.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of flight dictionaries.
+            List[dict]: A List of flight dictionaries.
         """
         # Create the query
         query = Flight.objects.filter(departure_datetime__date=date)
@@ -616,15 +577,15 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(Date)
-    def get_flights_by_arrival_date(date: Date, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_arrival_date(date: Date, paginator: Paginate = Paginate()) -> List[dict]:
         """Get flights that arrive on a certain date.
 
         Args:
             date (Date): a date object to check on.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of flight dictionaries.
+            List[dict]: A List of flight dictionaries.
         """
         # Create the query
         query = Flight.objects.filter(arrival_datetime__date=date)
@@ -637,15 +598,15 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_customer(customer_id: int, paginator: Paginate = Paginate()) -> List[Dict]:
+    def get_flights_by_customer(customer_id: int, paginator: Paginate = Paginate()) -> List[dict]:
         """Fetch all flights for a customer.
 
         Args:
             customer_id (int): ID of the customer.
-            paginator (Paginate): A Paginate object if required.
+            paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
-            List[Dict]: A List of flight dictionaries.
+            List[dict]: A List of flight dictionaries.
         """
         # Create the query
         query = Flight.objects.filter(tickets__customer__id=customer_id)
@@ -711,12 +672,13 @@ class Repository():
         flight_happened = flight.departure_datetime <= timezone.now()
         if flight_happened:
             return False, 'the flight has already taken off'
-                
+        
         all_tickets = Repository.get_tickets_by_flight(id)
         total_booked_seats = 0
+        # Count how many seats were booked
         for ticket in all_tickets:
             total_booked_seats += ticket['seat_count'] if not ticket['is_canceled'] else 0
-        
+        # Check if there are enough seats to fulfill this order
         if total_booked_seats + seat_count > flight.total_seats:
             return False, f'the flight only has {flight.total_seats - total_booked_seats} seat(s) left'
         
@@ -724,39 +686,61 @@ class Repository():
     
     @staticmethod
     @accepts(int, str)
-    def assign_group_to_user(user_id: int, group_name: str):
-        # Check if the user is already in a group
+    def assign_group_to_user(user_id: int, group_name: str) -> dict:
+        """Adds a user to a specific group.
+
+        Args:
+            user_id (int): ID of the user
+            group_name (str): Name of the group to add the user to
+
+        Raises:
+            EntityNotFoundException: If the user was not found.
+            UserAlreadyInGroupException: If the user is already in a group.
+
+        Returns:
+            dict: A serialized user dictionary after addition to the group.
+        """
+        # Get and check the user by ID
         user = User.objects.filter(pk=user_id).first()
         if not user:
             raise EntityNotFoundException('This user does not exist.')
         
+        # Check if the user is already in a group
         if len(user.groups.all()) > 0:
             raise UserAlreadyInGroupException()
         
+        # Add the user to a group or remove from all groups if group_name is blank
         if group_name:
             group = Group.objects.get_or_create(group_name)
             user.groups.add(group)
         else:
             user.groups.clear()
-            
         user.save()
         
         return DBTables.USER.serializer(user).data
 
     @staticmethod
     @accepts(User)
-    def serialize_user(user: User):
+    def serialize_user(user: User) -> dict:
+        """Takes a User object and serializes it
+
+        Args:
+            user (User): A User object to serialize
+
+        Returns:
+            dict: A serialized User
+        """
         return DBTables.USER.serializer(user).data
 
-    @staticmethod
-    @log_action
-    def authenticate(request, username: str, password: str):
-        user = authenticate(request, username=username, password=password)
-        if user:
-            return DBTables.USER.serializer(user).data
-        else:
-            return {}
+    # @staticmethod
+    # @log_action
+    # def authenticate(request, username: str, password: str):
+    #     user = authenticate(request, username=username, password=password)
+    #     if user:
+    #         return DBTables.USER.serializer(user).data
+    #     else:
+    #         return {}
         
-    def is_authenticated(user_id):
-        user = Repository.get_by_id(DBTables.USER, user_id)
-        return user.is_authenticated()
+    # def is_authenticated(user_id):
+    #     user = Repository.get_by_id(DBTables.USER, user_id)
+    #     return user.is_authenticated()
