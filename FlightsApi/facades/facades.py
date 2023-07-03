@@ -5,7 +5,7 @@ from ..utils import is_customer, is_airline, is_admin
 from .errors import *
 # Python builtin imports
 from datetime import datetime, date as Date
-from typing import Union, Tuple
+from typing import Tuple
 from abc import abstractmethod
 # Django imports
 from django.contrib.auth import login
@@ -24,7 +24,8 @@ class FacadeBase():
         """
         pass
     
-    def get_all_flights(self, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
+    @staticmethod
+    def get_all_flights(limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Fetches all flights (paginated) from the repository
 
         Args:
@@ -43,8 +44,8 @@ class FacadeBase():
         # Make response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
     
-    
-    def get_flight_by_id(self, id: int) -> Tuple[int, dict]:
+    @staticmethod
+    def get_flight_by_id(id: int) -> Tuple[int, dict]:
         """Fetches a flight from the repo by a given ID
 
         Args:
@@ -66,8 +67,8 @@ class FacadeBase():
         # Make response
         return status.HTTP_200_OK, {'data': data}
     
-    
-    def get_flights_by_parameters(self, origin_country_id: int = None, destination_country_id: int = None, date: Date = None, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
+    @staticmethod
+    def get_flights_by_parameters(origin_country_id: int = None, destination_country_id: int = None, date: Date = None, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Get all flights and filter by given parameters.
 
         Args:
@@ -90,9 +91,9 @@ class FacadeBase():
 
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
         
-        
-    def get_all_airlines(self,  limit: int = 50, page: int = 1) -> Tuple[int, dict]:
-        """An alias function to get_flights_by_parameters() with no parameters (ie. all flights)
+    @staticmethod
+    def get_all_airlines(limit: int = 50, page: int = 1) -> Tuple[int, dict]:
+        """Get all airlines
 
         Args:
             limit (int, optional): Pagination limit. Defaults to 50.
@@ -101,11 +102,17 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        pagination = Paginate(limit, page)
+        try:
+            data = R.get_all(DBTables.AIRLINECOMPANY, pagination)
+        except Exception as e:
+            return handle_unexpected_exception(e)
+                
         # Make response
-        return FacadeBase.get_airlines_by_name(self, name='', limit=limit, page=page)
+        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
     
-    
-    def get_airline_by_id(self, id: int) -> Tuple[int, dict]:
+    @staticmethod
+    def get_airline_by_id(id: int) -> Tuple[int, dict]:
         """Get an airline by a given ID
 
         Args:
@@ -127,7 +134,8 @@ class FacadeBase():
         # Make response
         return status.HTTP_200_OK, {'data': data}
     
-    def get_airlines_by_name(self, name: str, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
+    @staticmethod
+    def get_airlines_by_name(name: str, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Get all airlines whos name contains a certain string.
 
         Args:
@@ -147,8 +155,8 @@ class FacadeBase():
         # Make response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
 
-
-    def get_all_countries(self, limit: int = 50, page: int = 0) -> Tuple[int, dict]:
+    @staticmethod
+    def get_all_countries(limit: int = 50, page: int = 0) -> Tuple[int, dict]:
         """Gets all countries
 
         Args:
@@ -167,8 +175,8 @@ class FacadeBase():
         # Make response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
     
-    
-    def get_country_by_id(self, id: int) -> Tuple[int, dict]:
+    @staticmethod
+    def get_country_by_id(id: int) -> Tuple[int, dict]:
         """Gets a country with a given ID
 
         Args:
