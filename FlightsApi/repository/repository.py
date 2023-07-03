@@ -677,7 +677,7 @@ class Repository():
         total_booked_seats = 0
         # Count how many seats were booked
         for ticket in all_tickets:
-            total_booked_seats += ticket['seat_count'] if not ticket['is_canceled'] else 0
+            total_booked_seats +=  0 if ticket['is_canceled'] else ticket['seat_count']
         # Check if there are enough seats to fulfill this order
         if total_booked_seats + seat_count > flight.total_seats:
             return False, f'the flight only has {flight.total_seats - total_booked_seats} seat(s) left'
