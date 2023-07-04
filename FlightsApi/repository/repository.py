@@ -192,17 +192,20 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(DBTables, int)
-    def update(dbtable: DBTables, id: int, **updated_values) -> Dict:
+    def update(dbtable: DBTables, id: int, **updated_values) -> Tuple[dict, bool]:
         """
         Update row from table with new data.
 
         Args:
             dbtable (DBTables): Table to update a row in.
             id (int): id of row to update.
-        Kwargs:
-            updated_values: Any updated values.
+            updated_values (kwargs): Any updated values.
+            
         Raises:
             FetchError for not found rows.
+            
+        Returns:
+            Tuple[dict, bool]: Updated instance, success flag
         """
         # Get the item
         instance = dbtable.model.objects.filter(id=id).first()

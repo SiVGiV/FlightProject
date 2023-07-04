@@ -188,7 +188,7 @@ class FacadeBase():
         try:
             data = R.get_by_id(DBTables.COUNTRY, id)
         except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ["'id' must be larger than zero."]}
+            return status.HTTP_400_BAD_REQUEST, {'errors': ["Country ID must be larger than zero."]}
         except Exception as e:
             return handle_unexpected_exception(e)
         
@@ -284,6 +284,8 @@ class AnonymousFacade(FacadeBase):
         user_created = False
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except (ValueError, TypeError, ValidationError) as e:
+            return 400, {'errors': ['Error while applying request data.', str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
         
@@ -356,31 +358,34 @@ class CustomerFacade(FacadeBase):
     def required_group(self):
         return self.__required_group
         
-    def update_customer(self, id: int, **updated_fields):
+    def update_customer(self, **updated_fields):
         """Updates a customer's details (Does not update any user credentials!)
 
         Args:
-            id (int): Customer's ID
+            updated_fields (kwargs): New details
 
         Returns:
             Tuple[int, dict]: A response tuple containing [status code, response data/errors]
         """
         try:
-            data = R.update(DBTables.CUSTOMER, id, **updated_fields)
+            data, success = R.update(DBTables.CUSTOMER, self.__user['customer'], **updated_fields)
         except RepoErrors.FetchError as e:
-            res = status.HTTP_404_NOT_FOUND, {'errors': [f"Could not find a customer with the id '{id}'"]}
+            res = status.HTTP_404_NOT_FOUND, {'errors': [f"Could not find a customer with the id '{self.__user['customer']}'"]}
         except (ValueError, TypeError, ValidationError) as e:
-            res = status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            res = status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', str(e)]}
         except Exception as e:
             res = handle_unexpected_exception(e)
         else:
-            res = status.HTTP_200_OK, {'data':data}
+            if success:
+                res = status.HTTP_200_OK, {'data':data}
+            else:
+                res = status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', data]}
             
         # Return response
         return res
 
 
-    def add_ticket(self, flight_id: int, seat_count: int):
+    def add_ticket(self, flight_id: int, seat_count: int) -> Tuple[int, dict]:
         """Adds a flight ticket for a customer
 
         Args:
@@ -420,7 +425,9 @@ class CustomerFacade(FacadeBase):
             Tuple[int, dict]: A response tuple containing status code, data/error dictionary
         """
         try:
-            ticket = R.get_by_id(DBTables, ticket_id)
+            ticket = R.get_by_id(DBTables.TICKET, ticket_id)
+        except RepoErrors.OutOfBoundsException as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': [str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
             
@@ -429,18 +436,20 @@ class CustomerFacade(FacadeBase):
             return status.HTTP_404_NOT_FOUND, {'errors': ['Ticket not found.']}
         
         #  Check if this customer owns the ticket
-        if ticket['customer'] == self.__user['customer']:
-            try:
-                data = R.update(DBTables.TICKET, id=ticket_id, is_canceled=True)
-            except RepoErrors.FetchError:
-                return status.HTTP_404_NOT_FOUND, {'errors': ['Ticket not found.']}
-            except (ValueError, TypeError, ValidationError) as e:
-                return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
-            if not data['is_canceled']:
-                return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Something went wrong when cancelling this ticket.', str(data)]}
-            return status.HTTP_200_OK, {'data': data}
-        else:
+        if not ticket['customer'] == self.__user['customer']:
             return status.HTTP_403_FORBIDDEN, {'errors': ['You cannot modify this ticket since it belongs to a different customer.']}
+        
+        try:
+            data, success = R.update(DBTables.TICKET, id=ticket_id, is_canceled=True)
+        except RepoErrors.FetchError:
+            return status.HTTP_404_NOT_FOUND, {'errors': ['Ticket not found.']}
+        except (ValueError, TypeError, ValidationError) as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+        
+        if not success:
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Something went wrong when cancelling this ticket.', data]}
+        return status.HTTP_200_OK, {'data': data}
+            
 
     def get_my_tickets(self, limit: int = 50, page: int = 0) -> Tuple[int, dict]:
         """Gets the customer's tickets
@@ -541,7 +550,7 @@ class AirlineFacade(FacadeBase):
             updated_fields.update(country_id=country_id)
         
         try:
-            data = R.update(DBTables.AIRLINECOMPANY, self.__user['airline'], **updated_fields)
+            data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline'], **updated_fields)
         except RepoErrors.FetchError:
             return status.HTTP_404_NOT_FOUND, {'errors': ['Airline not found.']}
         except (ValueError, TypeError, ValidationError) as e:
@@ -595,6 +604,8 @@ class AirlineFacade(FacadeBase):
         """
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
+        except RepoErrors.OutOfBoundsException as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': ["Flight ID must be greater than 0."]}
         except (ValueError, TypeError) as e:
             return status.HTTP_400_BAD_REQUEST, {'errors': [str(e)]}
         
@@ -606,7 +617,7 @@ class AirlineFacade(FacadeBase):
             return status.HTTP_403_FORBIDDEN, {'errors': ['You do not own this flight and cannot update it.']}
 
         try:
-            updated_flight = R.update(DBTables.FLIGHT, id=flight_id, **updated_fields)
+            updated_flight, success = R.update(DBTables.FLIGHT, id=flight_id, **updated_fields)
         except RepoErrors.FetchError as e:
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find flight with ID {flight_id}']}
         except (ValueError, TypeError, ValidationError) as e:
@@ -614,7 +625,10 @@ class AirlineFacade(FacadeBase):
         except Exception as e:
             return handle_unexpected_exception(e)
 
-        return status.HTTP_200_OK, {'data': updated_flight}
+        if success:
+            return status.HTTP_200_OK, {'data': updated_flight}
+        else:
+            return status.HTTP_400_BAD_REQUEST, {'errors': updated_flight}
 
     def cancel_flight(self, flight_id: int) -> Tuple[int, dict]:
         """Cancels a flight
@@ -627,6 +641,8 @@ class AirlineFacade(FacadeBase):
         """
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
+        except RepoErrors.OutOfBoundsException as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': [str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
             
@@ -638,11 +654,14 @@ class AirlineFacade(FacadeBase):
             return status.HTTP_403_FORBIDDEN, {'errors': ['You cannot modify this flight since it belongs to a different airline.']}
         
         try:
-            data = R.update(DBTables.FLIGHT, id=flight_id, is_canceled=True)
+            data, success = R.update(DBTables.FLIGHT, id=flight_id, is_canceled=True)
         except RepoErrors.FetchError:
             return status.HTTP_404_NOT_FOUND, {'errors': ['Flight not found.']}
         except (ValueError, TypeError, ValidationError) as e:
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+        except Exception as e:
+            return handle_unexpected_exception(e)
+        
         if not data['is_canceled']:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Something went wrong when cancelling this flight.', str(data)]}
         return status.HTTP_200_OK, {'data': data}
@@ -724,9 +743,12 @@ class AdministratorFacade(FacadeBase):
         Returns:
             Tuple[int, dict]: A response tuple containing status code and data/errors.
         """
+        
         # Create user
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except (ValueError, TypeError, ValidationError) as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
         
@@ -745,7 +767,7 @@ class AdministratorFacade(FacadeBase):
         except Exception as e:
             return handle_unexpected_exception(e)
                 
-        # Create airline
+        # Verify user and country
         country_exists = R.instance_exists(DBTables.COUNTRY, country_id)
         if not country_exists:
             return status.HTTP_400_BAD_REQUEST, {'errors':[f'Country ID {country_id} not found.']}
@@ -753,6 +775,7 @@ class AdministratorFacade(FacadeBase):
         user_exists = R.instance_exists(DBTables.USER, user_id)
         if not user_exists:
             return status.HTTP_400_BAD_REQUEST, {'errors':[f'User ID {user_id} not found.']}
+        # Create airline
         try:
             airline, success = R.add(
                 DBTables.AIRLINECOMPANY,
@@ -792,6 +815,8 @@ class AdministratorFacade(FacadeBase):
         # Create user
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except (ValueError, TypeError, ValidationError) as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
         
@@ -848,6 +873,8 @@ class AdministratorFacade(FacadeBase):
         # Create user
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+        except (ValueError, TypeError, ValidationError) as e:
+            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
         
@@ -904,7 +931,7 @@ class AdministratorFacade(FacadeBase):
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find an airline with the ID {airline_id}']}
 
         try:
-            updated = R.update(DBTables.USER, airline['user'], is_active=False)
+            updated, success = R.update(DBTables.USER, airline['user'], is_active=False)
         except RepoErrors.FetchError:
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching an airline with the ID {airline_id}']}
         except Exception as e:
@@ -913,7 +940,7 @@ class AdministratorFacade(FacadeBase):
         if updated['is_active'] == False:
             return status.HTTP_200_OK, {'data': {'success': True}} 
         else:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'data': {'success': False}}
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Unexpected failure occured.']}
     
     def deactivate_customer(self, customer_id) -> Tuple[int, dict]:
         """Deactivates a customer account
@@ -933,7 +960,7 @@ class AdministratorFacade(FacadeBase):
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a customer with the ID {customer_id}']}
 
         try:
-            updated = R.update(DBTables.USER, customer['user'], is_active=False)
+            updated, success = R.update(DBTables.USER, customer['user'], is_active=False)
         except RepoErrors.FetchError:
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching a customer with the ID {customer_id}']}
         except Exception as e:
@@ -942,7 +969,7 @@ class AdministratorFacade(FacadeBase):
         if updated['is_active'] == False:
             return status.HTTP_200_OK, {'data': {'success': True}}
         else:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'data': {'success': False}}
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Unexpected failure occured.']}
         
     
     def deactivate_administrator(self, admin_id) -> Tuple[int, dict]:
@@ -960,12 +987,12 @@ class AdministratorFacade(FacadeBase):
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Admin ID must be greater than 0.']}
         
         if not admin:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a admin with the ID {admin_id}']}
+            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find an admin with the ID {admin_id}']}
 
         try:
-            updated = R.update(DBTables.USER, admin['user'], is_active=False)
+            updated, success = R.update(DBTables.USER, admin['user'], is_active=False)
         except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching a admin with the ID {admin_id}']}
+            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching an admin with the ID {admin_id}']}
         except Exception as e:
             return handle_unexpected_exception(e)
         
@@ -973,7 +1000,7 @@ class AdministratorFacade(FacadeBase):
         if updated['is_active'] == False:
             return status.HTTP_200_OK, {'data': {'success': True}}
         else:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'data': {'success': False}}
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Unexpected failure occured.']}
     
 
 def handle_unexpected_exception(exception) -> Tuple[int, dict]:
