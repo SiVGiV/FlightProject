@@ -625,8 +625,8 @@ class AirlineFacade(FacadeBase):
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
         except RepoErrors.OutOfBoundsException as e:
             return status.HTTP_400_BAD_REQUEST, {'errors': ["Flight ID must be greater than 0."]}
-        except (ValueError, TypeError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [str(e)]}
+        except Exception as e:
+            return handle_unexpected_exception(e)
         
         if not flight:
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find flight with ID {flight_id}']}
@@ -786,14 +786,11 @@ class AdministratorFacade(FacadeBase):
         except Exception as e:
             return handle_unexpected_exception(e)
                 
-        # Verify user and country
+        # Verify country
         country_exists = R.instance_exists(DBTables.COUNTRY, country_id)
         if not country_exists:
             return status.HTTP_400_BAD_REQUEST, {'errors':[f'Country ID {country_id} not found.']}
         
-        user_exists = R.instance_exists(DBTables.USER, user_id)
-        if not user_exists:
-            return status.HTTP_400_BAD_REQUEST, {'errors':[f'User ID {user_id} not found.']}
         # Create airline
         try:
             airline, success = R.add(
@@ -853,6 +850,7 @@ class AdministratorFacade(FacadeBase):
             return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
         except Exception as e:
             return handle_unexpected_exception(e)
+        
         # Create customer
         try:
             customer, customer_created = R.add(
@@ -974,6 +972,8 @@ class AdministratorFacade(FacadeBase):
             customer = R.get_by_id(DBTables.CUSTOMER, customer_id)
         except RepoErrors.OutOfBoundsException:
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Customer ID must be greater than 0.']}
+        except Exception as e:
+            return handle_unexpected_exception(e)
         
         if not customer:
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a customer with the ID {customer_id}']}
@@ -1004,6 +1004,8 @@ class AdministratorFacade(FacadeBase):
             admin = R.get_by_id(DBTables.ADMIN, admin_id)
         except RepoErrors.OutOfBoundsException:
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Admin ID must be greater than 0.']}
+        except Exception as e:
+            return handle_unexpected_exception(e)
         
         if not admin:
             return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find an admin with the ID {admin_id}']}

@@ -291,71 +291,65 @@ class TestAdminFacade(TestCase):
             mock_repo.instance_exists.side_effect = [True, True]
 
         # User creation
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('Validation error'):
             mock_repo.add.side_effect = ValueError('Some error')
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('Unexpected exception'):
             mock_repo.add.side_effect = Exception('Some error')
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('User not created'):
             mock_repo.add.return_value = ({'SomeError': ['error']}, False)
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (400, { 'errors': {'SomeError': ['error']} }))
             reset_mocks()
             
         # Adding user to group
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('User not found in assign_group_to_user'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.EntityNotFoundException
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (400, {'errors': ['User ID 1 not found.']}))
             reset_mocks()
             
-        with self.subTest('fourth EXCEPT block'):
+        with self.subTest('User already in a group'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.UserAlreadyInGroupException
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (409, {'errors': ['User ID 1 is already assigned to a role.']}))
             reset_mocks()
         
-        with self.subTest('fifth EXCEPT block'):
+        with self.subTest('Unexpected exception from assign_group_to_user'):
             mock_repo.assign_group_to_user.side_effect = Exception('Some error')
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # User and country verification
-        with self.subTest('second IF block'):
+        # Country verification
+        with self.subTest('Country does not exist'):
             mock_repo.instance_exists.side_effect = [False, True]
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (400, {'errors': ['Country ID 1 not found.']}))
             reset_mocks()
             
-        with self.subTest('third IF block'):
-            mock_repo.instance_exists.side_effect = [True, False]
-            result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
-            self.assertEqual(result, (400, {'errors': ['User ID 1 not found.']}))
-            reset_mocks()
-            
         # Airline creation
-        with self.subTest('sixth except block'):
+        with self.subTest('Validation error on airline creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), ValueError('Some value error')]
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some value error']}))
             reset_mocks()
             
-        with self.subTest('seventh except block'):
+        with self.subTest('Unexpected exception'):
             mock_repo.add.side_effect = [({'id': 1}, True), Exception('Some error')]
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
         # Airline result verification
-        with self.subTest('fourth IF block'):
+        with self.subTest('Airline creation failure'):
             mock_repo.add.side_effect = [({'id': 1}, True), ({'id': 1}, False)]
             result = self.facade.add_airline('username', 'password', 'email', 'name', 1)
             self.assertEqual(result, (400, {'errors': {'id': 1}}))
@@ -393,58 +387,58 @@ class TestAdminFacade(TestCase):
             mock_repo.instance_exists.side_effect = [True, True]
 
         # User creation
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('User creation validation error'):
             mock_repo.add.side_effect = ValueError('Some error')
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('Unexpected exception at user creation'):
             mock_repo.add.side_effect = Exception('Some error')
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('User creation failure'):
             mock_repo.add.return_value = ({'SomeError': ['error']}, False)
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, { 'errors': {'SomeError': ['error']} }))
             reset_mocks()
             
         # Adding user to group
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('User not found in assign_group_to_user'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.EntityNotFoundException
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': ['User ID 1 not found.']}))
             reset_mocks()
             
-        with self.subTest('fourth EXCEPT block'):
+        with self.subTest('User already in a group'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.UserAlreadyInGroupException
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (409, {'errors': ['User ID 1 is already assigned to a role.']}))
             reset_mocks()
         
-        with self.subTest('fifth EXCEPT block'):
+        with self.subTest('Unexpected exception'):
             mock_repo.assign_group_to_user.side_effect = Exception('Some error')
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # Airline creation
-        with self.subTest('sixth except block'):
+        # Customer creation
+        with self.subTest('Validation exception on customer creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), ValueError('Some value error')]
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some value error']}))
             reset_mocks()
             
-        with self.subTest('seventh except block'):
+        with self.subTest('Unexpected exception on customer creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), Exception('Some error')]
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # Airline result verification
-        with self.subTest('second IF block'):
+        # Customer result verification
+        with self.subTest('Customer creation failure'):
             mock_repo.add.side_effect = [({'id': 1}, True), ({'id': 1}, False)]
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': {'id': 1}}))
@@ -480,58 +474,58 @@ class TestAdminFacade(TestCase):
             mock_repo.instance_exists.side_effect = [True, True]
 
         # User creation
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('User creation validation error'):
             mock_repo.add.side_effect = ValueError('Some error')
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('User creation unexpected exception'):
             mock_repo.add.side_effect = Exception('Some error')
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('User not created'):
             mock_repo.add.return_value = ({'SomeError': ['error']}, False)
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (400, { 'errors': {'SomeError': ['error']} }))
             reset_mocks()
             
         # Adding user to group
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('User not found in assign_group_to_user'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.EntityNotFoundException
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (400, {'errors': ['User ID 1 not found.']}))
             reset_mocks()
             
-        with self.subTest('fourth EXCEPT block'):
+        with self.subTest('User already in a group'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.UserAlreadyInGroupException
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (409, {'errors': ['User ID 1 is already assigned to a role.']}))
             reset_mocks()
         
-        with self.subTest('fifth EXCEPT block'):
+        with self.subTest('Unexpected exception in assign_group_to_user'):
             mock_repo.assign_group_to_user.side_effect = Exception('Some error')
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # Airline creation
-        with self.subTest('sixth except block'):
+        # Admin creation
+        with self.subTest('Validation error on admin creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), ValueError('Some value error')]
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some value error']}))
             reset_mocks()
             
-        with self.subTest('seventh except block'):
+        with self.subTest('Unexpected exception on admin creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), Exception('Some error')]
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # Airline result verification
-        with self.subTest('second IF block'):
+        # Admin result verification
+        with self.subTest('Admin not created'):
             mock_repo.add.side_effect = [({'id': 1}, True), ({'id': 1}, False)]
             result = self.facade.add_administrator('username', 'password', 'email', 'first_name', 'last_name')
             self.assertEqual(result, (400, {'errors': {'id': 1}}))
@@ -554,31 +548,31 @@ class TestAdminFacade(TestCase):
             mock_repo.update.reset_mock(return_value=True, side_effect=True)
             mock_repo.update.return_value = {'id': 1, 'is_active': False}, True
         
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('Airline id out of bounds'):
             mock_repo.get_by_id.side_effect = RepoErrors.OutOfBoundsException()
             result = self.facade.deactivate_airline(1)
             self.assertEqual(result, (400, {'errors': ['Airline ID must be greater than 0.']}))
             reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('Airline not found'):
             mock_repo.get_by_id.return_value = {}
             result = self.facade.deactivate_airline(1)
             self.assertEqual(result, (404, {'errors': [f'Could not find an airline with the ID 1']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('User not found on update'):
             mock_repo.update.side_effect = RepoErrors.FetchError('Some error')
             result = self.facade.deactivate_airline(1)
             self.assertEqual(result, (404, {'errors': [f'Could not find a user matching an airline with the ID 1']}))
             reset_mocks()
             
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('unexpected exception on update'):
             mock_repo.update.side_effect = Exception('Some error')
             result = self.facade.deactivate_airline(1)
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second IF block'):
+        with self.subTest('user not updated'):
             mock_repo.update.return_value = {'is_active': True}, False
             result = self.facade.deactivate_airline(1)
             self.assertEqual(result, (500, {'errors': ['Unexpected failure occured.']}))
@@ -602,31 +596,37 @@ class TestAdminFacade(TestCase):
             mock_repo.update.reset_mock(return_value=True, side_effect=True)
             mock_repo.update.return_value = {'id': 1, 'is_active': False}, True
         
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('Customer id out of bounds'):
             mock_repo.get_by_id.side_effect = RepoErrors.OutOfBoundsException()
             result = self.facade.deactivate_customer(1)
             self.assertEqual(result, (400, {'errors': ['Customer ID must be greater than 0.']}))
             reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('Unexpected exception at get_by_id'):
+            mock_repo.get_by_id.side_effect = Exception('Some error')
+            result = self.facade.deactivate_customer(1)
+            self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
+            reset_mocks()
+            
+        with self.subTest('Customer not found'):
             mock_repo.get_by_id.return_value = {}
             result = self.facade.deactivate_customer(1)
             self.assertEqual(result, (404, {'errors': [f'Could not find a customer with the ID 1']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('User fetch error at user update'):
             mock_repo.update.side_effect = RepoErrors.FetchError('Some error')
             result = self.facade.deactivate_customer(1)
             self.assertEqual(result, (404, {'errors': [f'Could not find a user matching a customer with the ID 1']}))
             reset_mocks()
             
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('Unexpected exception at user update'):
             mock_repo.update.side_effect = Exception('Some error')
             result = self.facade.deactivate_customer(1)
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second IF block'):
+        with self.subTest('Update failed'):
             mock_repo.update.return_value = {'is_active': True}, False
             result = self.facade.deactivate_customer(1)
             self.assertEqual(result, (500, {'errors': ['Unexpected failure occured.']}))
@@ -649,31 +649,37 @@ class TestAdminFacade(TestCase):
             mock_repo.update.reset_mock(return_value=True, side_effect=True)
             mock_repo.update.return_value = {'id': 1, 'is_active': False}, True
         
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('Admin id out of bounds'):
             mock_repo.get_by_id.side_effect = RepoErrors.OutOfBoundsException()
             result = self.facade.deactivate_administrator(1)
             self.assertEqual(result, (400, {'errors': ['Admin ID must be greater than 0.']}))
             reset_mocks()
+        
+        with self.subTest('Unexpected exception on get_by_id'):
+            mock_repo.get_by_id.side_effect = Exception('Some error')
+            result = self.facade.deactivate_administrator(1)
+            self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
+            reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('Admin not found'):
             mock_repo.get_by_id.return_value = {}
             result = self.facade.deactivate_administrator(1)
             self.assertEqual(result, (404, {'errors': [f'Could not find an admin with the ID 1']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('Fetch error at update'):
             mock_repo.update.side_effect = RepoErrors.FetchError('Some error')
             result = self.facade.deactivate_administrator(1)
             self.assertEqual(result, (404, {'errors': [f'Could not find a user matching an admin with the ID 1']}))
             reset_mocks()
             
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('Unexpected exception at update'):
             mock_repo.update.side_effect = Exception('Some error')
             result = self.facade.deactivate_administrator(1)
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second IF block'):
+        with self.subTest('Update failed'):
             mock_repo.update.return_value = {'is_active': True}, False
             result = self.facade.deactivate_administrator(1)
             self.assertEqual(result, (500, {'errors': ['Unexpected failure occured.']}))
@@ -853,16 +859,16 @@ class TestAirlineFacade(TestCase):
                 (400, {'errors': ["Flight ID must be greater than 0."]})
             )
             reset_mocks()
-            
-        with self.subTest('Bad type/value of '):
-            mock_repo.get_by_id.side_effect = ValueError('Some error')
+
+        with self.subTest('Unexpected exception at get_by_id'):
+            mock_repo.get_by_id.side_effect = Exception('Some error')
             result = self.facade.update_flight(1, total_seats=1)
             self.assertEqual(
                 result,
-                (400, {'errors': ["Some error"]})
+                (500, {'errors': ["The server encountered an unexpected error.", 'Some error']})
             )
             reset_mocks()
-
+            
         with self.subTest('Flight not found'):
             mock_repo.get_by_id.return_value = {}
             result = self.facade.update_flight(1, total_seats=1)
@@ -1187,58 +1193,58 @@ class TestAnonymousFacade(TestCase):
             mock_repo.instance_exists.side_effect = [True, True]
 
         # User creation
-        with self.subTest('first EXCEPT block'):
+        with self.subTest('User creation validation error'):
             mock_repo.add.side_effect = ValueError('Some error')
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('second EXCEPT block'):
+        with self.subTest('Unexpected exception at user creation'):
             mock_repo.add.side_effect = Exception('Some error')
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        with self.subTest('first IF block'):
+        with self.subTest('User creation failure'):
             mock_repo.add.return_value = ({'SomeError': ['error']}, False)
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, { 'errors': {'SomeError': ['error']} }))
             reset_mocks()
             
         # Adding user to group
-        with self.subTest('third EXCEPT block'):
+        with self.subTest('User not found in assign_group_to_user'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.EntityNotFoundException
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': ['User ID 1 not found.']}))
             reset_mocks()
             
-        with self.subTest('fourth EXCEPT block'):
+        with self.subTest('User already in a group'):
             mock_repo.assign_group_to_user.side_effect = RepoErrors.UserAlreadyInGroupException
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (409, {'errors': ['User ID 1 is already assigned to a role.']}))
             reset_mocks()
         
-        with self.subTest('fifth EXCEPT block'):
+        with self.subTest('Unexpected exception'):
             mock_repo.assign_group_to_user.side_effect = Exception('Some error')
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # Airline creation
-        with self.subTest('sixth except block'):
+        # Customer creation
+        with self.subTest('Validation exception on customer creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), ValueError('Some value error')]
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': ['Error while applying request data.', 'Some value error']}))
             reset_mocks()
             
-        with self.subTest('seventh except block'):
+        with self.subTest('Unexpected exception on customer creation'):
             mock_repo.add.side_effect = [({'id': 1}, True), Exception('Some error')]
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (500, {'errors': ['The server encountered an unexpected error.', 'Some error']}))
             reset_mocks()
             
-        # Airline result verification
-        with self.subTest('second IF block'):
+        # Customer result verification
+        with self.subTest('Customer creation failure'):
             mock_repo.add.side_effect = [({'id': 1}, True), ({'id': 1}, False)]
             result = self.facade.add_customer('username', 'password', 'email', 'first_name', 'last_name', 'address', 'phone_number')
             self.assertEqual(result, (400, {'errors': {'id': 1}}))
