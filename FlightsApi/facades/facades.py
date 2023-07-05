@@ -276,6 +276,8 @@ class AnonymousFacade(FacadeBase):
         user = request.user
         
         if user:
+            if user.is_anonymous:
+                return AnonymousFacade()
             login(request, user) # Django login function
             facade = AnonymousFacade.facade_from_user(user)
             if facade:
