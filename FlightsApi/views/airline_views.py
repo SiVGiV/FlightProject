@@ -76,9 +76,6 @@ class AirlineView(APIView): # /airline/<id>
         if error_msg:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
         
-        # Get all the details
-        id = request.GET.get('id', 0)
-        
         # Call facade and return response
         code, data = facade.get_airline_by_id(id)
         return Response(status=code, data=data)
@@ -99,32 +96,30 @@ class AirlineView(APIView): # /airline/<id>
         # Call facade and return response
         code, data = facade.deactivate_airline(id)
         return Response(status=code, data=data)
-        
-        
-@api_view(['PATCH'])
-def update_airline_view(request):
-    """
-    PATCH /airline/<id> - Update an airline
-    """
-    # Get correct facade
-    facade, error_msg = AnonymousFacade.login(request)
-    if error_msg:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
     
-    # Check if the user has the right permissions
-    if not isinstance(facade, AirlineFacade):
-        return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
-    
-    update_fields = {}
-    name = request.PATCH.get('name', '')
-    if name:
-        update_fields['name'] = name
-    try:
-        country_id = int(request.PATCH.get('country', ''))
-    except TypeError:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Country ID must be an integer.']})
-    if country_id:
-        update_fields['country'] = country_id
+    def patch(self, request, id):
+        """
+        PATCH /airline/<id> - Update an airline
+        """
+        # Get correct facade
+        facade, error_msg = AnonymousFacade.login(request)
+        if error_msg:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        
+        # Check if the user has the right permissions
+        if not isinstance(facade, AirlineFacade):
+            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+        
+        update_fields = {}
+        name = request.PATCH.get('name', '')
+        if name:
+            update_fields['name'] = name
+        try:
+            country_id = int(request.PATCH.get('country', ''))
+        except TypeError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Country ID must be an integer.']})
+        if country_id:
+            update_fields['country'] = country_id
 
-    code, data = facade.update_airline(**update_fields)
-    return Response(status=code, data=data)
+        code, data = facade.update_airline(**update_fields)
+        return Response(status=code, data=data)

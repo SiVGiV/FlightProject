@@ -23,14 +23,13 @@ urlpatterns = [
     
     path('airlines/', AirlinesView.as_view(), name="airlines"),
     path('airline/<int:id>/', AirlineView.as_view(), name="airline"),
-    path('airline/', update_airline_view, name="update_airline"),
     
     path('countries/', CountriesView.as_view(), name="countries"),
     path('country/<int:id>/', CountryView.as_view(), name="country"),
     
     path('customers/', CustomersView.as_view(), name="customers"),
     path('customer/<int:id>/', CustomerView.as_view(), name="customer"),
-    path('customer/', update_customer_view, name="update_customer"),
+    path('customer/<int:id>/', update_customer_view, name="update_customer"),
     
     path('flights/', FlightsView.as_view(), name="flights"),
     path('flight/<int:id>/', FlightView.as_view(), name="flight"),

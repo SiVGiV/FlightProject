@@ -96,8 +96,8 @@ class FacadeBase():
         # Return response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
         
-    @staticmethod
-    def get_all_airlines(limit: int = 50, page: int = 1) -> Tuple[int, dict]:
+    @classmethod
+    def get_all_airlines(cls, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Get all airlines
 
         Args:
@@ -107,17 +107,7 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
-        # Initialize pagination
-        pagination = Paginate(limit, page)
-        
-        # Fetch data and handle exceptions
-        try:
-            data = R.get_all(DBTables.AIRLINECOMPANY, pagination)
-        except Exception as e:
-            return handle_unexpected_exception(e)
-                
-        # Return response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        cls.get_airlines_by_name('', limit=limit, page=page)
     
     @staticmethod
     def get_airline_by_id(id: int) -> Tuple[int, dict]:
@@ -144,7 +134,7 @@ class FacadeBase():
         return status.HTTP_200_OK, {'data': data}
     
     @staticmethod
-    def get_airlines_by_name(name: str, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
+    def get_airlines_by_name(name: str, limit: int = 50, page: int = 1, allow_deactivated = False) -> Tuple[int, dict]:
         """Get all airlines whos name contains a certain string.
 
         Args:
@@ -160,7 +150,7 @@ class FacadeBase():
         
         # Fetch airlines and handle exceptions
         try:
-            data = R.get_airlines_by_name(name, pagination)
+            data = R.get_airlines_by_name(name, pagination, allow_deactivated)
         except Exception as e:
             return handle_unexpected_exception(e)
                 
@@ -749,6 +739,10 @@ class AdministratorFacade(FacadeBase):
         
         # Make response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+    
+    
+    def get_airlines_by_name(self, name, limit, page):
+        return super().get_airlines_by_name(name, limit, page, allow_deactivated=True)
         
         
     def add_airline(self, username, password, email, name: str, country_id: int) -> Tuple[int, dict]:

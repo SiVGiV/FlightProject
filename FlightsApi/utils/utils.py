@@ -1,7 +1,9 @@
-import logging
 from functools import wraps
 from ..models import User
-logger = logging.getLogger(__name__)
+from logging import getLogger
+from inspect import stack
+
+logger = getLogger('django')
 
 def ordinal(n: int):
     """Converts an int to an ordinal number (1 -> 1st, 2 -> 2nd, ...)
@@ -18,7 +20,6 @@ def ordinal(n: int):
         suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
     return str(n) + suffix
 
-
 def log_action(func):
     """Logs function calls at the debug level
 
@@ -27,9 +28,9 @@ def log_action(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        logger.debug(f"Called {func.__name__} @ {__name__}")
+        logger.info(f"Called {func.__name__}")
         res = func(*args, **kwargs)
-        logger.debug(f"{func.__name__} finished @ {__name__}")
+        logger.info(f"{func.__name__} finished")
         return res
     return wrapper
 

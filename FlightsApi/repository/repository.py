@@ -26,8 +26,7 @@ from .repository_utils import Paginate
 # [L] Utilities
 from ..utils import accepts, log_action
 
-logger = logging.getLogger()
-
+logger = logging.getLogger('django')
 
 @unique
 class DBTables(Enum):
@@ -493,7 +492,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(str)
-    def get_airlines_by_name(name: str, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_airlines_by_name(name: str,  paginator: Paginate = Paginate(), allow_deactivated = False) -> List[dict]:
         """
         Get all airlines whos name contains a str.
 
@@ -506,6 +505,11 @@ class Repository():
         """
         # Create the query
         query = AirlineCompany.objects.filter(name__icontains=name)
+        
+        # If deactivated are not allowed filter to only active
+        if not allow_deactivated:
+            query = query.filter(user__is_active=True)
+        
         # Paginate the results
         query = query.all()[paginator.slice]
         # Serialized the results

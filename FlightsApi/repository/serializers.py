@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from ..models import Country, User, Admin, AirlineCompany, Customer, Flight, Ticket
 from django.contrib.auth.models import Group
+from django.contrib.auth.hashers import make_password
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -10,9 +11,19 @@ class CountrySerializer(serializers.ModelSerializer):
 
         
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        help_text='Leave empty if no change needed',
+        style={'input_type': 'password', 'placeholder': 'Password'}
+    )
     class Meta:
         model = User
-        exclude = ['password']
+        fields = "__all__"
+        
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data.get('password'))
+        return super(UserSerializer, self).create(validated_data)
 
         
 class AdminSerializer(serializers.ModelSerializer):
@@ -25,28 +36,17 @@ class AirlineCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = AirlineCompany
         fields = "__all__"
-        # fields = ['name', 'country_id', 'user_id']
 
         
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = "__all__"
-        # fields = ['first_name', 'last_name', 'address', 'phone_number', 'user_id']
 
 class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = "__all__"
-        # fields = [
-        #     'airline_id',
-        #     'origin_country_id', 
-        #     'destination_country_id', 
-        #     'departure_datetime', 
-        #     'arrival_datetime', 
-        #     'total_seats', 
-        #     'is_canceled'
-        # ]
 
 
         
@@ -54,12 +54,6 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
-        # fields = [
-        #     'flight_id',
-        #     'customer_id',
-        #     'seat_count',
-        #     'is_canceled'
-        # ]
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:

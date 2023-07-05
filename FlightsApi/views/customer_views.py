@@ -5,9 +5,6 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-import logging
-logger = logging.getLogger(__name__)
-
 class CustomersView(APIView): # /customers
     def get(self, request):
         # Get correct facade
