@@ -35,13 +35,16 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        # Initialize pagination
         pagination = Paginate(per_page=limit, page_number=page)
+        
+        # Fetch data
         try:
             data = R.get_all(DBTables.FLIGHT, pagination)
         except Exception as e:
             return handle_unexpected_exception(e)
         
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
     
     @staticmethod
@@ -54,6 +57,7 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        # Fetch data and handle repository errors
         try:
             data = R.get_by_id(DBTables.FLIGHT, id)
         except RepoErrors.OutOfBoundsException:
@@ -64,7 +68,7 @@ class FacadeBase():
         if not data: # Check if the result came up empty
             return status.HTTP_404_NOT_FOUND, {'errors':['The requested resource was not found.']}
         
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data}
     
     @staticmethod
@@ -81,14 +85,16 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        # Initialize pagination
         pagination = Paginate(limit, page)
         
+        # Fetch data and handle exceptions
         try:
             data = R.get_flights_by_parameters(origin_country_id, destination_country_id, date, pagination)
         except Exception as e:
             return handle_unexpected_exception(e)
         
-
+        # Return response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
         
     @staticmethod
@@ -102,13 +108,16 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        # Initialize pagination
         pagination = Paginate(limit, page)
+        
+        # Fetch data and handle exceptions
         try:
             data = R.get_all(DBTables.AIRLINECOMPANY, pagination)
         except Exception as e:
             return handle_unexpected_exception(e)
                 
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
     
     @staticmethod
@@ -121,6 +130,7 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        # Fetch airline and handle exceptions
         try:
             data = R.get_by_id(DBTables.AIRLINECOMPANY, id)
         except RepoErrors.OutOfBoundsException:
@@ -131,7 +141,7 @@ class FacadeBase():
         if not data: # Check if the result came up empty
             return status.HTTP_404_NOT_FOUND, {'errors': ['The requested resource was not found.']}
         
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data}
     
     @staticmethod
@@ -146,13 +156,16 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data.
         """
+        # Initialize pagination
         pagination = Paginate(limit, page)
+        
+        # Fetch airlines and handle exceptions
         try:
             data = R.get_airlines_by_name(name, pagination)
         except Exception as e:
             return handle_unexpected_exception(e)
                 
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
 
     @staticmethod
@@ -166,13 +179,16 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data
         """
+        # Initialize pagination
         pagination = Paginate(per_page=limit, page_number=page)
+        
+        # Fetch data and handle exceptions
         try:
             data = R.get_all(DBTables.COUNTRY, pagination)
         except Exception as e:
             return handle_unexpected_exception(e)
         
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
     
     @staticmethod
@@ -185,6 +201,7 @@ class FacadeBase():
         Returns:
             Tuple[int, dict]: Status code, data.
         """
+        # Fetch data and handle exceptions
         try:
             data = R.get_by_id(DBTables.COUNTRY, id)
         except RepoErrors.OutOfBoundsException:
@@ -195,7 +212,7 @@ class FacadeBase():
         if not data: # Check if the result came up empty
             return status.HTTP_404_NOT_FOUND, {'errors': ['The requested resource was not found.']}
         
-        # Make response
+        # Return response
         return status.HTTP_200_OK, {'data': data}
         
 
@@ -205,7 +222,7 @@ class AnonymousFacade(FacadeBase):
     """
     def __init__(self):
         super().__init__()
-        self.__required_group = None
+        self.__required_group = None # Anonymous users do not need to be a part of a group
     
     @property 
     def required_group(self):
@@ -224,6 +241,7 @@ class AnonymousFacade(FacadeBase):
         Returns:
             Union[AdministratorFacade, AirlineFacade, CustomerFacade, AnonymousFacade]: _description_
         """
+        # Make sure the groups were created - this should happen once on the first facade fetch.
         if not __groups_created:
             try:
                 R.get_or_create_group('admin')
@@ -254,12 +272,14 @@ class AnonymousFacade(FacadeBase):
         Returns:
             Union[FacadeBase, str]: A tuple of Facade, error-message
         """
+        # Get user from request
         user = request.user
+        
         if user:
-            login(request, user)
+            login(request, user) # Django login function
             facade = AnonymousFacade.facade_from_user(user)
             if facade:
-                return facade, ''
+                return facade, '' # Return the right facade and an empty reason.
             else:
                 return AnonymousFacade(), 'User not assigned to any groups.'
         else:
@@ -281,18 +301,17 @@ class AnonymousFacade(FacadeBase):
             Tuple[int, dict]: A Status code and response tuple
         """
         # Create user
-        user_created = False
         try:
-            user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
+            user_data, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
             return 400, {'errors': ['Error while applying request data.', str(e)]}
         except Exception as e:
             return handle_unexpected_exception(e)
         
         if not user_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': user}
+            return status.HTTP_400_BAD_REQUEST, {'errors': user_data}
         
-        user_id = user['id']
+        user_id = user_data['id']
         
         # Add user to customer group
         try:
@@ -303,10 +322,10 @@ class AnonymousFacade(FacadeBase):
             return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
         except Exception as e:
             return handle_unexpected_exception(e)
+        
         # Create customer
-        customer_created = False
         try:
-            customer, customer_created = R.add(
+            customer_data, customer_created = R.add(
                 DBTables.CUSTOMER,
                 first_name=first_name,
                 last_name=last_name,
@@ -322,10 +341,10 @@ class AnonymousFacade(FacadeBase):
             return handle_unexpected_exception(e)
         
         if not customer_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': customer}
+            return status.HTTP_400_BAD_REQUEST, {'errors': customer_data}
 
-
-        return status.HTTP_200_OK, {'data': {'customer': customer, 'user': user}}
+        # Return response
+        return status.HTTP_200_OK, {'data': {'customer': customer_data, 'user': user_data}}
 
     def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Overrides FacadeBase's function and removes the user information from the response.
@@ -336,7 +355,7 @@ class AnonymousFacade(FacadeBase):
             page (int, optional): Page number. Defaults to 1.
 
         Returns:
-            Tuple[int, dict]: _description_
+            Tuple[int, dict]: status code, response data
         """
         code, data =  super().get_airlines_by_name(name, limit, page)
         # If not success return result
