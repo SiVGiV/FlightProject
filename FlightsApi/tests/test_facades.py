@@ -925,11 +925,12 @@ class TestAirlineFacade(TestCase):
     
     @patch('FlightsApi.facades.facades.R')
     def test_cancel_flight_success(self, mock_repo):
+        # Mock setup
         mock_repo.get_by_id.return_value = {'airline': 1}
         mock_repo.update.return_value = ({'is_canceled': True}, True)
-        
+        # Function call
         result = self.facade.cancel_flight(1)
-        
+        # Assertions
         self.assertEqual(
             result,
             (200, {'data': {'is_canceled': True}})
