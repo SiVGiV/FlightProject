@@ -23,7 +23,7 @@ class CustomersView(APIView): # /customers
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Pagination limit or page are not integers.']})
         
-        code, data = facade.get_all_customers(request, limit=limit or 0, page=page or 0)
+        code, data = facade.get_all_customers(limit=limit, page=page)
         return Response(status=code, data=data)
         
     
