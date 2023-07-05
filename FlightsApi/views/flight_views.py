@@ -2,9 +2,7 @@ from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, Administra
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 class FlightsView(APIView): # /flights
     def get(self, request):
@@ -15,14 +13,14 @@ class FlightsView(APIView): # /flights
         
         # Validate and fetch request parameters
         try:
-            origin_country_id = int(request.GET.get('origin_country_id', 0))
+            origin_country_id = int(request.GET.get('origin_country', 0))
         except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'origin_country_id' must be an integer."]})
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'origin_country' must be an integer."]})
         
         try:
-            destination_country_id = int(request.GET.get('destination_country_id', 0))
+            destination_country_id = int(request.GET.get('destination_country', 0))
         except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'destination_country_id' must be an integer."]})
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'destination_country' must be an integer."]})
         
         date = request.GET.get('date', None)
         
@@ -55,18 +53,18 @@ class FlightsView(APIView): # /flights
         
         # Validate and fetch request parameters
         try:
-            origin_country_id = int(request.POST.get('origin_country_id', 0))
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'origin_country_id' must be an integer."]})
+            origin_country_id = int(request.POST.get('origin_country', 0))
+        except TypeError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'origin_country' must be an integer."]})
         
         try:
-            destination_country_id = int(request.POST.get('destination_country_id', 0))
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'destination_country_id' must be an integer."]})
+            destination_country_id = int(request.POST.get('destination_country', 0))
+        except TypeError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'destination_country' must be an integer."]})
         
         try:
             total_seats = int(request.POST.get('total_seats', 0))
-        except ValueError:
+        except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'total_seats' must be an integer."]})
         
         departure_datetime = request.POST.get('departure_datetime', None)
@@ -103,22 +101,22 @@ class FlightView(APIView): # /flight/<id>
         # Validate and fetch request parameters
         update_fields = {}
         try:
-            origin_country_id = int(request.POST.get('origin_country_id', 0))
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'origin_country_id' must be an integer."]})
+            origin_country_id = int(request.POST.get('origin_country', 0))
+        except TypeError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'origin_country' must be an integer."]})
         if origin_country_id:
-            update_fields['origin_country_id'] = origin_country_id
+            update_fields['origin_country'] = origin_country_id
             
         try:
-            destination_country_id = int(request.POST.get('destination_country_id', 0))
-        except ValueError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'destination_country_id' must be an integer."]})
+            destination_country_id = int(request.POST.get('destination_country', 0))
+        except TypeError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'destination_country' must be an integer."]})
         if destination_country_id:
-            update_fields['destination_country_id'] = destination_country_id
+            update_fields['destination_country'] = destination_country_id
         
         try:
             total_seats = int(request.POST.get('total_seats', 0))
-        except ValueError:
+        except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'total_seats' must be an integer."]})
         if total_seats:
             update_fields['total_seats'] = total_seats

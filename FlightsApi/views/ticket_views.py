@@ -2,9 +2,7 @@ from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, Administra
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 class TicketsView(APIView): # /tickets
     def get(self, request):
@@ -21,7 +19,7 @@ class TicketsView(APIView): # /tickets
         try:
             limit = int(request.GET.get('limit', 50))
             page = int(request.GET.get('page', 1))
-        except ValueError:
+        except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Pagination limit or page are not integers.']})
         
         
@@ -41,12 +39,12 @@ class TicketsView(APIView): # /tickets
         # Validate inputs
         try:
             flight_id = int(request.GET.get('flight_id'))
-        except ValueError:
+        except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'flight_id' must be an integer."]})
         
         try:
             seat_count = int(request.GET.get('seat_count'))
-        except ValueError:
+        except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'seat_count' must be an integer."]})
         
         code, data = facade.add_ticket(flight_id=flight_id, seat_count=seat_count)

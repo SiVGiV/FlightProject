@@ -181,13 +181,12 @@ class Repository():
         deserialized_data = dbtable.serializer(data=fields)
         # Validate the data and return the result and a success/failure flag
         if deserialized_data.is_valid():
-            new_obj = deserialized_data.save()
+            deserialized_data.save()
             # If data is valid return a serialized instance of it
-            return dbtable.serializer(new_obj).data, True
+            return deserialized_data.data, True
         else:
-            errors = deserialized_data.errors
             # If there were errors in the creation of the instance return them
-            return errors, False
+            return deserialized_data.errors, False
     
     @staticmethod
     @log_action
@@ -714,8 +713,8 @@ class Repository():
         
         # Add the user to a group or remove from all groups if group_name is blank
         if group_name:
-            group = Group.objects.get_or_create(group_name)
-            user.groups.add(group)
+            group, created = Group.objects.get_or_create(name=group_name)
+            group.user_set.add(user)
         else:
             user.groups.clear()
         user.save()

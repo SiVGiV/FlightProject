@@ -2,15 +2,13 @@ from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, Administra
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import permission_classes, api_view
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 import logging
 logger = logging.getLogger(__name__)
 
 class CustomersView(APIView): # /customers
-    @permission_classes([IsAuthenticated,])
     def get(self, request):
         # Get correct facade
         facade, error_msg = AnonymousFacade.login(request)
@@ -62,7 +60,6 @@ class CustomersView(APIView): # /customers
         return Response(status=code, data=data)
     
 class CustomerView(APIView): # /customer/<id>
-    permission_classes = [IsAuthenticated,]
     def delete(self, request, id):
         """
         DELETE /customer/<id> - Deactivate customer account

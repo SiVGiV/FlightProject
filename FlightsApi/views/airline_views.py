@@ -2,9 +2,8 @@ from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, Administra
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import permission_classes, api_view
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 class AirlinesView(APIView): # /airlines
     def get(self, request):
@@ -23,7 +22,7 @@ class AirlinesView(APIView): # /airlines
         try:
             limit = int(request.GET.get('limit', 50))
             page = int(request.GET.get('page', 1))
-        except ValueError:
+        except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Pagination limit or page are not integers.']})
         
         # Call facade and return response
@@ -51,7 +50,10 @@ class AirlinesView(APIView): # /airlines
         password = request.POST.get('password')
         email = request.POST.get('email')
         name = request.POST.get('name')
-        country_id = request.POST.get('country_id')
+        try:
+            country_id = int(request.POST.get('country'))
+        except TypeError as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'country' must be an integer."]})
         
         code, data = facade.add_airline(
             username=username,
@@ -118,11 +120,11 @@ def update_airline_view(request):
     if name:
         update_fields['name'] = name
     try:
-        country_id = int(request.PATCH.get('country_id', ''))
-    except ValueError:
+        country_id = int(request.PATCH.get('country', ''))
+    except TypeError:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Country ID must be an integer.']})
     if country_id:
-        update_fields['country_id'] = country_id
+        update_fields['country'] = country_id
 
     code, data = facade.update_airline(**update_fields)
     return Response(status=code, data=data)

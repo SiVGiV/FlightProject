@@ -13,7 +13,6 @@ from django.http import HttpRequest
 from rest_framework import status
 from django.core.exceptions import ValidationError
 
-__groups_created = False
 DATE_FORMAT = "%Y-%m-%d"
 
 class FacadeBase():    
@@ -220,6 +219,7 @@ class AnonymousFacade(FacadeBase):
     """
     An anonymous user serving class.
     """
+    __groups_created = False
     def __init__(self):
         super().__init__()
         self.__required_group = None # Anonymous users do not need to be a part of a group
@@ -242,7 +242,7 @@ class AnonymousFacade(FacadeBase):
             Union[AdministratorFacade, AirlineFacade, CustomerFacade, AnonymousFacade]: _description_
         """
         # Make sure the groups were created - this should happen once on the first facade fetch.
-        if not __groups_created:
+        if not AnonymousFacade.__groups_created:
             try:
                 R.get_or_create_group('admin')
                 R.get_or_create_group('airline')
@@ -250,7 +250,7 @@ class AnonymousFacade(FacadeBase):
             except Exception as e:
                 raise RepositoryTransactionException("Failed to get/create permission group.\n" + str(e))
             else:
-                __groups_created = True
+                AnonymousFacade.__groups_created = True
         
         # Return the right facade
         if is_admin(user):
@@ -277,7 +277,7 @@ class AnonymousFacade(FacadeBase):
         
         if user:
             if user.is_anonymous:
-                return AnonymousFacade()
+                return AnonymousFacade(), ''
             login(request, user) # Django login function
             facade = AnonymousFacade.facade_from_user(user)
             if facade:
@@ -333,13 +333,13 @@ class AnonymousFacade(FacadeBase):
                 last_name=last_name,
                 address=address,
                 phone_number=phone_number,
-                user_id=user_id
+                user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
-            R.assign_group_to_user(user_id, '') # undo the assignment of a group to the user
+            R.remove(DBTables.USER, user_id)
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
-            R.assign_group_to_user(user_id, '') # undo the assignment of a group to the user
+            R.remove(DBTables.USER, user_id)
             return handle_unexpected_exception(e)
         
         if not customer_created:
@@ -423,7 +423,7 @@ class CustomerFacade(FacadeBase):
         
         # Create ticket
         try:
-            data, success = R.add(DBTables.TICKET, flight_id=flight_id, customer_id=self.__user['customer'], seat_count=seat_count)
+            data, success = R.add(DBTables.TICKET, flight=flight_id, customer=self.__user['customer'], seat_count=seat_count)
         except (ValueError, TypeError, ValidationError) as e:
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
@@ -598,9 +598,9 @@ class AirlineFacade(FacadeBase):
         try:
             data, success = R.add(
                 DBTables.FLIGHT,
-                airline_id=self.__user['airline'],
-                origin_country_id=origin_id,
-                destination_country_id=destination_id,
+                airline=self.__user['airline'],
+                origin_country=origin_id,
+                destination_country=destination_id,
                 departure_datetime=departure_datetime,
                 arrival_datetime=arrival_datetime,
                 total_seats=total_seats    
@@ -798,14 +798,14 @@ class AdministratorFacade(FacadeBase):
             airline, success = R.add(
                 DBTables.AIRLINECOMPANY,
                 name=name,
-                country_id=country_id,
-                user_id=user_id
+                country=country_id,
+                user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
-            R.assign_group_to_user(user_id, '') # undo the addition of a group
+            R.remove(DBTables.USER, user_id)
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
-            R.assign_group_to_user(user_id, '') # undo the addition of a group
+            R.remove(DBTables.USER, user_id)
             return handle_unexpected_exception(e)
         
         if success:
@@ -861,13 +861,13 @@ class AdministratorFacade(FacadeBase):
                 last_name=last_name,
                 address=address,
                 phone_number=phone_number,
-                user_id=user_id
+                user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
-            R.assign_group_to_user(user_id, '') # undo the addition of a group
+            R.remove(DBTables.USER, user_id)
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
         except Exception as e:
-            R.assign_group_to_user(user_id, '') # undo the addition of a group
+            R.remove(DBTables.USER, user_id)
             return handle_unexpected_exception(e)
         
         if not customer_created:
@@ -917,13 +917,13 @@ class AdministratorFacade(FacadeBase):
                 DBTables.ADMIN,
                 first_name=first_name,
                 last_name=last_name,
-                user_id=user_id
+                user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
-            R.assign_group_to_user(user_id, '') # undo the addition of a group
+            R.remove(DBTables.USER, user_id)
             return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', str(e)]}
         except Exception as e:
-            R.assign_group_to_user(user_id, '') # undo the addition of a group
+            R.remove(DBTables.USER, user_id)
             return handle_unexpected_exception(e)
         
         if not success:
