@@ -2,11 +2,11 @@ import os
 import django
 import logging
 
-
 # Setup django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "FlightProject.settings") 
 django.setup()
-logger = logging.getLogger(__name__)
+
+logger = logging.getLogger('django')
 
 def get_connection():
     """Creates and returns a Connection object (from mysql_connector_python) with the default django database settings
@@ -51,6 +51,19 @@ def create_schema():
         logger.info("%s schema creation successful." % DATABASE_SETTINGS['NAME'])
     
     
+def make_superuser_admin(*args):
+    """
+    Makes the 1st superuser an admin.
+    """
+    from django.contrib.auth.models import Group
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    superuser = User.objects.get(username=args[0])
+    group, created = Group.objects.get_or_create(name='admin')
+    superuser.groups.add(group)
+    superuser.save()
+    
+    
 def redirect_cmdline(cmd_name: str):
     """Redirects a command to the right function
 
@@ -60,8 +73,11 @@ def redirect_cmdline(cmd_name: str):
     match cmd_name:
         case 'create_schema' | 'create_database':
             return create_schema
+        case 'make_superuser_admin':
+            return make_superuser_admin
         case other:
             return lambda:None
+        
     
 if __name__ == "__main__":
     import sys
@@ -69,4 +85,4 @@ if __name__ == "__main__":
         case 1:
             create_schema()
         case 2:
-            redirect_cmdline(sys.argv[1])()
+            redirect_cmdline(sys.argv[1])(sys.argv[2:])

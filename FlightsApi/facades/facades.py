@@ -250,6 +250,9 @@ class AnonymousFacade(FacadeBase):
         elif is_customer(user):
             return CustomerFacade(R.serialize_user(user))
         else:
+            if user.is_superuser:
+                R.assign_group_to_user(user.id, 'admin')
+                return AdministratorFacade(R.serialize_user(user))
             return AnonymousFacade()
         
     @staticmethod
