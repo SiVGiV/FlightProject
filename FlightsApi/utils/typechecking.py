@@ -43,9 +43,12 @@ def accepts(*types, throw: Exception = IncorrectTypePassedToFunctionException):
             for type_index in range(len(types)):
                 argument_for_check = arg_list[type_index]
                 expected_type = types[type_index]
-                
                 if not isinstance(argument_for_check, expected_type):
-                    raise throw(f"Function '{ func.__name__ }' expected '{ expected_type.__name__ }' at {ordinal(type_index + 1)} argument but got '{ type(argument_for_check).__name__ }' instead.")
+                    if isinstance(expected_type, tuple):
+                        expected_name = ' or '.join(map(lambda type: type.__name__, expected_type))
+                    else:
+                        expected_name = expected_type.__name__
+                    raise throw(f"Function '{ func.__name__ }' expected '{ expected_name }' at {ordinal(type_index + 1)} argument but got '{ type(argument_for_check).__name__ }' instead.")
             return func(*args, **kwargs)
         return wrapper
     return decorator

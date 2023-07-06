@@ -20,7 +20,6 @@ class TestGetById(TestCase):
             last_name="testson",
             address="123 test st.",
             phone_number="+972 1231212",
-            credit_card_number="1234 1234 1234 1234",
             user=user
         )
         
@@ -95,7 +94,6 @@ class TestAdd(TestCase):
                 last_name="testson",
                 address="123 test st.",
                 phone_number="+972 1231212",
-                credit_card_number="1234 1234 1234 1234",
                 user=user['id']
             )[0]
         with self.subTest("User creation"):
@@ -203,7 +201,6 @@ class TestQueries(TestCase):
             last_name="testing",
             address="123 test ave.",
             phone_number="+123 1234 1234",
-            credit_card_number="4580 1234 5678 1111",
             user=user1
         )
         customer2 = Customer.objects.create(
@@ -211,7 +208,6 @@ class TestQueries(TestCase):
             last_name="testing",
             address="123 test ave.",
             phone_number="+123 5678 5678",
-            credit_card_number="4580 1234 5678 2222",
             user=user2
         )
         self.testing_data['users'].extend((user1, user2,))
