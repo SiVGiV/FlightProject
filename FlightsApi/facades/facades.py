@@ -2,6 +2,9 @@
 from ..repository import Repository as R, DBTables, Paginate
 from ..repository import errors as RepoErrors
 from ..utils import is_customer, is_airline, is_admin
+from ..facades.utils import conflict_response, not_found_response, bad_request_response, \
+                            ok_response, created_response, internal_error_response, \
+                            no_content_ok, forbidden_response
 from .errors import *
 # Python builtin imports
 from datetime import datetime, date as Date
@@ -41,10 +44,10 @@ class FacadeBase():
         try:
             data = R.get_all(DBTables.FLIGHT, pagination)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         # Return response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return ok_response(data=data, pagination=pagination)
     
     @staticmethod
     def get_flight_by_id(id: int) -> Tuple[int, dict]:
@@ -59,16 +62,16 @@ class FacadeBase():
         # Fetch data and handle repository errors
         try:
             data = R.get_by_id(DBTables.FLIGHT, id)
-        except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors':["'id' must be larger than zero."]}
+        except RepoErrors.OutOfBoundsException as e:
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not data: # Check if the result came up empty
-            return status.HTTP_404_NOT_FOUND, {'errors':['The requested resource was not found.']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Return response
-        return status.HTTP_200_OK, {'data': data}
+        return ok_response(data=data)
     
     @staticmethod
     def get_flights_by_parameters(origin_country_id: int = None, destination_country_id: int = None, date: Date = None, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
@@ -91,10 +94,10 @@ class FacadeBase():
         try:
             data = R.get_flights_by_parameters(origin_country_id, destination_country_id, date, pagination)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         # Return response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return ok_response(data=data, pagination=pagination)
         
     @classmethod
     def get_all_airlines(cls, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
@@ -122,16 +125,16 @@ class FacadeBase():
         # Fetch airline and handle exceptions
         try:
             data = R.get_by_id(DBTables.AIRLINECOMPANY, id)
-        except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ["'id' must be larger than zero."]}
+        except RepoErrors.OutOfBoundsException as e:
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not data: # Check if the result came up empty
-            return status.HTTP_404_NOT_FOUND, {'errors': ['The requested resource was not found.']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Return response
-        return status.HTTP_200_OK, {'data': data}
+        return ok_response(data=data)
     
     @staticmethod
     def get_airlines_by_name(name: str, limit: int = 50, page: int = 1, allow_deactivated = False) -> Tuple[int, dict]:
@@ -152,10 +155,10 @@ class FacadeBase():
         try:
             data = R.get_airlines_by_name(name, pagination, allow_deactivated)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
                 
         # Return response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return ok_response(data=data, pagination=pagination)
 
     @staticmethod
     def get_all_countries(limit: int = 50, page: int = 0) -> Tuple[int, dict]:
@@ -175,10 +178,10 @@ class FacadeBase():
         try:
             data = R.get_all(DBTables.COUNTRY, pagination)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         # Return response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return ok_response(data=data, pagination=pagination)
     
     @staticmethod
     def get_country_by_id(id: int) -> Tuple[int, dict]:
@@ -193,16 +196,16 @@ class FacadeBase():
         # Fetch data and handle exceptions
         try:
             data = R.get_by_id(DBTables.COUNTRY, id)
-        except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ["Country ID must be larger than zero."]}
+        except RepoErrors.OutOfBoundsException as e:
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not data: # Check if the result came up empty
-            return status.HTTP_404_NOT_FOUND, {'errors': ['The requested resource was not found.']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Return response
-        return status.HTTP_200_OK, {'data': data}
+        return ok_response(data=data)
         
 
 class AnonymousFacade(FacadeBase):
@@ -299,24 +302,22 @@ class AnonymousFacade(FacadeBase):
         try:
             user_data, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
-            return 400, {'errors': ['Error while applying request data.', str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not user_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': user_data}
+            return bad_request_response(errors=user_data)
         
         user_id = user_data['id']
         
         # Add user to customer group
         try:
             R.assign_group_to_user(user_id, group_name='customer')
-        except RepoErrors.EntityNotFoundException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [f'User ID {user_id} not found.']}
-        except RepoErrors.UserAlreadyInGroupException:
-            return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
+        except RepoErrors.UserAlreadyInGroupException as e:
+            return conflict_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         # Create customer
         try:
@@ -330,16 +331,17 @@ class AnonymousFacade(FacadeBase):
             )
         except (ValueError, TypeError, ValidationError) as e:
             R.remove(DBTables.USER, user_id)
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
             R.remove(DBTables.USER, user_id)
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not customer_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': customer_data}
+            return bad_request_response(errors=customer_data)
 
+        data = {'customer': customer_data, 'user': user_data}
         # Return response
-        return status.HTTP_200_OK, {'data': {'customer': customer_data, 'user': user_data}}
+        return created_response(data)
 
     def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Overrides FacadeBase's function and removes the user information from the response.
@@ -384,19 +386,16 @@ class CustomerFacade(FacadeBase):
         try:
             data, success = R.update(DBTables.CUSTOMER, self.__user['customer'], **updated_fields)
         except RepoErrors.FetchError as e:
-            res = status.HTTP_404_NOT_FOUND, {'errors': [f"Could not find a customer with the id '{self.__user['customer']}'"]}
+            return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
-            res = status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', str(e)]}
+            return bad_request_response(errors=e) 
         except Exception as e:
-            res = handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         else:
             if success:
-                res = status.HTTP_200_OK, {'data':data}
+                return ok_response(data)
             else:
-                res = status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', data]}
-            
-        # Return response
-        return res
+                return bad_request_response(errors=data)
 
 
     def add_ticket(self, flight_id: int, seat_count: int) -> Tuple[int, dict]:
@@ -412,21 +411,21 @@ class CustomerFacade(FacadeBase):
         # Check if possible
         bookable, reason = R.is_flight_bookable(flight_id, seat_count)
         if not bookable:
-            return status.HTTP_409_CONFLICT, {'errors': [f'Cannot book flight because { reason }.']}
+            return conflict_response(errors=f'Cannot book flight because { reason }.')
         
         # Create ticket
         try:
             data, success = R.add(DBTables.TICKET, flight=flight_id, customer=self.__user['customer'], seat_count=seat_count)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
 
         if success:
-            return status.HTTP_200_OK, {'data': data}
+            return created_response(data)
         else:
-            return status.HTTP_400_BAD_REQUEST, {'errors': data}
+            return bad_request_response(errors=data)
 
 
     def cancel_ticket(self, ticket_id: int) -> Tuple[int, dict]:
@@ -441,28 +440,28 @@ class CustomerFacade(FacadeBase):
         try:
             ticket = R.get_by_id(DBTables.TICKET, ticket_id)
         except RepoErrors.OutOfBoundsException as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
             
         # Check if ticket exists
         if not ticket:
-            return status.HTTP_404_NOT_FOUND, {'errors': ['Ticket not found.']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         #  Check if this customer owns the ticket
         if not ticket['customer'] == self.__user['customer']:
-            return status.HTTP_403_FORBIDDEN, {'errors': ['You cannot modify this ticket since it belongs to a different customer.']}
+            return forbidden_response()
         
         try:
             data, success = R.update(DBTables.TICKET, id=ticket_id, is_canceled=True)
-        except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': ['Ticket not found.']}
+        except RepoErrors.FetchError as e:
+            return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         
         if not success:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Something went wrong when cancelling this ticket.', data]}
-        return status.HTTP_200_OK, {'data': data}
+            return internal_error_response('Failed to update ticket.')
+        return ok_response(data=data)
             
 
     def get_my_tickets(self, limit: int = 50, page: int = 0) -> Tuple[int, dict]:
@@ -475,13 +474,13 @@ class CustomerFacade(FacadeBase):
         Returns:
             Tuple[int, dict]: A response tuple containing status code and data/errors.
         """
-        paginator = Paginate(limit, page)
+        pagination = Paginate(limit, page)
 
         try:
-            data = R.get_tickets_by_customer(self.__user['customer'], paginator)
+            data = R.get_tickets_by_customer(self.__user['customer'], pagination)
         except Exception as e:
-            return handle_unexpected_exception(e)
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**paginator}}
+            return internal_error_response(errors=e)
+        return ok_response(data=data, pagination=pagination)
     
     def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Overrides FacadeBase's function and censors the user information from it.
@@ -542,10 +541,10 @@ class AirlineFacade(FacadeBase):
         try:
             data = R.get_flights_by_airline_id(self.__user['airline'])
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
 
         pagination = Paginate(limit, page)
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return ok_response(data=data, pagination=pagination)
 
     def update_airline(self, name: str = None, country_id: int = None) -> Tuple[int, dict]:
         """Updates the airline.
@@ -565,15 +564,16 @@ class AirlineFacade(FacadeBase):
         
         try:
             data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline'], **updated_fields)
-        except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': ['Airline not found.']}
+        except RepoErrors.FetchError as e:
+            return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
-        
-
-        return status.HTTP_200_OK, {'data': data}
+            return internal_error_response(errors=e)
+        if success:
+            return ok_response(data=data)
+        else:
+            return bad_request_response(errors=data)
 
     def add_flight(self, origin_id: int, destination_id: int, departure_datetime: datetime, arrival_datetime: datetime, total_seats: int) -> Tuple[int, dict]:
         """Add a new flight to the airline
@@ -599,13 +599,13 @@ class AirlineFacade(FacadeBase):
                 total_seats=total_seats    
             )
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         if not success:
-            return status.HTTP_400_BAD_REQUEST, {'errors': data}
+            return bad_request_response(errors=data)
 
-        return status.HTTP_200_OK, {'data': data}
+        return created_response(data)
 
     def update_flight(self, flight_id: int, **updated_fields) -> Tuple[int, dict]:
         """Update a flight owned by the airline
@@ -619,30 +619,30 @@ class AirlineFacade(FacadeBase):
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
         except RepoErrors.OutOfBoundsException as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ["Flight ID must be greater than 0."]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not flight:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find flight with ID {flight_id}']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Make sure this airline owns the flight
         if not flight['airline'] == self.__user['airline']:
-            return status.HTTP_403_FORBIDDEN, {'errors': ['You do not own this flight and cannot update it.']}
+            return forbidden_response()
 
         try:
             updated_flight, success = R.update(DBTables.FLIGHT, id=flight_id, **updated_fields)
         except RepoErrors.FetchError as e:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find flight with ID {flight_id}']}
+            return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
 
         if success:
-            return status.HTTP_200_OK, {'data': updated_flight}
+            return ok_response(updated_flight)
         else:
-            return status.HTTP_400_BAD_REQUEST, {'errors': updated_flight}
+            return bad_request_response(errors=updated_flight)
 
     def cancel_flight(self, flight_id: int) -> Tuple[int, dict]:
         """Cancels a flight
@@ -656,29 +656,29 @@ class AirlineFacade(FacadeBase):
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
         except RepoErrors.OutOfBoundsException as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
             
         # Check if flight exists
         if not flight:
-            return status.HTTP_404_NOT_FOUND, {'errors': ['Flight not found.']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         if not flight['airline'] == self.__user['airline']:
-            return status.HTTP_403_FORBIDDEN, {'errors': ['You cannot modify this flight since it belongs to a different airline.']}
+            return forbidden_response()
         
         try:
             data, success = R.update(DBTables.FLIGHT, id=flight_id, is_canceled=True)
-        except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': ['Flight not found.']}
+        except RepoErrors.FetchError as e:
+            return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not data['is_canceled']:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Something went wrong when cancelling this flight.', str(data)]}
-        return status.HTTP_200_OK, {'data': data}
+            return internal_error_response()
+        return no_content_ok()
         
     def get_airlines_by_name(self, name: str = '',  limit: int = 50, page: int = 1):
         """Overrides FacadeBase's function and removes the user information from it.
@@ -738,10 +738,10 @@ class AdministratorFacade(FacadeBase):
         try:
             data = R.get_all(DBTables.CUSTOMER, pagination)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         # Make response
-        return status.HTTP_200_OK, {'data': data, 'pagination': {**pagination}}
+        return ok_response(data=data, pagination=pagination)
     
     
     def get_airlines_by_name(self, name, limit, page):
@@ -766,29 +766,27 @@ class AdministratorFacade(FacadeBase):
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not user_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': user}
+            return bad_request_response(errors=user)
         
         user_id = user['id']
         
         # Add user to airline group
         try:
             R.assign_group_to_user(user_id, group_name='airline')
-        except RepoErrors.EntityNotFoundException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [f'User ID {user_id} not found.']}
-        except RepoErrors.UserAlreadyInGroupException:
-            return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
+        except RepoErrors.UserAlreadyInGroupException as e:
+            return conflict_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
                 
         # Verify country
         country_exists = R.instance_exists(DBTables.COUNTRY, country_id)
         if not country_exists:
-            return status.HTTP_400_BAD_REQUEST, {'errors':[f'Country ID {country_id} not found.']}
+            return bad_request_response('Country does not exist')
         
         # Create airline
         try:
@@ -800,15 +798,16 @@ class AdministratorFacade(FacadeBase):
             )
         except (ValueError, TypeError, ValidationError) as e:
             R.remove(DBTables.USER, user_id)
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
             R.remove(DBTables.USER, user_id)
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if success:
-            return status.HTTP_200_OK, {'data': {'airline': airline, 'user': user}}
+            data = {'airline': airline, 'user': user}
+            return created_response(data)
         else:
-            return status.HTTP_400_BAD_REQUEST, {'errors': airline}
+            return bad_request_response(errors=airline)
         
     
     
@@ -831,24 +830,22 @@ class AdministratorFacade(FacadeBase):
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not user_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': user}
+            return bad_request_response(errors=user)
         
         user_id = user['id']
         
         # Add user to customer group
         try:
             R.assign_group_to_user(user_id, group_name='customer')
-        except RepoErrors.EntityNotFoundException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [f'User ID {user_id} not found.']}
-        except RepoErrors.UserAlreadyInGroupException:
-            return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
+        except RepoErrors.UserAlreadyInGroupException as e:
+            return conflict_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         # Create customer
         try:
@@ -862,15 +859,17 @@ class AdministratorFacade(FacadeBase):
             )
         except (ValueError, TypeError, ValidationError) as e:
             R.remove(DBTables.USER, user_id)
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
             R.remove(DBTables.USER, user_id)
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not customer_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': customer}
+            return bad_request_response(errors=customer)
         
-        return status.HTTP_200_OK, {'data': {'customer': customer, 'user': user}}
+        data = {'customer': customer, 'user': user}
+        
+        return created_response(data)
     
     
     def add_administrator(self, username: str, password: str, email: str, first_name: str, last_name: str) -> Tuple[int, dict]:
@@ -890,24 +889,22 @@ class AdministratorFacade(FacadeBase):
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.',str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not user_created:
-            return status.HTTP_400_BAD_REQUEST, {'errors': user}
+            return bad_request_response(errors=user)
         
         user_id = user['id']
         
         # Add user to admin group
         try:
             R.assign_group_to_user(user_id, group_name='admin')
-        except RepoErrors.EntityNotFoundException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': [f'User ID {user_id} not found.']}
-        except RepoErrors.UserAlreadyInGroupException:
-            return status.HTTP_409_CONFLICT, {'errors': [f'User ID {user_id} is already assigned to a role.']}
+        except RepoErrors.UserAlreadyInGroupException as e:
+            return conflict_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         # Create admin
         try:
             admin, success = R.add(
@@ -918,16 +915,17 @@ class AdministratorFacade(FacadeBase):
             )
         except (ValueError, TypeError, ValidationError) as e:
             R.remove(DBTables.USER, user_id)
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Error while applying request data.', str(e)]}
+            return bad_request_response(errors=e)
         except Exception as e:
             R.remove(DBTables.USER, user_id)
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not success:
-            return status.HTTP_400_BAD_REQUEST, {'errors': admin}
+            return bad_request_response(errors=admin)
         
+        data = {'admin': admin, 'user': user}
 
-        return status.HTTP_200_OK, {'data': {'admin': admin, 'user': user}}
+        return created_response(data)
     
     def deactivate_airline(self, airline_id: int) -> Tuple[int, dict]:
         """Deactivates an airline account
@@ -940,23 +938,23 @@ class AdministratorFacade(FacadeBase):
         """
         try:
             airline = R.get_by_id(DBTables.AIRLINECOMPANY, airline_id)
-        except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Airline ID must be greater than 0.']}
+        except RepoErrors.OutOfBoundsException as e:
+            return bad_request_response(errors=e)
         
         if not airline:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find an airline with the ID {airline_id}']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
 
         try:
             updated, success = R.update(DBTables.USER, airline['user'], is_active=False)
-        except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching an airline with the ID {airline_id}']}
+        except RepoErrors.FetchError as e:
+            return not_found_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if updated['is_active'] == False:
-            return status.HTTP_200_OK, {'data': {'success': True}} 
+            return no_content_ok() 
         else:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Unexpected failure occured.']}
+            return internal_error_response('Failed to update airline.')
     
     def deactivate_customer(self, customer_id) -> Tuple[int, dict]:
         """Deactivates a customer account
@@ -969,27 +967,27 @@ class AdministratorFacade(FacadeBase):
         """
         try:
             customer = R.get_by_id(DBTables.CUSTOMER, customer_id)
-        except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Customer ID must be greater than 0.']}
+        except RepoErrors.OutOfBoundsException as e:
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not customer:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a customer with the ID {customer_id}']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
 
         try:
             updated, success = R.update(DBTables.USER, customer['user'], is_active=False)
-        except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching a customer with the ID {customer_id}']}
+        except RepoErrors.FetchError as e:
+            return not_found_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
 
         if updated['is_active'] == False:
-            return status.HTTP_200_OK, {'data': {'success': True}}
+            return no_content_ok()
         else:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Unexpected failure occured.']}
-        
-    
+            return internal_error_response('Failed to update customer.')
+
+
     def deactivate_administrator(self, admin_id) -> Tuple[int, dict]:
         """Deactivates an admin account
 
@@ -1001,35 +999,23 @@ class AdministratorFacade(FacadeBase):
         """
         try:
             admin = R.get_by_id(DBTables.ADMIN, admin_id)
-        except RepoErrors.OutOfBoundsException:
-            return status.HTTP_400_BAD_REQUEST, {'errors': ['Admin ID must be greater than 0.']}
+        except RepoErrors.OutOfBoundsException as e:
+            return bad_request_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
         if not admin:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find an admin with the ID {admin_id}']}
+            return not_found_response(errors=RepoErrors.EntityNotFoundException())
 
         try:
             updated, success = R.update(DBTables.USER, admin['user'], is_active=False)
-        except RepoErrors.FetchError:
-            return status.HTTP_404_NOT_FOUND, {'errors': [f'Could not find a user matching an admin with the ID {admin_id}']}
+        except RepoErrors.FetchError as e:
+            return not_found_response(errors=e)
         except Exception as e:
-            return handle_unexpected_exception(e)
+            return internal_error_response(errors=e)
         
 
         if updated['is_active'] == False:
-            return status.HTTP_200_OK, {'data': {'success': True}}
+            return no_content_ok()
         else:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ['Unexpected failure occured.']}
-    
-
-def handle_unexpected_exception(exception) -> Tuple[int, dict]:
-    """Creates a status 500 message for an exception.
-
-    Args:
-        exception (Exception): Any exception
-
-    Returns:
-        Tuple[int, dict]: A 500 status code and an errors dictionary.
-    """
-    return status.HTTP_500_INTERNAL_SERVER_ERROR, {'errors': ["The server encountered an unexpected error.", str(exception)]}
+            return internal_error_response('Failed to update administrator.')

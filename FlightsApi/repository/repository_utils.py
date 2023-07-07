@@ -37,3 +37,6 @@ class Paginate():
         
     def keys(self):
         return ('page', 'limit')
+    
+    def get_dict(self):
+        return {'limit': self.__per_page, 'page': self.__page_number}
