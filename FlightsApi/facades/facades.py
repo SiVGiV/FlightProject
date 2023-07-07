@@ -2,7 +2,7 @@
 from ..repository import Repository as R, DBTables, Paginate
 from ..repository import errors as RepoErrors
 from ..utils import is_customer, is_airline, is_admin
-from ..facades.utils import conflict_response, not_found_response, bad_request_response, \
+from ..utils.response_utils import conflict_response, not_found_response, bad_request_response, \
                             ok_response, created_response, internal_error_response, \
                             no_content_ok, forbidden_response
 from .errors import *
@@ -363,6 +363,21 @@ class AnonymousFacade(FacadeBase):
             airline.pop('user', None)
         # Return censored result
         return code, data
+    
+    def get_airline_by_id(self, id: int):
+        """Overrides FacadeBase's function and censors the user information from it.
+
+        Args:
+            id (int): ID to look up.
+
+        Returns:
+            Tuple[int, dict]: A response tuple containing status code and data/errors.
+        """
+        code, data =  super().get_airline_by_id(id)
+        if code != 200:
+            return code, data
+        data['data'].pop('user', None)
+        return code, data
 
 class CustomerFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -373,7 +388,31 @@ class CustomerFacade(FacadeBase):
     @property 
     def required_group(self):
         return self.__required_group
+
+    def get_customer_by_id(self, id: int):
+        """Get a customer's details
         
+        Args:
+            id (int): Customer's ID
+
+        Returns:
+            Tuple[int, dict]: A response tuple containing [status code, response data/errors]
+        """
+        if not self.__user['customer'] == id:
+            return forbidden_response()
+        
+        try:
+            data = R.get_by_id(DBTables.CUSTOMER, id)
+        except (RepoErrors.FetchError, RepoErrors.EntityNotFoundException) as e:
+            return not_found_response(errors=e)
+        except Exception as e:
+            return internal_error_response(errors=e)
+        else:
+            if data:
+                return ok_response(data) 
+            else:
+                return not_found_response()
+
     def update_customer(self, **updated_fields):
         """Updates a customer's details (Does not update any user credentials!)
 
@@ -710,7 +749,8 @@ class AirlineFacade(FacadeBase):
         code, data =  super().get_airline_by_id(id)
         if code != 200:
             return code, data
-        data['data'].pop('user', None)
+        if self.__user['airline'] != id:
+            data['data'].pop('user', None)
         return code, data
 
 class AdministratorFacade(FacadeBase):
@@ -722,6 +762,27 @@ class AdministratorFacade(FacadeBase):
     @property 
     def required_group(self):
         return self.__required_group
+    
+    def get_customer_by_id(self, id: int):
+        """Get a customer's details
+        
+        Args:
+            id (int): Customer's ID
+
+        Returns:
+            Tuple[int, dict]: A response tuple containing [status code, response data/errors]
+        """
+        try:
+            data = R.get_by_id(DBTables.CUSTOMER, id)
+        except (RepoErrors.FetchError, RepoErrors.EntityNotFoundException) as e:
+            return not_found_response(errors=e)
+        except Exception as e:
+            return internal_error_response(errors=e)
+        else:
+            if data:
+                return ok_response(data) 
+            else:
+                return not_found_response()
     
     def get_all_customers(self, limit: int = 50, page: int = 1) -> Tuple[int, dict]:
         """Gets all customers in the system

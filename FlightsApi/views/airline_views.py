@@ -1,9 +1,10 @@
-from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, AdministratorFacade
+from ..facades import AnonymousFacade, AirlineFacade, AdministratorFacade
 
-from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from FlightsApi.utils.response_utils import forbidden_response, bad_request_response
+
 
 class AirlinesView(APIView): # /airlines
     def get(self, request):
@@ -13,7 +14,8 @@ class AirlinesView(APIView): # /airlines
         # Get correct facade
         facade, error_msg = AnonymousFacade.login(request)
         if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+            code, data = bad_request_response(error_msg)
+            return Response(status=code, data=data)
         
         # Get all the details
         name = request.GET.get('name', '')
@@ -23,7 +25,8 @@ class AirlinesView(APIView): # /airlines
             limit = int(request.GET.get('limit', 50))
             page = int(request.GET.get('page', 1))
         except TypeError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Pagination limit or page are not integers.']})
+            code, data = bad_request_response('Pagination limit or page are not integers.')
+            return Response(status=code, data=data)
         
         # Call facade and return response
         code, data = facade.get_airlines_by_name(
@@ -40,20 +43,23 @@ class AirlinesView(APIView): # /airlines
         # Get correct facade
         facade, error_msg = AnonymousFacade.login(request)
         if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
-        
+            code, data = bad_request_response(error_msg)
+            return Response(status=code, data=data)
+
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):
-            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+            code, data = forbidden_response()
+            return Response(status=code, data=data)
         
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        email = request.POST.get('email')
-        name = request.POST.get('name')
+        username = request.data.get('username')
+        password = request.data.get('password')
+        email = request.data.get('email')
+        name = request.data.get('name')
         try:
-            country_id = int(request.POST.get('country'))
+            country_id = int(request.data.get('country'))
         except TypeError as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'country' must be an integer."]})
+            code, data = bad_request_response("'country' must be an integer.")
+            return Response(status=code, data=data)
         
         code, data = facade.add_airline(
             username=username,
@@ -74,7 +80,8 @@ class AirlineView(APIView): # /airline/<id>
         # Get correct facade
         facade, error_msg = AnonymousFacade.login(request)
         if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+            code, data = bad_request_response(error_msg)
+            return Response(status=code, data=data)
         
         # Call facade and return response
         code, data = facade.get_airline_by_id(id)
@@ -87,11 +94,13 @@ class AirlineView(APIView): # /airline/<id>
         # Get correct facade
         facade, error_msg = AnonymousFacade.login(request)
         if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+            code, data = bad_request_response(error_msg)
+            return Response(status=code, data=data)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):
-            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+            code, data = forbidden_response()
+            return Response(status=code, data=data)
         
         # Call facade and return response
         code, data = facade.deactivate_airline(id)
@@ -104,11 +113,13 @@ class AirlineView(APIView): # /airline/<id>
         # Get correct facade
         facade, error_msg = AnonymousFacade.login(request)
         if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+            code, data = bad_request_response(error_msg)
+            return Response(status=code, data=data)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AirlineFacade):
-            return Response(status=status.HTTP_403_FORBIDDEN, data={'errors': ['You do not have the right permissions.']})
+            code, data = forbidden_response()
+            return Response(status=code, data=data)
         
         update_fields = {}
         name = request.PATCH.get('name', '')
@@ -117,7 +128,8 @@ class AirlineView(APIView): # /airline/<id>
         try:
             country_id = int(request.PATCH.get('country', ''))
         except TypeError:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Country ID must be an integer.']})
+            code, data = bad_request_response('Country ID must be an integer.')
+            return Response(status=code, data=data)
         if country_id:
             update_fields['country'] = country_id
 
