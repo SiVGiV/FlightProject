@@ -1,6 +1,6 @@
 class FacadeException(Exception):
     """
-    
+    An exception base class to be inherited from
     """
 
 class RepositoryTransactionException(FacadeException):
