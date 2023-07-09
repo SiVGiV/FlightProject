@@ -29,7 +29,6 @@ urlpatterns = [
     
     path('customers/', CustomersView.as_view(), name="customers"),
     path('customer/<int:id>/', CustomerView.as_view(), name="customer"),
-    path('customer/<int:id>/', update_customer_view, name="update_customer"),
     
     path('flights/', FlightsView.as_view(), name="flights"),
     path('flight/<int:id>/', FlightView.as_view(), name="flight"),
