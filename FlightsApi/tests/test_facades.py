@@ -1,15 +1,17 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from FlightsApi.repository.repository_utils import Paginate
 
 from datetime import datetime, timedelta
 
-from FlightsApi.facades.facades import AdministratorFacade, AirlineFacade, CustomerFacade, AnonymousFacade, FacadeBase # Imports to test
-from FlightsApi.facades.facades import R, RepoErrors, is_customer, is_airline, is_admin, DBTables # Imports for mocking etc.
+from FlightsApi.facades import AdministratorFacade, AirlineFacade, CustomerFacade, AnonymousFacade # Imports to test
+from FlightsApi.facades.facade_base import FacadeBase
+from FlightsApi.repository import Paginate, DBTables, errors as RepoErrors
+
 
 class TestFacadeBase(TestCase):
-    @patch('FlightsApi.facades.facades.R.get_all')
+    @patch('FlightsApi.facades.facade_base.R.get_all')
     def test_get_all_flights(self, mock_repo):
         with self.subTest('Success'):
             mock_repo.return_value = [{'success': True}]
@@ -27,7 +29,7 @@ class TestFacadeBase(TestCase):
             self.assertIn('unexpected error', result[1]['error'])
     
     
-    @patch('FlightsApi.facades.facades.R.get_by_id')
+    @patch('FlightsApi.facades.facade_base.R.get_by_id')
     def test_get_flight_by_id(self, mock_repo):
         with self.subTest('Success'):
             mock_repo.return_value = {'success': True}
@@ -58,8 +60,8 @@ class TestFacadeBase(TestCase):
             self.assertIn('unexpected error', result[1]['error'])
     
     
-    @patch('FlightsApi.facades.facades.Paginate')
-    @patch('FlightsApi.facades.facades.R.get_flights_by_parameters')
+    @patch('FlightsApi.facades.facade_base.Paginate')
+    @patch('FlightsApi.facades.facade_base.R.get_flights_by_parameters')
     def test_get_flights_by_parameters(self, mock_repo, mock_paginate):
         with self.subTest('Success'):
             pagination = Paginate(1, 2)
@@ -82,7 +84,7 @@ class TestFacadeBase(TestCase):
             self.assertIn('unexpected error', result[1]['error'])
     
     
-    @patch('FlightsApi.facades.facades.R.get_by_id')
+    @patch('FlightsApi.facades.facade_base.R.get_by_id')
     def test_get_airline_by_id(self, mock_repo):
         with self.subTest('Success'):
             mock_repo.return_value = {'success': True}
@@ -112,8 +114,8 @@ class TestFacadeBase(TestCase):
             self.assertEqual(result[0], 500)
             self.assertIn('unexpected error', result[1]['error'])
     
-    @patch('FlightsApi.facades.facades.Paginate')
-    @patch('FlightsApi.facades.facades.R.get_airlines_by_name')
+    @patch('FlightsApi.facades.facade_base.Paginate')
+    @patch('FlightsApi.facades.facade_base.R.get_airlines_by_name')
     def test_get_airlines_by_name(self, mock_repo, mock_pagination):
         with self.subTest('Success'):
             pagination = Paginate(1, 2)
@@ -137,8 +139,8 @@ class TestFacadeBase(TestCase):
             self.assertEqual(result[0], 500)
             self.assertIn('unexpected error', result[1]['error'])
 
-    @patch('FlightsApi.facades.facades.Paginate')
-    @patch('FlightsApi.facades.facades.R.get_all')
+    @patch('FlightsApi.facades.facade_base.Paginate')
+    @patch('FlightsApi.facades.facade_base.R.get_all')
     def test_get_all_countries(self, mock_repo, mock_paginate):
         with self.subTest('Success'):
             pagination = Paginate(1, 2)
@@ -160,7 +162,7 @@ class TestFacadeBase(TestCase):
             self.assertEqual(result[0], 500)
             self.assertIn('unexpected error', result[1]['error'])
     
-    @patch('FlightsApi.facades.facades.R.get_by_id')
+    @patch('FlightsApi.facades.facade_base.R.get_by_id')
     def test_get_country_by_id(self, mock_repo):
         with self.subTest('Success'):
             mock_repo.return_value = {'success': True}
@@ -194,20 +196,20 @@ class TestFacadeBase(TestCase):
 class TestAdminFacade(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        with patch('FlightsApi.facades.facades.R.get_or_create_group') as mock:
-            mock.return_value = {'id': 1, 'name': 'admin'}
+        with patch('FlightsApi.facades.administrator_facade.R') as mock:
+            mock.get_or_create_group.return_value = {'id': 1, 'name': 'admin'}
+            mock.get_by_user_id.return_value = {'id': 1}
             cls.facade = AdministratorFacade({
                 'id': 1,
                 'username': 'testadmin',
                 'email': 'test@admin.com',
-                'admin': 1,
                 'is_active': True,
                 'groups': [1]
             })
         return super().setUpClass()
     
-    @patch('FlightsApi.facades.facades.Paginate')
-    @patch('FlightsApi.facades.facades.R.get_all')
+    @patch('FlightsApi.facades.administrator_facade.Paginate')
+    @patch('FlightsApi.facades.administrator_facade.R.get_all')
     def test_get_all_customers(self, mock_repo, mock_paginate):
         with self.subTest('Success'): 
             pagination = Paginate(1, 2)
@@ -230,9 +232,10 @@ class TestAdminFacade(TestCase):
             self.assertIn('unexpected error', result[1]['error'])
 
 
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_add_airline_success(self, mock_repo):
         mock_repo.add.return_value = {'id': 1}, True
+        mock_repo.get_by_id.return_value = {'id': 1}
         mock_repo.assign_group_to_user.return_value = None
         mock_repo.instance_exists.side_effect = [True, True]
         result = self.facade.add_airline(
@@ -245,7 +248,7 @@ class TestAdminFacade(TestCase):
         # Assertions
         self.assertEqual(result, (201, {'data': {'airline': {'id': 1}, 'user': {'id': 1}}}))
         
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_add_airline_repo_errors(self, mock_repo):
         # Mocks
         def reset_mocks():
@@ -329,9 +332,10 @@ class TestAdminFacade(TestCase):
             self.assertIn('fieldError', result[1]['error'])
     
 
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_add_customer_success(self, mock_repo):
         mock_repo.add.return_value = {'id': 1}, True
+        mock_repo.get_by_id.return_value = {'id': 1}
         mock_repo.assign_group_to_user.return_value = None
         result = self.facade.add_customer(
             username='username',
@@ -345,7 +349,7 @@ class TestAdminFacade(TestCase):
         # Assertions
         self.assertEqual(result, (201, {'data': {'customer': {'id': 1}, 'user': {'id': 1}}}))
         
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_add_customer_repo_errors(self, mock_repo):
         # Mocks
         def reset_mocks():
@@ -426,9 +430,10 @@ class TestAdminFacade(TestCase):
             self.assertIn('fieldError', result[1]['error'])
     
 
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_add_administrator_success(self, mock_repo):
         mock_repo.add.return_value = {'id': 1}, True
+        mock_repo.get_by_id.return_value = {'id': 1}
         mock_repo.assign_group_to_user.return_value = None
         result = self.facade.add_administrator(
             username='username',
@@ -440,7 +445,7 @@ class TestAdminFacade(TestCase):
         # Assertions
         self.assertEqual(result, (201, {'data': {'admin': {'id': 1}, 'user': {'id': 1}}}))
         
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_add_administrator_repo_errors(self, mock_repo):
         # Mocks
         def reset_mocks():
@@ -513,7 +518,7 @@ class TestAdminFacade(TestCase):
             self.assertEqual(result[0], 400) 
             self.assertIn('fieldError', result[1]['error'])
 
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_deactivate_airline_success(self, mock_repo):
         mock_repo.get_by_id.return_value = {'id': 1, 'user': 1}
         mock_repo.update.return_value = {'id': 1, 'is_active': False}, True
@@ -521,7 +526,7 @@ class TestAdminFacade(TestCase):
         result = self.facade.deactivate_airline(1)
         self.assertEqual(result, (204, None))
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_deactivate_airline_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.get_by_id.reset_mock(return_value=True, side_effect=True)
@@ -566,7 +571,7 @@ class TestAdminFacade(TestCase):
             self.assertIn('unexpected error', result[1]['error'])
             
 
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_deactivate_customer_success(self, mock_repo):
         mock_repo.get_by_id.return_value = {'id': 1, 'user': 1}
         mock_repo.update.return_value = {'id': 1, 'is_active': False}, True
@@ -574,7 +579,7 @@ class TestAdminFacade(TestCase):
         result = self.facade.deactivate_customer(1)
         self.assertEqual(result, (204, None))
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_deactivate_customer_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.get_by_id.reset_mock(return_value=True, side_effect=True)
@@ -625,7 +630,7 @@ class TestAdminFacade(TestCase):
             self.assertEqual(result[0], 500)
             self.assertIn('unexpected error', result[1]['error'])
 
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_deactivate_administrator_success(self, mock_repo):
         mock_repo.get_by_id.return_value = {'id': 1, 'user': 1}
         mock_repo.update.return_value = {'id': 1, 'is_active': False}, True
@@ -633,7 +638,7 @@ class TestAdminFacade(TestCase):
         result = self.facade.deactivate_administrator(1)
         self.assertEqual(result, (204, None))
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.administrator_facade.R')
     def test_deactivate_administrator_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.get_by_id.reset_mock(return_value=True, side_effect=True)
@@ -689,19 +694,19 @@ class TestAdminFacade(TestCase):
 class TestAirlineFacade(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        with patch('FlightsApi.facades.facades.R.get_or_create_group') as mock:
-            mock.return_value = {'id': 1, 'name': 'airline'}
+        with patch('FlightsApi.facades.airline_facade.R') as mock:
+            mock.get_or_create_group.return_value = {'id': 1, 'name': 'airline'}
+            mock.get_by_user_id.return_value = {'id': 1}
             cls.facade = AirlineFacade({
                 'id': 1,
                 'username': 'testairline',
                 'email': 'test@airline.com',
-                'airline': 1,
                 'is_active': True,
                 'groups': [1]
             })
         return super().setUpClass()
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_get_my_flights(self, mock_repo):
         with self.subTest('Success'):
             mock_repo.get_flights_by_airline_id.return_value = [{'success': True}]
@@ -718,7 +723,7 @@ class TestAirlineFacade(TestCase):
             self.assertEqual(result[0], 500)
             self.assertIn('unexpected error', result[1]['error'])
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_update_airline_success(self, mock_repo):
         # Mocking
         mock_repo.update.return_value = ({'Success': True}, True)
@@ -729,7 +734,7 @@ class TestAirlineFacade(TestCase):
         mock_repo.update.assert_called_with(DBTables.AIRLINECOMPANY, 1, name='name', country_id=1)
         
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_update_airline_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.reset_mock()
@@ -758,7 +763,7 @@ class TestAirlineFacade(TestCase):
             self.assertEqual(result[0], 500) 
             self.assertIn('unexpected error', result[1]['error'])
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_add_flight_success(self, mock_repo):
         # Mocking
         mock_repo.add.return_value = {'success': True}, True
@@ -784,7 +789,7 @@ class TestAirlineFacade(TestCase):
             total_seats=1
         )
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_add_flight_errors(self, mock_repo):
         time1 = datetime.now()
         time2 = time1 + timedelta(days=1)
@@ -817,7 +822,7 @@ class TestAirlineFacade(TestCase):
             self.assertIn('fieldError', result[1]['error'])
             
             
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_update_flight_success(self, mock_repo):
         # Mocking
         mock_repo.get_by_id.return_value = {'airline': 1}
@@ -834,7 +839,7 @@ class TestAirlineFacade(TestCase):
         mock_repo.get_by_id.assert_called_with(DBTables.FLIGHT, 1)
         mock_repo.update.assert_called_with(DBTables.FLIGHT, id=1, total_seats=1)
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_update_flight_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.reset_mock()
@@ -901,7 +906,7 @@ class TestAirlineFacade(TestCase):
             self.assertEqual(result[0], 400) 
             self.assertIn('Some error', result[1]['error'])
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_cancel_flight_success(self, mock_repo):
         # Mock setup
         mock_repo.get_by_id.return_value = {'airline': 1}
@@ -913,7 +918,7 @@ class TestAirlineFacade(TestCase):
         mock_repo.get_by_id.assert_called_with(DBTables.FLIGHT, 1)
         mock_repo.update.assert_called_with(DBTables.FLIGHT, id=1, is_canceled=True)
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.airline_facade.R')
     def test_cancel_flight_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.reset_mock()
@@ -984,19 +989,19 @@ class TestAirlineFacade(TestCase):
 class TestCustomerFacade(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        with patch('FlightsApi.facades.facades.R.get_or_create_group') as mock:
-            mock.return_value = {'id': 1, 'name': 'customer'}
+        with patch('FlightsApi.facades.customer_facade.R') as mock:
+            mock.get_or_create_group.return_value = {'id': 1, 'name': 'customer'}
+            mock.get_by_user_id.return_value = {'id': 1}
             cls.facade = CustomerFacade({
                 'id': 1,
                 'username': 'testcustomer',
                 'email': 'test@customer.com',
-                'customer': 1,
                 'is_active': True,
                 'groups': [1]
             })
         return super().setUpClass()
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.customer_facade.R')
     def test_update_customer_success(self, mock_repo):
         # Mock
         mock_repo.update.return_value = {'success': True}, True
@@ -1006,7 +1011,7 @@ class TestCustomerFacade(TestCase):
         self.assertEqual(result, (200, {'data': {'success': True}}))
         mock_repo.update.assert_called_with(DBTables.CUSTOMER, 1, first_name='first_name')
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.customer_facade.R')
     def test_update_customer_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.reset_mock()
@@ -1042,7 +1047,7 @@ class TestCustomerFacade(TestCase):
             self.assertEqual(result[0], 400) 
             self.assertIn('success', result[1]['error'])
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.customer_facade.R')
     def test_add_ticket_success(self, mock_repo):
         mock_repo.is_flight_bookable.return_value = True, ''
         mock_repo.add.return_value = {'success': True}, True
@@ -1053,7 +1058,7 @@ class TestCustomerFacade(TestCase):
         mock_repo.is_flight_bookable.assert_called_with(1, 2)
         mock_repo.add.assert_called_with(DBTables.TICKET, flight=1, customer=1, seat_count=2)
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.customer_facade.R')
     def test_add_ticket_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.reset_mock()
@@ -1091,7 +1096,7 @@ class TestCustomerFacade(TestCase):
             result = self.facade.add_ticket(1, 2)
             self.assertEqual(result, (400, {'error': {'success': False}}))
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.customer_facade.R')
     def test_cancel_ticket_success(self, mock_repo):
         mock_repo.get_by_id.return_value = {'customer': 1}
         mock_repo.update.return_value = {'is_canceled': True}, True
@@ -1102,7 +1107,7 @@ class TestCustomerFacade(TestCase):
         mock_repo.get_by_id.assert_called_with(DBTables.TICKET, 1)
         mock_repo.update.assert_called_with(DBTables.TICKET, id=1, is_canceled=True)
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.customer_facade.R')
     def test_cancel_ticket_errors(self, mock_repo):
         def reset_mocks():
             mock_repo.reset_mock()
@@ -1168,9 +1173,10 @@ class TestAnonymousFacade(TestCase):
         cls.facade = AnonymousFacade()
         return super().setUpClass()
     
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.anonymous_facade.R')
     def test_add_customer_success(self, mock_repo):
         mock_repo.add.return_value = {'id': 1}, True
+        mock_repo.get_by_id.return_value = {'id': 1}
         mock_repo.assign_group_to_user.return_value = None
         result = self.facade.add_customer(
             username='username',
@@ -1184,7 +1190,7 @@ class TestAnonymousFacade(TestCase):
         # Assertions
         self.assertEqual(result, (201, {'data': {'customer': {'id': 1}, 'user': {'id': 1}}}))
         
-    @patch('FlightsApi.facades.facades.R')
+    @patch('FlightsApi.facades.anonymous_facade.R')
     def test_add_customer_repo_errors(self, mock_repo):
         # Mocks
         def reset_mocks():

@@ -38,7 +38,7 @@ class AirlineFacade(FacadeBase):
             Tuple[int, dict]: A response tuple containing status code and data/errors.
         """
         try:
-            data = R.get_flights_by_airline_id(self.__user['airline'])
+            data = R.get_flights_by_airline_id(self.__user['airline']['id'])
         except Exception as e:
             return internal_error_response(errors=e)
 
@@ -62,7 +62,7 @@ class AirlineFacade(FacadeBase):
             updated_fields.update(country_id=country_id)
         
         try:
-            data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline'], **updated_fields)
+            data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline']['id'], **updated_fields)
         except RepoErrors.FetchError as e:
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
