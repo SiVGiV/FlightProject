@@ -319,6 +319,10 @@ class AnonymousFacade(FacadeBase):
         except Exception as e:
             return internal_error_response(errors=e)
         
+        temp_user_data = R.get_by_id(DBTables.USER, user_data['id'])
+        if temp_user_data:
+            user_data = temp_user_data
+        
         # Create customer
         try:
             customer_data, customer_created = R.add(
@@ -844,6 +848,10 @@ class AdministratorFacade(FacadeBase):
         except Exception as e:
             return internal_error_response(errors=e)
                 
+        temp_user_data = R.get_by_id(DBTables.USER, user['id'])
+        if temp_user_data:
+            user = temp_user_data
+                
         # Verify country
         country_exists = R.instance_exists(DBTables.COUNTRY, country_id)
         if not country_exists:
@@ -908,6 +916,10 @@ class AdministratorFacade(FacadeBase):
         except Exception as e:
             return internal_error_response(errors=e)
         
+        temp_user_data = R.get_by_id(DBTables.USER, user['id'])
+        if temp_user_data:
+            user = temp_user_data
+        
         # Create customer
         try:
             customer, customer_created = R.add(
@@ -966,6 +978,11 @@ class AdministratorFacade(FacadeBase):
             return conflict_response(errors=e)
         except Exception as e:
             return internal_error_response(errors=e)
+        
+        temp_user_data = R.get_by_id(DBTables.USER, user['id'])
+        if temp_user_data:
+            user = temp_user_data
+                
         # Create admin
         try:
             admin, success = R.add(
