@@ -388,6 +388,7 @@ class CustomerFacade(FacadeBase):
         super().__init__()
         self.__required_group = R.get_or_create_group('customer')
         self.__user = user
+        self.__user['customer'] = R.get_by_user_id(DBTables.CUSTOMER, self.__user['id'])
         
     @property 
     def required_group(self):
@@ -402,7 +403,7 @@ class CustomerFacade(FacadeBase):
         Returns:
             Tuple[int, dict]: A response tuple containing [status code, response data/errors]
         """
-        if not self.__user['customer'] == id:
+        if not self.__user['customer']['id'] == id:
             return forbidden_response()
         
         try:
@@ -427,7 +428,7 @@ class CustomerFacade(FacadeBase):
             Tuple[int, dict]: A response tuple containing [status code, response data/errors]
         """
         try:
-            data, success = R.update(DBTables.CUSTOMER, self.__user['customer'], **updated_fields)
+            data, success = R.update(DBTables.CUSTOMER, self.__user['customer']['id'], **updated_fields)
         except RepoErrors.FetchError as e:
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
@@ -458,7 +459,7 @@ class CustomerFacade(FacadeBase):
         
         # Create ticket
         try:
-            data, success = R.add(DBTables.TICKET, flight=flight_id, customer=self.__user['customer'], seat_count=seat_count)
+            data, success = R.add(DBTables.TICKET, flight=flight_id, customer=self.__user['customer']['id'], seat_count=seat_count)
         except (ValueError, TypeError, ValidationError) as e:
             return bad_request_response(errors=e)
         except Exception as e:
@@ -492,7 +493,7 @@ class CustomerFacade(FacadeBase):
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         #  Check if this customer owns the ticket
-        if not ticket['customer'] == self.__user['customer']:
+        if not ticket['customer'] == self.__user['customer']['id']:
             return forbidden_response()
         
         try:
@@ -520,7 +521,7 @@ class CustomerFacade(FacadeBase):
         pagination = Paginate(limit, page)
 
         try:
-            data = R.get_tickets_by_customer(self.__user['customer'], pagination)
+            data = R.get_tickets_by_customer(self.__user['customer']['id'], pagination)
         except Exception as e:
             return internal_error_response(errors=e)
         return ok_response(data=data, pagination=pagination)
@@ -566,6 +567,7 @@ class AirlineFacade(FacadeBase):
         super().__init__()
         self.__required_group = R.get_or_create_group('airlinecompany')
         self.__user = user
+        self.__user['airline'] = R.get_by_user_id(DBTables.AIRLINECOMPANY, self.__user['id'])
     
     @property 
     def required_group(self):
@@ -634,7 +636,7 @@ class AirlineFacade(FacadeBase):
         try:
             data, success = R.add(
                 DBTables.FLIGHT,
-                airline=self.__user['airline'],
+                airline=self.__user['airline']['id'],
                 origin_country=origin_id,
                 destination_country=destination_id,
                 departure_datetime=departure_datetime,
@@ -670,7 +672,7 @@ class AirlineFacade(FacadeBase):
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Make sure this airline owns the flight
-        if not flight['airline'] == self.__user['airline']:
+        if not flight['airline'] == self.__user['airline']['id']:
             return forbidden_response()
 
         try:
@@ -707,7 +709,7 @@ class AirlineFacade(FacadeBase):
         if not flight:
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
-        if not flight['airline'] == self.__user['airline']:
+        if not flight['airline'] == self.__user['airline']['id']:
             return forbidden_response()
         
         try:
@@ -753,7 +755,7 @@ class AirlineFacade(FacadeBase):
         code, data =  super().get_airline_by_id(id)
         if code != 200:
             return code, data
-        if self.__user['airline'] != id:
+        if self.__user['airline']['id'] != id:
             data['data'].pop('user', None)
         return code, data
 
@@ -762,6 +764,8 @@ class AdministratorFacade(FacadeBase):
         super().__init__()
         self.__required_group = R.get_or_create_group('admin')
         self.__user = user
+        self.__user['admin'] = R.get_by_user_id(DBTables.ADMIN, self.__user['id'])
+        
 
     @property 
     def required_group(self):

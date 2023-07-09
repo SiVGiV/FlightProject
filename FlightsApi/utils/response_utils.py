@@ -1,6 +1,10 @@
 from rest_framework import status
 from django.core.exceptions import ValidationError
 from ..repository.errors import EntityNotFoundException, UserAlreadyInGroupException, OutOfBoundsException, FetchError
+from logging import getLogger
+
+logger = getLogger('django')
+
 
 def not_found_response(errors=None):
     return create_facade_response(status.HTTP_404_NOT_FOUND, errors=errors)
@@ -83,6 +87,7 @@ def dict_builder(**fields):
                 elif (isinstance(value, dict) and len(value.keys()) == 1):
                     return {'error': value}
                 elif (isinstance(value, Exception)):
+                    logger.error(value)
                     return {'error': stringify_exception(value)}
                 else:
                     return {'errors': value}

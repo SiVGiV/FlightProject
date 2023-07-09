@@ -38,12 +38,12 @@ class TicketsView(APIView): # /tickets
         
         # Validate inputs
         try:
-            flight_id = int(request.GET.get('flight_id'))
+            flight_id = int(request.data.get('flight_id'))
         except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'flight_id' must be an integer."]})
         
         try:
-            seat_count = int(request.GET.get('seat_count'))
+            seat_count = int(request.data.get('seat_count'))
         except TypeError:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ["'seat_count' must be an integer."]})
         

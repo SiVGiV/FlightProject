@@ -272,6 +272,18 @@ class Repository():
         else:
             # If not found or failed return False
             return False
+    
+    @staticmethod
+    @log_action
+    @accepts(DBTables, int)
+    def get_by_user_id(dbtable: DBTables, user_id: int):
+        if not dbtable in (DBTables.ADMIN, DBTables.AIRLINECOMPANY, DBTables.CUSTOMER, DBTables.USER):
+            return {}
+        profile = dbtable.model.objects.filter(user__id=user_id).first()
+        if profile:
+            return dbtable.serializer(instance=profile).data
+        else:
+            return {}
             
     @staticmethod
     @log_action
@@ -656,7 +668,7 @@ class Repository():
         return exists
     
     @staticmethod
-    @accepts(int)
+    @accepts(int, int)
     def is_flight_bookable(id: int, seat_count: int = 1) -> Tuple[bool, str]:
         """Checks if it's possible to book a certain amount of seats on a specific flight.
 
@@ -667,7 +679,7 @@ class Repository():
         Returns:
             Tuple[bool, str]: A Tuple of Bookable(bool), Reason(str)
         """
-        flight_exists = Repository.instance_exists(id)
+        flight_exists = Repository.instance_exists(DBTables.FLIGHT, id)
         if not flight_exists:
             return False, 'the flight does not exist'
         

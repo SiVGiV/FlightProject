@@ -91,8 +91,8 @@ class FlightsView(APIView): # /flights
         try:
             departure_datetime_str = request.data['departure_datetime']
             arrival_datetime_str = request.data['arrival_datetime']
-            departure_datetime = parser.parse(departure_datetime_str).date()
-            arrival_datetime = parser.parse(arrival_datetime_str).date()
+            departure_datetime = parser.parse(departure_datetime_str)
+            arrival_datetime = parser.parse(arrival_datetime_str)
         except ValueError as e:
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
             return Response(status=code, data=data)
@@ -154,8 +154,8 @@ class FlightView(APIView): # /flight/<id>
         try:
             departure_datetime_str = request.data.get('departure_datetime')
             arrival_datetime_str = request.data.get('arrival_datetime')
-            departure_datetime = parser.parse(departure_datetime_str).date()
-            arrival_datetime = parser.parse(arrival_datetime_str).date()
+            departure_datetime = parser.parse(departure_datetime_str)
+            arrival_datetime = parser.parse(arrival_datetime_str)
         except ValueError as e:
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
             return Response(status=code, data=data)
