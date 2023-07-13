@@ -29,6 +29,10 @@ class AnonymousFacade(FacadeBase):
         super().__init__()
         self.__required_group = None # Anonymous users do not need to be a part of a group
     
+    @staticmethod
+    def usertype():
+        return 'anon'
+    
     @property 
     def required_group(self):
         return self.__required_group
@@ -85,14 +89,18 @@ class AnonymousFacade(FacadeBase):
         
         if user:
             if user.is_anonymous:
+                request.COOKIES['usertype'] = 'anon'
                 return AnonymousFacade(), ''
             login(request, user) # Django login function
             facade = AnonymousFacade.facade_from_user(user)
             if facade:
+                request.COOKIES['usertype'] = facade.usertype()
                 return facade, '' # Return the right facade and an empty reason.
             else:
+                request.COOKIES['usertype'] = 'anon'
                 return AnonymousFacade(), 'User not assigned to any groups.'
         else:
+            request.COOKIES['usertype'] = 'anon'
             return AnonymousFacade(), 'A user with this combination of user/password does not exist.'
     
     def add_customer(self, username, password, email, first_name, last_name, address, phone_number) -> Tuple[int, dict]:

@@ -1,7 +1,9 @@
-from ..forms import UserRegisterForm
-from django.views.generic.edit import CreateView
+from django.contrib.auth import logout
+from rest_framework.response import Response
+from FlightsApi.utils.response_utils import no_content_ok
 
-# Create your views here.
-class RegisterView(CreateView):
-    template_name = "register.html"
-    form_class = UserRegisterForm
+def logout(request):
+    logout(request)
+    request.COOKIES['usertype'] = 'anon'
+    code, res = no_content_ok()
+    return Response(status=code, data=res)

@@ -8,7 +8,12 @@ from ..utils.response_utils import not_found_response, bad_request_response, \
                             ok_response, internal_error_response
 
 
-class FacadeBase():    
+class FacadeBase():
+    @staticmethod
+    @abstractmethod
+    def usertype():
+        pass
+        
     @abstractmethod
     def required_group(self):
         """

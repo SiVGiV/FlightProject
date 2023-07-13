@@ -22,6 +22,10 @@ class CustomerFacade(FacadeBase):
         self.__user = user
         self.__user['customer'] = R.get_by_user_id(DBTables.CUSTOMER, self.__user['id'])
         
+    @staticmethod
+    def usertype():
+        return 'customer'
+        
     @property 
     def required_group(self):
         return self.__required_group

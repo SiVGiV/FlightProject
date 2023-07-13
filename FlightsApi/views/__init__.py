@@ -4,3 +4,4 @@ from .customer_views import CustomerView, CustomersView
 from .flight_views import FlightView, FlightsView
 from .ticket_views import TicketView, TicketsView
 from .country_views import CountryView, CountriesView
+from .auth_views import logout

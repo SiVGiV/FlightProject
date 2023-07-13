@@ -21,6 +21,9 @@ class AdministratorFacade(FacadeBase):
         self.__user = user
         self.__user['admin'] = R.get_by_user_id(DBTables.ADMIN, self.__user['id'])
         
+    @staticmethod
+    def usertype():
+        return 'admin'
 
     @property 
     def required_group(self):
