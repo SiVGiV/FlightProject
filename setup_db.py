@@ -7,6 +7,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "FlightProject.settings")
 django.setup()
 
 logger = logging.getLogger('django')
+from FlightProject.settings import DATABASES
+DATABASE_SETTINGS = DATABASES['default']
 
 def get_connection():
     """Creates and returns a Connection object (from mysql_connector_python) with the default django database settings
@@ -14,26 +16,26 @@ def get_connection():
     Returns:
         PooledMySQLConnection | MySQLConnection | Any: A Connection object
     """
-    from FlightProject.settings import DATABASES
     from mysql.connector import connect
-    DATABASE_SETTINGS = DATABASES['default']
-    connection = connect(
+    try:
+        connection = connect(
         host=DATABASE_SETTINGS['HOST'],
         port=DATABASE_SETTINGS['PORT'],
-        user=DATABASE_SETTINGS['USER'],
-        password=DATABASE_SETTINGS['PASSWORD'],
+        user='root',
+        password=os.getenv('MYSQL_ROOT_PASSWORD'),
     )
+    except Exception as e:
+        print(f"failed to connect to { DATABASE_SETTINGS['HOST'] }:3306")
+        print(e)
+        raise
     if connection:
-        logger.info(f"Successfully connected to database @ //{ DATABASE_SETTINGS['HOST'] }:{ DATABASE_SETTINGS['PORT'] }/")
+        logger.info(f"Successfully connected to database @ //{ DATABASE_SETTINGS['HOST'] }:3306/")
     return connection
 
 
 def create_schema():
     """Creates the main django schema
     """
-    from FlightProject.settings import DATABASES
-    
-    DATABASE_SETTINGS = DATABASES['default']
     try:
         connection = get_connection()
     except ConnectionError as e:
