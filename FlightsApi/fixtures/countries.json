@@ -5,7 +5,7 @@
   "fields": {
     "name": "Afghanistan",
     "symbol": "af",
-    "flag": "/countries/flags/af.png"
+    "flag": "static/countries/flags/af.png"
   }
 },
 {
@@ -14,7 +14,7 @@
   "fields": {
     "name": "Albania",
     "symbol": "al",
-    "flag": "/countries/flags/al.png"
+    "flag": "static/countries/flags/al.png"
   }
 },
 {
@@ -23,7 +23,7 @@
   "fields": {
     "name": "Algeria",
     "symbol": "dz",
-    "flag": "/countries/flags/dz.png"
+    "flag": "static/countries/flags/dz.png"
   }
 },
 {
@@ -32,7 +32,7 @@
   "fields": {
     "name": "Andorra",
     "symbol": "ad",
-    "flag": "/countries/flags/ad.png"
+    "flag": "static/countries/flags/ad.png"
   }
 },
 {
@@ -41,7 +41,7 @@
   "fields": {
     "name": "Angola",
     "symbol": "ao",
-    "flag": "/countries/flags/ao.png"
+    "flag": "static/countries/flags/ao.png"
   }
 },
 {
@@ -50,7 +50,7 @@
   "fields": {
     "name": "Antigua and Barbuda",
     "symbol": "ag",
-    "flag": "/countries/flags/ag.png"
+    "flag": "static/countries/flags/ag.png"
   }
 },
 {
@@ -59,7 +59,7 @@
   "fields": {
     "name": "Argentina",
     "symbol": "ar",
-    "flag": "/countries/flags/ar.png"
+    "flag": "static/countries/flags/ar.png"
   }
 },
 {
@@ -68,7 +68,7 @@
   "fields": {
     "name": "Armenia",
     "symbol": "am",
-    "flag": "/countries/flags/am.png"
+    "flag": "static/countries/flags/am.png"
   }
 },
 {
@@ -77,7 +77,7 @@
   "fields": {
     "name": "Australia",
     "symbol": "au",
-    "flag": "/countries/flags/au.png"
+    "flag": "static/countries/flags/au.png"
   }
 },
 {
@@ -86,7 +86,7 @@
   "fields": {
     "name": "Austria",
     "symbol": "at",
-    "flag": "/countries/flags/at.png"
+    "flag": "static/countries/flags/at.png"
   }
 },
 {
@@ -95,7 +95,7 @@
   "fields": {
     "name": "Azerbaijan",
     "symbol": "az",
-    "flag": "/countries/flags/az.png"
+    "flag": "static/countries/flags/az.png"
   }
 },
 {
@@ -104,7 +104,7 @@
   "fields": {
     "name": "Bahamas",
     "symbol": "bs",
-    "flag": "/countries/flags/bs.png"
+    "flag": "static/countries/flags/bs.png"
   }
 },
 {
@@ -113,7 +113,7 @@
   "fields": {
     "name": "Bahrain",
     "symbol": "bh",
-    "flag": "/countries/flags/bh.png"
+    "flag": "static/countries/flags/bh.png"
   }
 },
 {
@@ -122,7 +122,7 @@
   "fields": {
     "name": "Bangladesh",
     "symbol": "bd",
-    "flag": "/countries/flags/bd.png"
+    "flag": "static/countries/flags/bd.png"
   }
 },
 {
@@ -131,7 +131,7 @@
   "fields": {
     "name": "Barbados",
     "symbol": "bb",
-    "flag": "/countries/flags/bb.png"
+    "flag": "static/countries/flags/bb.png"
   }
 },
 {
@@ -140,7 +140,7 @@
   "fields": {
     "name": "Belarus",
     "symbol": "by",
-    "flag": "/countries/flags/by.png"
+    "flag": "static/countries/flags/by.png"
   }
 },
 {
@@ -149,7 +149,7 @@
   "fields": {
     "name": "Belgium",
     "symbol": "be",
-    "flag": "/countries/flags/be.png"
+    "flag": "static/countries/flags/be.png"
   }
 },
 {
@@ -158,7 +158,7 @@
   "fields": {
     "name": "Belize",
     "symbol": "bz",
-    "flag": "/countries/flags/bz.png"
+    "flag": "static/countries/flags/bz.png"
   }
 },
 {
@@ -167,7 +167,7 @@
   "fields": {
     "name": "Benin",
     "symbol": "bj",
-    "flag": "/countries/flags/bj.png"
+    "flag": "static/countries/flags/bj.png"
   }
 },
 {
@@ -176,7 +176,7 @@
   "fields": {
     "name": "Bhutan",
     "symbol": "bt",
-    "flag": "/countries/flags/bt.png"
+    "flag": "static/countries/flags/bt.png"
   }
 },
 {
@@ -185,7 +185,7 @@
   "fields": {
     "name": "Bolivia",
     "symbol": "bo",
-    "flag": "/countries/flags/bo.png"
+    "flag": "static/countries/flags/bo.png"
   }
 },
 {
@@ -194,7 +194,7 @@
   "fields": {
     "name": "Bosnia and Herzegovina",
     "symbol": "ba",
-    "flag": "/countries/flags/ba.png"
+    "flag": "static/countries/flags/ba.png"
   }
 },
 {
@@ -203,7 +203,7 @@
   "fields": {
     "name": "Botswana",
     "symbol": "bw",
-    "flag": "/countries/flags/bw.png"
+    "flag": "static/countries/flags/bw.png"
   }
 },
 {
@@ -212,7 +212,7 @@
   "fields": {
     "name": "Brazil",
     "symbol": "br",
-    "flag": "/countries/flags/br.png"
+    "flag": "static/countries/flags/br.png"
   }
 },
 {
@@ -221,7 +221,7 @@
   "fields": {
     "name": "Brunei",
     "symbol": "bn",
-    "flag": "/countries/flags/bn.png"
+    "flag": "static/countries/flags/bn.png"
   }
 },
 {
@@ -230,7 +230,7 @@
   "fields": {
     "name": "Bulgaria",
     "symbol": "bg",
-    "flag": "/countries/flags/bg.png"
+    "flag": "static/countries/flags/bg.png"
   }
 },
 {
@@ -239,7 +239,7 @@
   "fields": {
     "name": "Burkina Faso",
     "symbol": "bf",
-    "flag": "/countries/flags/bf.png"
+    "flag": "static/countries/flags/bf.png"
   }
 },
 {
@@ -248,7 +248,7 @@
   "fields": {
     "name": "Burundi",
     "symbol": "bi",
-    "flag": "/countries/flags/bi.png"
+    "flag": "static/countries/flags/bi.png"
   }
 },
 {
@@ -257,7 +257,7 @@
   "fields": {
     "name": "Cabo Verde",
     "symbol": "cv",
-    "flag": "/countries/flags/cv.png"
+    "flag": "static/countries/flags/cv.png"
   }
 },
 {
@@ -266,7 +266,7 @@
   "fields": {
     "name": "Cambodia",
     "symbol": "kh",
-    "flag": "/countries/flags/kh.png"
+    "flag": "static/countries/flags/kh.png"
   }
 },
 {
@@ -275,7 +275,7 @@
   "fields": {
     "name": "Cameroon",
     "symbol": "cm",
-    "flag": "/countries/flags/cm.png"
+    "flag": "static/countries/flags/cm.png"
   }
 },
 {
@@ -284,7 +284,7 @@
   "fields": {
     "name": "Canada",
     "symbol": "ca",
-    "flag": "/countries/flags/ca.png"
+    "flag": "static/countries/flags/ca.png"
   }
 },
 {
@@ -293,7 +293,7 @@
   "fields": {
     "name": "Central African Republic",
     "symbol": "cf",
-    "flag": "/countries/flags/cf.png"
+    "flag": "static/countries/flags/cf.png"
   }
 },
 {
@@ -302,7 +302,7 @@
   "fields": {
     "name": "Chad",
     "symbol": "td",
-    "flag": "/countries/flags/td.png"
+    "flag": "static/countries/flags/td.png"
   }
 },
 {
@@ -311,7 +311,7 @@
   "fields": {
     "name": "Chile",
     "symbol": "cl",
-    "flag": "/countries/flags/cl.png"
+    "flag": "static/countries/flags/cl.png"
   }
 },
 {
@@ -320,7 +320,7 @@
   "fields": {
     "name": "China",
     "symbol": "cn",
-    "flag": "/countries/flags/cn.png"
+    "flag": "static/countries/flags/cn.png"
   }
 },
 {
@@ -329,7 +329,7 @@
   "fields": {
     "name": "Colombia",
     "symbol": "co",
-    "flag": "/countries/flags/co.png"
+    "flag": "static/countries/flags/co.png"
   }
 },
 {
@@ -338,7 +338,7 @@
   "fields": {
     "name": "Comoros",
     "symbol": "km",
-    "flag": "/countries/flags/km.png"
+    "flag": "static/countries/flags/km.png"
   }
 },
 {
@@ -347,7 +347,7 @@
   "fields": {
     "name": "Congo",
     "symbol": "cg",
-    "flag": "/countries/flags/cg.png"
+    "flag": "static/countries/flags/cg.png"
   }
 },
 {
@@ -356,7 +356,7 @@
   "fields": {
     "name": "Costa Rica",
     "symbol": "cr",
-    "flag": "/countries/flags/cr.png"
+    "flag": "static/countries/flags/cr.png"
   }
 },
 {
@@ -365,7 +365,7 @@
   "fields": {
     "name": "Croatia",
     "symbol": "hr",
-    "flag": "/countries/flags/hr.png"
+    "flag": "static/countries/flags/hr.png"
   }
 },
 {
@@ -374,7 +374,7 @@
   "fields": {
     "name": "Cuba",
     "symbol": "cu",
-    "flag": "/countries/flags/cu.png"
+    "flag": "static/countries/flags/cu.png"
   }
 },
 {
@@ -383,7 +383,7 @@
   "fields": {
     "name": "Cyprus",
     "symbol": "cy",
-    "flag": "/countries/flags/cy.png"
+    "flag": "static/countries/flags/cy.png"
   }
 },
 {
@@ -392,7 +392,7 @@
   "fields": {
     "name": "Czech Republic",
     "symbol": "cz",
-    "flag": "/countries/flags/cz.png"
+    "flag": "static/countries/flags/cz.png"
   }
 },
 {
@@ -401,7 +401,7 @@
   "fields": {
     "name": "Denmark",
     "symbol": "dk",
-    "flag": "/countries/flags/dk.png"
+    "flag": "static/countries/flags/dk.png"
   }
 },
 {
@@ -410,7 +410,7 @@
   "fields": {
     "name": "Djibouti",
     "symbol": "dj",
-    "flag": "/countries/flags/dj.png"
+    "flag": "static/countries/flags/dj.png"
   }
 },
 {
@@ -419,7 +419,7 @@
   "fields": {
     "name": "Dominica",
     "symbol": "dm",
-    "flag": "/countries/flags/dm.png"
+    "flag": "static/countries/flags/dm.png"
   }
 },
 {
@@ -428,7 +428,7 @@
   "fields": {
     "name": "Dominican Republic",
     "symbol": "do",
-    "flag": "/countries/flags/do.png"
+    "flag": "static/countries/flags/do.png"
   }
 },
 {
@@ -437,7 +437,7 @@
   "fields": {
     "name": "Ecuador",
     "symbol": "ec",
-    "flag": "/countries/flags/ec.png"
+    "flag": "static/countries/flags/ec.png"
   }
 },
 {
@@ -446,7 +446,7 @@
   "fields": {
     "name": "Egypt",
     "symbol": "eg",
-    "flag": "/countries/flags/eg.png"
+    "flag": "static/countries/flags/eg.png"
   }
 },
 {
@@ -455,7 +455,7 @@
   "fields": {
     "name": "El Salvador",
     "symbol": "sv",
-    "flag": "/countries/flags/sv.png"
+    "flag": "static/countries/flags/sv.png"
   }
 },
 {
@@ -464,7 +464,7 @@
   "fields": {
     "name": "Equatorial Guinea",
     "symbol": "gq",
-    "flag": "/countries/flags/gq.png"
+    "flag": "static/countries/flags/gq.png"
   }
 },
 {
@@ -473,7 +473,7 @@
   "fields": {
     "name": "Eritrea",
     "symbol": "er",
-    "flag": "/countries/flags/er.png"
+    "flag": "static/countries/flags/er.png"
   }
 },
 {
@@ -482,7 +482,7 @@
   "fields": {
     "name": "Estonia",
     "symbol": "ee",
-    "flag": "/countries/flags/ee.png"
+    "flag": "static/countries/flags/ee.png"
   }
 },
 {
@@ -491,7 +491,7 @@
   "fields": {
     "name": "Eswatini",
     "symbol": "sz",
-    "flag": "/countries/flags/sz.png"
+    "flag": "static/countries/flags/sz.png"
   }
 },
 {
@@ -500,7 +500,7 @@
   "fields": {
     "name": "Ethiopia",
     "symbol": "et",
-    "flag": "/countries/flags/et.png"
+    "flag": "static/countries/flags/et.png"
   }
 },
 {
@@ -509,7 +509,7 @@
   "fields": {
     "name": "Fiji",
     "symbol": "fj",
-    "flag": "/countries/flags/fj.png"
+    "flag": "static/countries/flags/fj.png"
   }
 },
 {
@@ -518,7 +518,7 @@
   "fields": {
     "name": "Finland",
     "symbol": "fi",
-    "flag": "/countries/flags/fi.png"
+    "flag": "static/countries/flags/fi.png"
   }
 },
 {
@@ -527,7 +527,7 @@
   "fields": {
     "name": "France",
     "symbol": "fr",
-    "flag": "/countries/flags/fr.png"
+    "flag": "static/countries/flags/fr.png"
   }
 },
 {
@@ -536,7 +536,7 @@
   "fields": {
     "name": "Gabon",
     "symbol": "ga",
-    "flag": "/countries/flags/ga.png"
+    "flag": "static/countries/flags/ga.png"
   }
 },
 {
@@ -545,7 +545,7 @@
   "fields": {
     "name": "Gambia",
     "symbol": "gm",
-    "flag": "/countries/flags/gm.png"
+    "flag": "static/countries/flags/gm.png"
   }
 },
 {
@@ -554,7 +554,7 @@
   "fields": {
     "name": "Georgia",
     "symbol": "ge",
-    "flag": "/countries/flags/ge.png"
+    "flag": "static/countries/flags/ge.png"
   }
 },
 {
@@ -563,7 +563,7 @@
   "fields": {
     "name": "Germany",
     "symbol": "de",
-    "flag": "/countries/flags/de.png"
+    "flag": "static/countries/flags/de.png"
   }
 },
 {
@@ -572,7 +572,7 @@
   "fields": {
     "name": "Ghana",
     "symbol": "gh",
-    "flag": "/countries/flags/gh.png"
+    "flag": "static/countries/flags/gh.png"
   }
 },
 {
@@ -581,7 +581,7 @@
   "fields": {
     "name": "Greece",
     "symbol": "gr",
-    "flag": "/countries/flags/gr.png"
+    "flag": "static/countries/flags/gr.png"
   }
 },
 {
@@ -590,7 +590,7 @@
   "fields": {
     "name": "Grenada",
     "symbol": "gd",
-    "flag": "/countries/flags/gd.png"
+    "flag": "static/countries/flags/gd.png"
   }
 },
 {
@@ -599,7 +599,7 @@
   "fields": {
     "name": "Guatemala",
     "symbol": "gt",
-    "flag": "/countries/flags/gt.png"
+    "flag": "static/countries/flags/gt.png"
   }
 },
 {
@@ -608,7 +608,7 @@
   "fields": {
     "name": "Guinea",
     "symbol": "gn",
-    "flag": "/countries/flags/gn.png"
+    "flag": "static/countries/flags/gn.png"
   }
 },
 {
@@ -617,7 +617,7 @@
   "fields": {
     "name": "Guinea-Bissau",
     "symbol": "gw",
-    "flag": "/countries/flags/gw.png"
+    "flag": "static/countries/flags/gw.png"
   }
 },
 {
@@ -626,7 +626,7 @@
   "fields": {
     "name": "Guyana",
     "symbol": "gy",
-    "flag": "/countries/flags/gy.png"
+    "flag": "static/countries/flags/gy.png"
   }
 },
 {
@@ -635,7 +635,7 @@
   "fields": {
     "name": "Haiti",
     "symbol": "ht",
-    "flag": "/countries/flags/ht.png"
+    "flag": "static/countries/flags/ht.png"
   }
 },
 {
@@ -644,7 +644,7 @@
   "fields": {
     "name": "Honduras",
     "symbol": "hn",
-    "flag": "/countries/flags/hn.png"
+    "flag": "static/countries/flags/hn.png"
   }
 },
 {
@@ -653,7 +653,7 @@
   "fields": {
     "name": "Hungary",
     "symbol": "hu",
-    "flag": "/countries/flags/hu.png"
+    "flag": "static/countries/flags/hu.png"
   }
 },
 {
@@ -662,7 +662,7 @@
   "fields": {
     "name": "Iceland",
     "symbol": "is",
-    "flag": "/countries/flags/is.png"
+    "flag": "static/countries/flags/is.png"
   }
 },
 {
@@ -671,7 +671,7 @@
   "fields": {
     "name": "India",
     "symbol": "in",
-    "flag": "/countries/flags/in.png"
+    "flag": "static/countries/flags/in.png"
   }
 },
 {
@@ -680,7 +680,7 @@
   "fields": {
     "name": "Indonesia",
     "symbol": "id",
-    "flag": "/countries/flags/id.png"
+    "flag": "static/countries/flags/id.png"
   }
 },
 {
@@ -689,7 +689,7 @@
   "fields": {
     "name": "Iran",
     "symbol": "ir",
-    "flag": "/countries/flags/ir.png"
+    "flag": "static/countries/flags/ir.png"
   }
 },
 {
@@ -698,7 +698,7 @@
   "fields": {
     "name": "Iraq",
     "symbol": "iq",
-    "flag": "/countries/flags/iq.png"
+    "flag": "static/countries/flags/iq.png"
   }
 },
 {
@@ -707,7 +707,7 @@
   "fields": {
     "name": "Ireland",
     "symbol": "ie",
-    "flag": "/countries/flags/ie.png"
+    "flag": "static/countries/flags/ie.png"
   }
 },
 {
@@ -716,7 +716,7 @@
   "fields": {
     "name": "Israel",
     "symbol": "il",
-    "flag": "/countries/flags/il.png"
+    "flag": "static/countries/flags/il.png"
   }
 },
 {
@@ -725,7 +725,7 @@
   "fields": {
     "name": "Italy",
     "symbol": "it",
-    "flag": "/countries/flags/it.png"
+    "flag": "static/countries/flags/it.png"
   }
 },
 {
@@ -734,7 +734,7 @@
   "fields": {
     "name": "Jamaica",
     "symbol": "jm",
-    "flag": "/countries/flags/jm.png"
+    "flag": "static/countries/flags/jm.png"
   }
 },
 {
@@ -743,7 +743,7 @@
   "fields": {
     "name": "Japan",
     "symbol": "jp",
-    "flag": "/countries/flags/jp.png"
+    "flag": "static/countries/flags/jp.png"
   }
 },
 {
@@ -752,7 +752,7 @@
   "fields": {
     "name": "Jordan",
     "symbol": "jo",
-    "flag": "/countries/flags/jo.png"
+    "flag": "static/countries/flags/jo.png"
   }
 },
 {
@@ -761,7 +761,7 @@
   "fields": {
     "name": "Kazakhstan",
     "symbol": "kz",
-    "flag": "/countries/flags/kz.png"
+    "flag": "static/countries/flags/kz.png"
   }
 },
 {
@@ -770,7 +770,7 @@
   "fields": {
     "name": "Kenya",
     "symbol": "ke",
-    "flag": "/countries/flags/ke.png"
+    "flag": "static/countries/flags/ke.png"
   }
 },
 {
@@ -779,7 +779,7 @@
   "fields": {
     "name": "Kiribati",
     "symbol": "ki",
-    "flag": "/countries/flags/ki.png"
+    "flag": "static/countries/flags/ki.png"
   }
 },
 {
@@ -788,7 +788,7 @@
   "fields": {
     "name": "Kuwait",
     "symbol": "kw",
-    "flag": "/countries/flags/kw.png"
+    "flag": "static/countries/flags/kw.png"
   }
 },
 {
@@ -797,7 +797,7 @@
   "fields": {
     "name": "Kyrgyzstan",
     "symbol": "kg",
-    "flag": "/countries/flags/kg.png"
+    "flag": "static/countries/flags/kg.png"
   }
 },
 {
@@ -806,7 +806,7 @@
   "fields": {
     "name": "Laos",
     "symbol": "la",
-    "flag": "/countries/flags/la.png"
+    "flag": "static/countries/flags/la.png"
   }
 },
 {
@@ -815,7 +815,7 @@
   "fields": {
     "name": "Latvia",
     "symbol": "lv",
-    "flag": "/countries/flags/lv.png"
+    "flag": "static/countries/flags/lv.png"
   }
 },
 {
@@ -824,7 +824,7 @@
   "fields": {
     "name": "Lebanon",
     "symbol": "lb",
-    "flag": "/countries/flags/lb.png"
+    "flag": "static/countries/flags/lb.png"
   }
 },
 {
@@ -833,7 +833,7 @@
   "fields": {
     "name": "Lesotho",
     "symbol": "ls",
-    "flag": "/countries/flags/ls.png"
+    "flag": "static/countries/flags/ls.png"
   }
 },
 {
@@ -842,7 +842,7 @@
   "fields": {
     "name": "Liberia",
     "symbol": "lr",
-    "flag": "/countries/flags/lr.png"
+    "flag": "static/countries/flags/lr.png"
   }
 },
 {
@@ -851,7 +851,7 @@
   "fields": {
     "name": "Libya",
     "symbol": "ly",
-    "flag": "/countries/flags/ly.png"
+    "flag": "static/countries/flags/ly.png"
   }
 },
 {
@@ -860,7 +860,7 @@
   "fields": {
     "name": "Liechtenstein",
     "symbol": "li",
-    "flag": "/countries/flags/li.png"
+    "flag": "static/countries/flags/li.png"
   }
 },
 {
@@ -869,7 +869,7 @@
   "fields": {
     "name": "Lithuania",
     "symbol": "lt",
-    "flag": "/countries/flags/lt.png"
+    "flag": "static/countries/flags/lt.png"
   }
 },
 {
@@ -878,7 +878,7 @@
   "fields": {
     "name": "Luxembourg",
     "symbol": "lu",
-    "flag": "/countries/flags/lu.png"
+    "flag": "static/countries/flags/lu.png"
   }
 },
 {
@@ -887,7 +887,7 @@
   "fields": {
     "name": "Madagascar",
     "symbol": "mg",
-    "flag": "/countries/flags/mg.png"
+    "flag": "static/countries/flags/mg.png"
   }
 },
 {
@@ -896,7 +896,7 @@
   "fields": {
     "name": "Malawi",
     "symbol": "mw",
-    "flag": "/countries/flags/mw.png"
+    "flag": "static/countries/flags/mw.png"
   }
 },
 {
@@ -905,7 +905,7 @@
   "fields": {
     "name": "Malaysia",
     "symbol": "my",
-    "flag": "/countries/flags/my.png"
+    "flag": "static/countries/flags/my.png"
   }
 },
 {
@@ -914,7 +914,7 @@
   "fields": {
     "name": "Maldives",
     "symbol": "mv",
-    "flag": "/countries/flags/mv.png"
+    "flag": "static/countries/flags/mv.png"
   }
 },
 {
@@ -923,7 +923,7 @@
   "fields": {
     "name": "Mali",
     "symbol": "ml",
-    "flag": "/countries/flags/ml.png"
+    "flag": "static/countries/flags/ml.png"
   }
 },
 {
@@ -932,7 +932,7 @@
   "fields": {
     "name": "Malta",
     "symbol": "mt",
-    "flag": "/countries/flags/mt.png"
+    "flag": "static/countries/flags/mt.png"
   }
 },
 {
@@ -941,7 +941,7 @@
   "fields": {
     "name": "Marshall Islands",
     "symbol": "mh",
-    "flag": "/countries/flags/mh.png"
+    "flag": "static/countries/flags/mh.png"
   }
 },
 {
@@ -950,7 +950,7 @@
   "fields": {
     "name": "Mauritania",
     "symbol": "mr",
-    "flag": "/countries/flags/mr.png"
+    "flag": "static/countries/flags/mr.png"
   }
 },
 {
@@ -959,7 +959,7 @@
   "fields": {
     "name": "Mauritius",
     "symbol": "mu",
-    "flag": "/countries/flags/mu.png"
+    "flag": "static/countries/flags/mu.png"
   }
 },
 {
@@ -968,7 +968,7 @@
   "fields": {
     "name": "Mexico",
     "symbol": "mx",
-    "flag": "/countries/flags/mx.png"
+    "flag": "static/countries/flags/mx.png"
   }
 },
 {
@@ -977,7 +977,7 @@
   "fields": {
     "name": "Micronesia",
     "symbol": "fm",
-    "flag": "/countries/flags/fm.png"
+    "flag": "static/countries/flags/fm.png"
   }
 },
 {
@@ -986,7 +986,7 @@
   "fields": {
     "name": "Moldova",
     "symbol": "md",
-    "flag": "/countries/flags/md.png"
+    "flag": "static/countries/flags/md.png"
   }
 },
 {
@@ -995,7 +995,7 @@
   "fields": {
     "name": "Monaco",
     "symbol": "mc",
-    "flag": "/countries/flags/mc.png"
+    "flag": "static/countries/flags/mc.png"
   }
 },
 {
@@ -1004,7 +1004,7 @@
   "fields": {
     "name": "Mongolia",
     "symbol": "mn",
-    "flag": "/countries/flags/mn.png"
+    "flag": "static/countries/flags/mn.png"
   }
 },
 {
@@ -1013,7 +1013,7 @@
   "fields": {
     "name": "Montenegro",
     "symbol": "me",
-    "flag": "/countries/flags/me.png"
+    "flag": "static/countries/flags/me.png"
   }
 },
 {
@@ -1022,7 +1022,7 @@
   "fields": {
     "name": "Morocco",
     "symbol": "ma",
-    "flag": "/countries/flags/ma.png"
+    "flag": "static/countries/flags/ma.png"
   }
 },
 {
@@ -1031,7 +1031,7 @@
   "fields": {
     "name": "Mozambique",
     "symbol": "mz",
-    "flag": "/countries/flags/mz.png"
+    "flag": "static/countries/flags/mz.png"
   }
 },
 {
@@ -1040,7 +1040,7 @@
   "fields": {
     "name": "Myanmar",
     "symbol": "mm",
-    "flag": "/countries/flags/mm.png"
+    "flag": "static/countries/flags/mm.png"
   }
 },
 {
@@ -1049,7 +1049,7 @@
   "fields": {
     "name": "Namibia",
     "symbol": "na",
-    "flag": "/countries/flags/na.png"
+    "flag": "static/countries/flags/na.png"
   }
 },
 {
@@ -1058,7 +1058,7 @@
   "fields": {
     "name": "Nauru",
     "symbol": "nr",
-    "flag": "/countries/flags/nr.png"
+    "flag": "static/countries/flags/nr.png"
   }
 },
 {
@@ -1067,7 +1067,7 @@
   "fields": {
     "name": "Nepal",
     "symbol": "np",
-    "flag": "/countries/flags/np.png"
+    "flag": "static/countries/flags/np.png"
   }
 },
 {
@@ -1076,7 +1076,7 @@
   "fields": {
     "name": "Netherlands",
     "symbol": "nl",
-    "flag": "/countries/flags/nl.png"
+    "flag": "static/countries/flags/nl.png"
   }
 },
 {
@@ -1085,7 +1085,7 @@
   "fields": {
     "name": "New Zealand",
     "symbol": "nz",
-    "flag": "/countries/flags/nz.png"
+    "flag": "static/countries/flags/nz.png"
   }
 },
 {
@@ -1094,7 +1094,7 @@
   "fields": {
     "name": "Nicaragua",
     "symbol": "ni",
-    "flag": "/countries/flags/ni.png"
+    "flag": "static/countries/flags/ni.png"
   }
 },
 {
@@ -1103,7 +1103,7 @@
   "fields": {
     "name": "Niger",
     "symbol": "ne",
-    "flag": "/countries/flags/ne.png"
+    "flag": "static/countries/flags/ne.png"
   }
 },
 {
@@ -1112,7 +1112,7 @@
   "fields": {
     "name": "Nigeria",
     "symbol": "ng",
-    "flag": "/countries/flags/ng.png"
+    "flag": "static/countries/flags/ng.png"
   }
 },
 {
@@ -1121,7 +1121,7 @@
   "fields": {
     "name": "North Korea",
     "symbol": "kp",
-    "flag": "/countries/flags/kp.png"
+    "flag": "static/countries/flags/kp.png"
   }
 },
 {
@@ -1130,7 +1130,7 @@
   "fields": {
     "name": "North Macedonia",
     "symbol": "mk",
-    "flag": "/countries/flags/mk.png"
+    "flag": "static/countries/flags/mk.png"
   }
 },
 {
@@ -1139,7 +1139,7 @@
   "fields": {
     "name": "Norway",
     "symbol": "no",
-    "flag": "/countries/flags/no.png"
+    "flag": "static/countries/flags/no.png"
   }
 },
 {
@@ -1148,7 +1148,7 @@
   "fields": {
     "name": "Oman",
     "symbol": "om",
-    "flag": "/countries/flags/om.png"
+    "flag": "static/countries/flags/om.png"
   }
 },
 {
@@ -1157,7 +1157,7 @@
   "fields": {
     "name": "Pakistan",
     "symbol": "pk",
-    "flag": "/countries/flags/pk.png"
+    "flag": "static/countries/flags/pk.png"
   }
 },
 {
@@ -1166,7 +1166,7 @@
   "fields": {
     "name": "Palau",
     "symbol": "pw",
-    "flag": "/countries/flags/pw.png"
+    "flag": "static/countries/flags/pw.png"
   }
 },
 {
@@ -1175,7 +1175,7 @@
   "fields": {
     "name": "Palestine",
     "symbol": "ps",
-    "flag": "/countries/flags/ps.png"
+    "flag": "static/countries/flags/ps.png"
   }
 },
 {
@@ -1184,7 +1184,7 @@
   "fields": {
     "name": "Panama",
     "symbol": "pa",
-    "flag": "/countries/flags/pa.png"
+    "flag": "static/countries/flags/pa.png"
   }
 },
 {
@@ -1193,7 +1193,7 @@
   "fields": {
     "name": "Papua New Guinea",
     "symbol": "pg",
-    "flag": "/countries/flags/pg.png"
+    "flag": "static/countries/flags/pg.png"
   }
 },
 {
@@ -1202,7 +1202,7 @@
   "fields": {
     "name": "Paraguay",
     "symbol": "py",
-    "flag": "/countries/flags/py.png"
+    "flag": "static/countries/flags/py.png"
   }
 },
 {
@@ -1211,7 +1211,7 @@
   "fields": {
     "name": "Peru",
     "symbol": "pe",
-    "flag": "/countries/flags/pe.png"
+    "flag": "static/countries/flags/pe.png"
   }
 },
 {
@@ -1220,7 +1220,7 @@
   "fields": {
     "name": "Philippines",
     "symbol": "ph",
-    "flag": "/countries/flags/ph.png"
+    "flag": "static/countries/flags/ph.png"
   }
 },
 {
@@ -1229,7 +1229,7 @@
   "fields": {
     "name": "Poland",
     "symbol": "pl",
-    "flag": "/countries/flags/pl.png"
+    "flag": "static/countries/flags/pl.png"
   }
 },
 {
@@ -1238,7 +1238,7 @@
   "fields": {
     "name": "Portugal",
     "symbol": "pt",
-    "flag": "/countries/flags/pt.png"
+    "flag": "static/countries/flags/pt.png"
   }
 },
 {
@@ -1247,7 +1247,7 @@
   "fields": {
     "name": "Qatar",
     "symbol": "qa",
-    "flag": "/countries/flags/qa.png"
+    "flag": "static/countries/flags/qa.png"
   }
 },
 {
@@ -1256,7 +1256,7 @@
   "fields": {
     "name": "Romania",
     "symbol": "ro",
-    "flag": "/countries/flags/ro.png"
+    "flag": "static/countries/flags/ro.png"
   }
 },
 {
@@ -1265,7 +1265,7 @@
   "fields": {
     "name": "Russia",
     "symbol": "ru",
-    "flag": "/countries/flags/ru.png"
+    "flag": "static/countries/flags/ru.png"
   }
 },
 {
@@ -1274,7 +1274,7 @@
   "fields": {
     "name": "Rwanda",
     "symbol": "rw",
-    "flag": "/countries/flags/rw.png"
+    "flag": "static/countries/flags/rw.png"
   }
 },
 {
@@ -1283,7 +1283,7 @@
   "fields": {
     "name": "Saint Kitts and Nevis",
     "symbol": "kn",
-    "flag": "/countries/flags/kn.png"
+    "flag": "static/countries/flags/kn.png"
   }
 },
 {
@@ -1292,7 +1292,7 @@
   "fields": {
     "name": "Saint Lucia",
     "symbol": "lc",
-    "flag": "/countries/flags/lc.png"
+    "flag": "static/countries/flags/lc.png"
   }
 },
 {
@@ -1301,7 +1301,7 @@
   "fields": {
     "name": "Saint Vincent and the Grenadines",
     "symbol": "vc",
-    "flag": "/countries/flags/vc.png"
+    "flag": "static/countries/flags/vc.png"
   }
 },
 {
@@ -1310,7 +1310,7 @@
   "fields": {
     "name": "Samoa",
     "symbol": "ws",
-    "flag": "/countries/flags/ws.png"
+    "flag": "static/countries/flags/ws.png"
   }
 },
 {
@@ -1319,7 +1319,7 @@
   "fields": {
     "name": "San Marino",
     "symbol": "sm",
-    "flag": "/countries/flags/sm.png"
+    "flag": "static/countries/flags/sm.png"
   }
 },
 {
@@ -1328,7 +1328,7 @@
   "fields": {
     "name": "Sao Tome and Principe",
     "symbol": "st",
-    "flag": "/countries/flags/st.png"
+    "flag": "static/countries/flags/st.png"
   }
 },
 {
@@ -1337,7 +1337,7 @@
   "fields": {
     "name": "Saudi Arabia",
     "symbol": "sa",
-    "flag": "/countries/flags/sa.png"
+    "flag": "static/countries/flags/sa.png"
   }
 },
 {
@@ -1346,7 +1346,7 @@
   "fields": {
     "name": "Senegal",
     "symbol": "sn",
-    "flag": "/countries/flags/sn.png"
+    "flag": "static/countries/flags/sn.png"
   }
 },
 {
@@ -1355,7 +1355,7 @@
   "fields": {
     "name": "Serbia",
     "symbol": "rs",
-    "flag": "/countries/flags/rs.png"
+    "flag": "static/countries/flags/rs.png"
   }
 },
 {
@@ -1364,7 +1364,7 @@
   "fields": {
     "name": "Seychelles",
     "symbol": "sc",
-    "flag": "/countries/flags/sc.png"
+    "flag": "static/countries/flags/sc.png"
   }
 },
 {
@@ -1373,7 +1373,7 @@
   "fields": {
     "name": "Sierra Leone",
     "symbol": "sl",
-    "flag": "/countries/flags/sl.png"
+    "flag": "static/countries/flags/sl.png"
   }
 },
 {
@@ -1382,7 +1382,7 @@
   "fields": {
     "name": "Singapore",
     "symbol": "sg",
-    "flag": "/countries/flags/sg.png"
+    "flag": "static/countries/flags/sg.png"
   }
 },
 {
@@ -1391,7 +1391,7 @@
   "fields": {
     "name": "Slovakia",
     "symbol": "sk",
-    "flag": "/countries/flags/sk.png"
+    "flag": "static/countries/flags/sk.png"
   }
 },
 {
@@ -1400,7 +1400,7 @@
   "fields": {
     "name": "Slovenia",
     "symbol": "si",
-    "flag": "/countries/flags/si.png"
+    "flag": "static/countries/flags/si.png"
   }
 },
 {
@@ -1409,7 +1409,7 @@
   "fields": {
     "name": "Solomon Islands",
     "symbol": "sb",
-    "flag": "/countries/flags/sb.png"
+    "flag": "static/countries/flags/sb.png"
   }
 },
 {
@@ -1418,7 +1418,7 @@
   "fields": {
     "name": "Somalia",
     "symbol": "so",
-    "flag": "/countries/flags/so.png"
+    "flag": "static/countries/flags/so.png"
   }
 },
 {
@@ -1427,7 +1427,7 @@
   "fields": {
     "name": "South Africa",
     "symbol": "za",
-    "flag": "/countries/flags/za.png"
+    "flag": "static/countries/flags/za.png"
   }
 },
 {
@@ -1436,7 +1436,7 @@
   "fields": {
     "name": "South Korea",
     "symbol": "kr",
-    "flag": "/countries/flags/kr.png"
+    "flag": "static/countries/flags/kr.png"
   }
 },
 {
@@ -1445,7 +1445,7 @@
   "fields": {
     "name": "South Sudan",
     "symbol": "ss",
-    "flag": "/countries/flags/ss.png"
+    "flag": "static/countries/flags/ss.png"
   }
 },
 {
@@ -1454,7 +1454,7 @@
   "fields": {
     "name": "Spain",
     "symbol": "es",
-    "flag": "/countries/flags/es.png"
+    "flag": "static/countries/flags/es.png"
   }
 },
 {
@@ -1463,7 +1463,7 @@
   "fields": {
     "name": "Sri Lanka",
     "symbol": "lk",
-    "flag": "/countries/flags/lk.png"
+    "flag": "static/countries/flags/lk.png"
   }
 },
 {
@@ -1472,7 +1472,7 @@
   "fields": {
     "name": "Sudan",
     "symbol": "sd",
-    "flag": "/countries/flags/sd.png"
+    "flag": "static/countries/flags/sd.png"
   }
 },
 {
@@ -1481,7 +1481,7 @@
   "fields": {
     "name": "Suriname",
     "symbol": "sr",
-    "flag": "/countries/flags/sr.png"
+    "flag": "static/countries/flags/sr.png"
   }
 },
 {
@@ -1490,7 +1490,7 @@
   "fields": {
     "name": "Sweden",
     "symbol": "se",
-    "flag": "/countries/flags/se.png"
+    "flag": "static/countries/flags/se.png"
   }
 },
 {
@@ -1499,7 +1499,7 @@
   "fields": {
     "name": "Switzerland",
     "symbol": "ch",
-    "flag": "/countries/flags/ch.png"
+    "flag": "static/countries/flags/ch.png"
   }
 },
 {
@@ -1508,7 +1508,7 @@
   "fields": {
     "name": "Syria",
     "symbol": "sy",
-    "flag": "/countries/flags/sy.png"
+    "flag": "static/countries/flags/sy.png"
   }
 },
 {
@@ -1517,7 +1517,7 @@
   "fields": {
     "name": "Taiwan",
     "symbol": "tw",
-    "flag": "/countries/flags/tw.png"
+    "flag": "static/countries/flags/tw.png"
   }
 },
 {
@@ -1526,7 +1526,7 @@
   "fields": {
     "name": "Tajikistan",
     "symbol": "tj",
-    "flag": "/countries/flags/tj.png"
+    "flag": "static/countries/flags/tj.png"
   }
 },
 {
@@ -1535,7 +1535,7 @@
   "fields": {
     "name": "Tanzania",
     "symbol": "tz",
-    "flag": "/countries/flags/tz.png"
+    "flag": "static/countries/flags/tz.png"
   }
 },
 {
@@ -1544,7 +1544,7 @@
   "fields": {
     "name": "Thailand",
     "symbol": "th",
-    "flag": "/countries/flags/th.png"
+    "flag": "static/countries/flags/th.png"
   }
 },
 {
@@ -1553,7 +1553,7 @@
   "fields": {
     "name": "Timor-Leste",
     "symbol": "tl",
-    "flag": "/countries/flags/tl.png"
+    "flag": "static/countries/flags/tl.png"
   }
 },
 {
@@ -1562,7 +1562,7 @@
   "fields": {
     "name": "Togo",
     "symbol": "tg",
-    "flag": "/countries/flags/tg.png"
+    "flag": "static/countries/flags/tg.png"
   }
 },
 {
@@ -1571,7 +1571,7 @@
   "fields": {
     "name": "Tonga",
     "symbol": "to",
-    "flag": "/countries/flags/to.png"
+    "flag": "static/countries/flags/to.png"
   }
 },
 {
@@ -1580,7 +1580,7 @@
   "fields": {
     "name": "Trinidad and Tobago",
     "symbol": "tt",
-    "flag": "/countries/flags/tt.png"
+    "flag": "static/countries/flags/tt.png"
   }
 },
 {
@@ -1589,7 +1589,7 @@
   "fields": {
     "name": "Tunisia",
     "symbol": "tn",
-    "flag": "/countries/flags/tn.png"
+    "flag": "static/countries/flags/tn.png"
   }
 },
 {
@@ -1598,7 +1598,7 @@
   "fields": {
     "name": "Turkey",
     "symbol": "tr",
-    "flag": "/countries/flags/tr.png"
+    "flag": "static/countries/flags/tr.png"
   }
 },
 {
@@ -1607,7 +1607,7 @@
   "fields": {
     "name": "Turkmenistan",
     "symbol": "tm",
-    "flag": "/countries/flags/tm.png"
+    "flag": "static/countries/flags/tm.png"
   }
 },
 {
@@ -1616,7 +1616,7 @@
   "fields": {
     "name": "Tuvalu",
     "symbol": "tv",
-    "flag": "/countries/flags/tv.png"
+    "flag": "static/countries/flags/tv.png"
   }
 },
 {
@@ -1625,7 +1625,7 @@
   "fields": {
     "name": "Uganda",
     "symbol": "ug",
-    "flag": "/countries/flags/ug.png"
+    "flag": "static/countries/flags/ug.png"
   }
 },
 {
@@ -1634,7 +1634,7 @@
   "fields": {
     "name": "Ukraine",
     "symbol": "ua",
-    "flag": "/countries/flags/ua.png"
+    "flag": "static/countries/flags/ua.png"
   }
 },
 {
@@ -1643,7 +1643,7 @@
   "fields": {
     "name": "United Arab Emirates",
     "symbol": "ae",
-    "flag": "/countries/flags/ae.png"
+    "flag": "static/countries/flags/ae.png"
   }
 },
 {
@@ -1652,7 +1652,7 @@
   "fields": {
     "name": "United Kingdom",
     "symbol": "gb",
-    "flag": "/countries/flags/gb.png"
+    "flag": "static/countries/flags/gb.png"
   }
 },
 {
@@ -1661,7 +1661,7 @@
   "fields": {
     "name": "United States",
     "symbol": "us",
-    "flag": "/countries/flags/us.png"
+    "flag": "static/countries/flags/us.png"
   }
 },
 {
@@ -1670,7 +1670,7 @@
   "fields": {
     "name": "Uruguay",
     "symbol": "uy",
-    "flag": "/countries/flags/uy.png"
+    "flag": "static/countries/flags/uy.png"
   }
 },
 {
@@ -1679,7 +1679,7 @@
   "fields": {
     "name": "Uzbekistan",
     "symbol": "uz",
-    "flag": "/countries/flags/uz.png"
+    "flag": "static/countries/flags/uz.png"
   }
 },
 {
@@ -1688,7 +1688,7 @@
   "fields": {
     "name": "Vanuatu",
     "symbol": "vu",
-    "flag": "/countries/flags/vu.png"
+    "flag": "static/countries/flags/vu.png"
   }
 },
 {
@@ -1697,7 +1697,7 @@
   "fields": {
     "name": "Vatican City",
     "symbol": "va",
-    "flag": "/countries/flags/va.png"
+    "flag": "static/countries/flags/va.png"
   }
 },
 {
@@ -1706,7 +1706,7 @@
   "fields": {
     "name": "Venezuela",
     "symbol": "ve",
-    "flag": "/countries/flags/ve.png"
+    "flag": "static/countries/flags/ve.png"
   }
 },
 {
@@ -1715,7 +1715,7 @@
   "fields": {
     "name": "Vietnam",
     "symbol": "vn",
-    "flag": "/countries/flags/vn.png"
+    "flag": "static/countries/flags/vn.png"
   }
 },
 {
@@ -1724,7 +1724,7 @@
   "fields": {
     "name": "Yemen",
     "symbol": "ye",
-    "flag": "/countries/flags/ye.png"
+    "flag": "static/countries/flags/ye.png"
   }
 },
 {
@@ -1733,7 +1733,7 @@
   "fields": {
     "name": "Zambia",
     "symbol": "zm",
-    "flag": "/countries/flags/zm.png"
+    "flag": "static/countries/flags/zm.png"
   }
 },
 {
@@ -1742,7 +1742,7 @@
   "fields": {
     "name": "Zimbabwe",
     "symbol": "zw",
-    "flag": "/countries/flags/zw.png"
+    "flag": "static/countries/flags/zw.png"
   }
 }
 ]
