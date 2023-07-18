@@ -2,7 +2,7 @@
 FROM python:3.11
 
 # set work directory
-ENV ProjectDir=/home/app/webapp
+ENV ProjectDir=/app
 RUN mkdir -p $ProjectDir
 WORKDIR $ProjectDir
 
