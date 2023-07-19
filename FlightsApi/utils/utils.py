@@ -28,9 +28,9 @@ def log_action(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        logger.info(f"Called {func.__name__}")
+        logger.debug(f"Called {func.__name__}")
         res = func(*args, **kwargs)
-        logger.info(f"{func.__name__} finished")
+        logger.debug(f"{func.__name__} finished")
         return res
     return wrapper
 
