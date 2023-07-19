@@ -168,11 +168,9 @@ LOGGING = {
         },
         "file": {
             "level": "DEBUG",
-            "class": "logging.handlers.TimedRotatingFileHandler",
+            "class": "logging.FileHandler",
             "filename": BASE_DIR / "exposed/logs/app.log",
-            "formatter": "timestamped",
-            'when': 'D', 
-            'interval': 1,
+            "formatter": "timestamped"
         },
     },
     "loggers": {
