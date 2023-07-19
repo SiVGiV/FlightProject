@@ -6,10 +6,10 @@ services:
       - db_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
-      timeout: 5s
-      retries: 15
       start_period: 20s
+      interval: 5s
+      retries: 5
+      timeout: 5s
   web:
     # build:
     #   context: .
@@ -24,6 +24,12 @@ services:
         condition: service_healthy
         restart: true
     env_file: ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8000/health || exit 1"]
+      start_period: 20s
+      interval: 30s
+      retries: 3
+      timeout: 10s
 volumes:
   db_data:
   backend_data:
