@@ -148,8 +148,8 @@ def generate_data(admins, airlines, customers, flights, tickets):
                 response = requests.post(BASE_URL + "tickets/", data=request_body, auth=auth)
                 if response.status_code == 201:
                     tickets_list.append(response.json()['data'])
-                    ticket_index += 1
                     print(f'Created ticket {ticket_index}/{total_tickets}...')
+                    ticket_index += 1
                 else:
                     print(response.json())
                     
@@ -162,7 +162,7 @@ def generate_data(admins, airlines, customers, flights, tickets):
         'flights': flight_dict,
         'tickets': tickets_dict
     }
-                
+    
     with open(OUTPUT_FILE, "w") as outfile:
         json.dump(output_dict, outfile, indent=4)
         

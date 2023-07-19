@@ -2,8 +2,10 @@
 .idea
 *.pyc
 *.pyo
-__pycache__
-.venv
+logs/*
+generated_data/*
+*/__pycache__/
+.venv/
 .dockerignore
 Dockerfile
 docker-compose.yml
