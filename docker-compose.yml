@@ -11,10 +11,10 @@ services:
       retries: 15
       start_period: 20s
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    # image: sivgiv/flight-project-backend:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: sivgiv/flight-project-backend:latest
     ports:
       - "8000:8000"
     volumes:
