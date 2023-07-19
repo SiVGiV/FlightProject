@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from FlightProject.settings import BASE_DIR
 
 BASE_URL = "http://127.0.0.1:8000/api/"
-OUTPUT_FILE = BASE_DIR / "/exposed/generated_data/output.json"
+
 
 SUPERUSER_USERNAME = os.environ['DJANGO_SUPERUSER_USERNAME']
 SUPERUSER_PASSWORD = os.environ['DJANGO_SUPERUSER_PASSWORD']
@@ -26,15 +26,17 @@ randdate = lambda: random_datetime(datetime.now(), datetime.now() + timedelta(we
 randdelta = lambda: timedelta(days=randint(0,1), hours=randint(0, 23), minutes=randint(0, 59))
 
 @click.command()
-@click.option('--admins', default=0, help='Number of admins to generate.', prompt=True, show_default=True)
-@click.option('--airlines', default=0, help='Number of airlines to generate.', prompt=True, show_default=True)
-@click.option('--customers', default=0, help='Number of customers to generate.', prompt=True, show_default=True)
-@click.option('--flights', default=0, help='Number of flights to generate per airline.', prompt=True, show_default=True)
-@click.option('--tickets', default=0, help='Number of tickets to generate per flight.', prompt=True, show_default=True)
+@click.option('--admins', default=0, help='Number of admins to generate.', prompt=True, show_default=("(Default: 0)"))
+@click.option('--airlines', default=0, help='Number of airlines to generate.', prompt=True, show_default=("(Default: 0)"))
+@click.option('--customers', default=0, help='Number of customers to generate.', prompt=True, show_default=("(Default: 0)"))
+@click.option('--flights', default=0, help='Number of flights to generate per airline.', prompt=True, show_default=("(Default: 0)"))
+@click.option('--tickets', default=0, help='Number of tickets to generate per flight.', prompt=True, show_default=("(Default: 0)"))
 def generate_data(admins, airlines, customers, flights, tickets):
     # Create admins
     admins_list = []
     auth = HTTPBasicAuth(SUPERUSER_USERNAME, SUPERUSER_PASSWORD)
+    OUTPUT_FILE = BASE_DIR / "exposed/generated_data/output.json"
+    print(f"Output file is '{ OUTPUT_FILE }'.")
 
     for index in range(admins):
         user = RandomUser()
