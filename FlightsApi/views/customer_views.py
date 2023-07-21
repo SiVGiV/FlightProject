@@ -1,3 +1,5 @@
+import logging
+
 from ..facades import AnonymousFacade, CustomerFacade, AdministratorFacade
 
 from rest_framework.views import APIView
@@ -5,13 +7,12 @@ from rest_framework.response import Response
 
 from FlightsApi.utils.response_utils import forbidden_response, bad_request_response
 
+logger = logging.getLogger('django')
+
 class CustomersView(APIView): # /customers
     def get(self, request):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):
@@ -31,10 +32,7 @@ class CustomersView(APIView): # /customers
     
     def post(self, request):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, (AdministratorFacade, AnonymousFacade)):
@@ -66,12 +64,10 @@ class CustomerView(APIView): # /customer/<id>
         GET /customer/<id> - Deactivate customer account
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
-        elif not isinstance(facade, (CustomerFacade, AdministratorFacade)):
+        if not isinstance(facade, (CustomerFacade, AdministratorFacade)):
             code, data = forbidden_response()
         
         # Call facade and return response
@@ -85,12 +81,10 @@ class CustomerView(APIView): # /customer/<id>
         DELETE /customer/<id> - Deactivate customer account
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
-        elif not isinstance(facade, AdministratorFacade):
+        if not isinstance(facade, AdministratorFacade):
             code, data = forbidden_response()       
         
         # Call facade and return response
@@ -99,15 +93,12 @@ class CustomerView(APIView): # /customer/<id>
             
         return Response(status=code, data=data)
         
-    def patch(self, request):
+    def patch(self, request, id):
         """
         PATCH /customer/<id> - Update a customer
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
 
         # Check if the user has the right permissions
         if not isinstance(facade, CustomerFacade):
@@ -132,5 +123,5 @@ class CustomerView(APIView): # /customer/<id>
         if phone_number:
             update_fields['phone_number'] = phone_number
 
-        code, data = facade.update_customer(**update_fields)
+        code, data = facade.update_customer(id, **update_fields)
         return Response(status=code, data=data)

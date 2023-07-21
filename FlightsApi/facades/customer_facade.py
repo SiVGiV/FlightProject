@@ -28,7 +28,7 @@ class CustomerFacade(FacadeBase):
     def usertype():
         return 'customer'
         
-    @property 
+    @property
     def required_group(self):
         return self.__required_group
 
@@ -58,15 +58,19 @@ class CustomerFacade(FacadeBase):
             else:
                 return not_found_response()
 
-    def update_customer(self, **updated_fields):
+    def update_customer(self, id, **updated_fields):
         """Updates a customer's details (Does not update any user credentials!)
 
         Args:
+            id (int): Customer ID (used for verification)
             updated_fields (kwargs): New details
 
         Returns:
             Tuple[int, dict]: A response tuple containing [status code, response data/errors]
         """
+        if not self.__user['customer']['id'] == id:
+            return forbidden_response()
+        
         try:
             data, success = R.update(DBTables.CUSTOMER, self.__user['customer']['id'], **updated_fields)
         except RepoErrors.FetchError as e:
