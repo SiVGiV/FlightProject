@@ -152,8 +152,12 @@ class FlightView(APIView): # /flight/<id>
             arrival_datetime_str = request.data.get('arrival_datetime')
             if departure_datetime_str:
                 departure_datetime = parser.parse(departure_datetime_str)
+            else:
+                departure_datetime = None
             if arrival_datetime_str:
                 arrival_datetime = parser.parse(arrival_datetime_str)
+            else:
+                arrival_datetime = None
         except ValueError as e:
             logger.info(e)
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
