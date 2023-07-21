@@ -22,6 +22,7 @@ class AdministratorFacade(FacadeBase):
         super().__init__()
         self.__required_group = R.get_or_create_group('admin')
         self.__user = user
+        self.__user['admin'] = R.get_by_user_id(DBTables.ADMIN, self.__user['id'])
         
     @staticmethod
     def usertype():

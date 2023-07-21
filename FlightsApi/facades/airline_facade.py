@@ -44,7 +44,7 @@ class AirlineFacade(FacadeBase):
             Tuple[int, dict]: A response tuple containing status code and data/errors.
         """
         try:
-            data = R.get_flights_by_airline_id(self.__user['airline'])
+            data = R.get_flights_by_airline_id(self.__user['airline']['id'])
         except Exception as e:
             logger.error(e)
             return internal_error_response(errors=e)
@@ -69,7 +69,7 @@ class AirlineFacade(FacadeBase):
             updated_fields.update(country_id=country_id)
         
         try:
-            data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline'], **updated_fields)
+            data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline']['id'], **updated_fields)
         except RepoErrors.FetchError as e:
             logger.error(e)
             return not_found_response(errors=e)
@@ -100,7 +100,7 @@ class AirlineFacade(FacadeBase):
         try:
             data, success = R.add(
                 DBTables.FLIGHT,
-                airline=self.__user['airline'],
+                airline=self.__user['airline']['id'],
                 origin_country=origin_id,
                 destination_country=destination_id,
                 departure_datetime=departure_datetime,
@@ -140,7 +140,7 @@ class AirlineFacade(FacadeBase):
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Make sure this airline owns the flight
-        if not flight['airline'] == self.__user['airline']:
+        if not flight['airline'] == self.__user['airline']['id']:
             return forbidden_response()
 
         try:
@@ -182,7 +182,7 @@ class AirlineFacade(FacadeBase):
         if not flight:
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
-        if not flight['airline'] == self.__user['airline']:
+        if not flight['airline'] == self.__user['airline']['id']:
             return forbidden_response()
         
         try:
@@ -231,6 +231,6 @@ class AirlineFacade(FacadeBase):
         code, data =  super().get_airline_by_id(id)
         if code != 200:
             return code, data
-        if self.__user['airline'] != id:
+        if self.__user['airline']['id'] != id:
             data['data'].pop('user', None)
         return code, data
