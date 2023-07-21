@@ -32,6 +32,7 @@ def no_content_ok():
     return create_facade_response(status.HTTP_204_NO_CONTENT)
 
 def create_facade_response(code, data = None, errors = None, pagination = None):
+    logger.debug(f"{code}: {data = } ||| {errors = }")
     if status.is_server_error(code):
         added_str = ''
         if errors:
