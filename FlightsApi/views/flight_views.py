@@ -1,3 +1,5 @@
+import logging
+
 from FlightsApi.facades import AnonymousFacade, AirlineFacade
 
 from rest_framework.views import APIView
@@ -6,6 +8,7 @@ from dateutil import parser
 
 from FlightsApi.utils.response_utils import bad_request_response, forbidden_response
 
+logger = logging.getLogger('django')
 
 class FlightsView(APIView): # /flights
     def get(self, request):
@@ -35,6 +38,7 @@ class FlightsView(APIView): # /flights
             else:
                 date = None
         except ValueError as e:
+            logger.info(e)
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
             return Response(status=code, data=data)
         
@@ -94,9 +98,11 @@ class FlightsView(APIView): # /flights
             departure_datetime = parser.parse(departure_datetime_str)
             arrival_datetime = parser.parse(arrival_datetime_str)
         except ValueError as e:
+            logger.info(e)
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
             return Response(status=code, data=data)
         except KeyError as e:
+            logger.info(e)
             code, data = bad_request_response("request must contain both departure and landing date/time.")
             return Response(status=code, data=data)
         
@@ -157,9 +163,11 @@ class FlightView(APIView): # /flight/<id>
             departure_datetime = parser.parse(departure_datetime_str)
             arrival_datetime = parser.parse(arrival_datetime_str)
         except ValueError as e:
+            logger.info(e)
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
             return Response(status=code, data=data)
         except KeyError as e:
+            logger.info(e)
             code, data = bad_request_response("request must contain both departure and landing date/time.")
             return Response(status=code, data=data)
         

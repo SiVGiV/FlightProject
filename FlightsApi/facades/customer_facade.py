@@ -1,5 +1,6 @@
 # Python builtin imports
 from typing import Tuple
+import logging
 
 # Django imports
 from django.core.exceptions import ValidationError
@@ -14,6 +15,7 @@ from FlightsApi.utils.response_utils import conflict_response, not_found_respons
 # Local module imports
 from .facade_base import FacadeBase
 
+logger = logging.getLogger('django')
 
 class CustomerFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -45,8 +47,10 @@ class CustomerFacade(FacadeBase):
         try:
             data = R.get_by_id(DBTables.CUSTOMER, id)
         except (RepoErrors.FetchError, RepoErrors.EntityNotFoundException) as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         else:
             if data:
@@ -66,10 +70,13 @@ class CustomerFacade(FacadeBase):
         try:
             data, success = R.update(DBTables.CUSTOMER, self.__user['customer']['id'], **updated_fields)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e) 
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         else:
             if success:
@@ -97,8 +104,10 @@ class CustomerFacade(FacadeBase):
         try:
             data, success = R.add(DBTables.TICKET, flight=flight_id, customer=self.__user['customer']['id'], seat_count=seat_count)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
 
@@ -120,8 +129,10 @@ class CustomerFacade(FacadeBase):
         try:
             ticket = R.get_by_id(DBTables.TICKET, ticket_id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
             
         # Check if ticket exists
@@ -135,8 +146,10 @@ class CustomerFacade(FacadeBase):
         try:
             data, success = R.update(DBTables.TICKET, id=ticket_id, is_canceled=True)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         
         if not success:
@@ -159,6 +172,7 @@ class CustomerFacade(FacadeBase):
         try:
             data = R.get_tickets_by_customer(self.__user['customer']['id'], pagination)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         return ok_response(data=data, pagination=pagination)
     

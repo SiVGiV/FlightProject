@@ -1,12 +1,14 @@
 from abc import abstractmethod
 from datetime import date as Date
 from typing import Tuple
+import logging
 
 from ..repository import Repository as R, DBTables, Paginate
 from ..repository import errors as RepoErrors
 from ..utils.response_utils import not_found_response, bad_request_response, \
                             ok_response, internal_error_response
 
+logger = logging.getLogger('django')
 
 class FacadeBase():
     @staticmethod
@@ -39,6 +41,7 @@ class FacadeBase():
         try:
             data = R.get_all(DBTables.FLIGHT, pagination)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         # Return response
@@ -58,8 +61,10 @@ class FacadeBase():
         try:
             data = R.get_by_id(DBTables.FLIGHT, id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not data: # Check if the result came up empty
@@ -89,6 +94,7 @@ class FacadeBase():
         try:
             data = R.get_flights_by_parameters(origin_country_id, destination_country_id, date, pagination)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         # Return response
@@ -121,8 +127,10 @@ class FacadeBase():
         try:
             data = R.get_by_id(DBTables.AIRLINECOMPANY, id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not data: # Check if the result came up empty
@@ -150,6 +158,7 @@ class FacadeBase():
         try:
             data = R.get_airlines_by_name(name, pagination, allow_deactivated)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
                 
         # Return response
@@ -173,6 +182,7 @@ class FacadeBase():
         try:
             data = R.get_all(DBTables.COUNTRY, pagination)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         # Return response
@@ -192,8 +202,10 @@ class FacadeBase():
         try:
             data = R.get_by_id(DBTables.COUNTRY, id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not data: # Check if the result came up empty

@@ -1,5 +1,6 @@
 # Python builtin imports
 from typing import Tuple
+import logging
 
 # Django imports
 from django.contrib.auth import login
@@ -19,6 +20,8 @@ from .facade_base import FacadeBase
 from .administrator_facade import AdministratorFacade
 from .airline_facade import AirlineFacade
 from .customer_facade import CustomerFacade
+
+logger = logging.getLogger('django')
 
 class AnonymousFacade(FacadeBase):
     """
@@ -57,6 +60,7 @@ class AnonymousFacade(FacadeBase):
                 R.get_or_create_group('airline')
                 R.get_or_create_group('customer')
             except Exception as e:
+                logger.error(e)
                 raise RepositoryTransactionException("Failed to get/create permission group.\n" + str(e))
             else:
                 AnonymousFacade.__groups_created = True
@@ -122,8 +126,10 @@ class AnonymousFacade(FacadeBase):
         try:
             user_data, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not user_created:
@@ -135,8 +141,10 @@ class AnonymousFacade(FacadeBase):
         try:
             R.assign_group_to_user(user_id, group_name='customer')
         except RepoErrors.UserAlreadyInGroupException as e:
+            logger.error(e)
             return conflict_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         temp_user_data = R.get_by_id(DBTables.USER, user_data['id'])
@@ -154,9 +162,11 @@ class AnonymousFacade(FacadeBase):
                 user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return internal_error_response(errors=e)
         

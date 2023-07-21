@@ -1,6 +1,7 @@
 # Python builtin imports
 from typing import Tuple
 from datetime import datetime
+import logging
 
 # Django imports
 from django.core.exceptions import ValidationError
@@ -15,6 +16,7 @@ from FlightsApi.utils.response_utils import not_found_response, bad_request_resp
 # Local module imports
 from .facade_base import FacadeBase
 
+logger = logging.getLogger('django')
 
 class AirlineFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -44,6 +46,7 @@ class AirlineFacade(FacadeBase):
         try:
             data = R.get_flights_by_airline_id(self.__user['airline']['id'])
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
 
         pagination = Paginate(limit, page)
@@ -68,10 +71,13 @@ class AirlineFacade(FacadeBase):
         try:
             data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline']['id'], **updated_fields)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         if success:
             return ok_response(data=data)
@@ -102,8 +108,10 @@ class AirlineFacade(FacadeBase):
                 total_seats=total_seats    
             )
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         if not success:
             return bad_request_response(errors=data)
@@ -122,8 +130,10 @@ class AirlineFacade(FacadeBase):
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not flight:
@@ -136,10 +146,13 @@ class AirlineFacade(FacadeBase):
         try:
             updated_flight, success = R.update(DBTables.FLIGHT, id=flight_id, **updated_fields)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
 
         if success:
@@ -159,8 +172,10 @@ class AirlineFacade(FacadeBase):
         try:
             flight = R.get_by_id(DBTables.FLIGHT, flight_id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
             
         # Check if flight exists
@@ -173,10 +188,13 @@ class AirlineFacade(FacadeBase):
         try:
             data, success = R.update(DBTables.FLIGHT, id=flight_id, is_canceled=True)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not data['is_canceled']:

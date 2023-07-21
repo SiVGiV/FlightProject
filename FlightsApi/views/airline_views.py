@@ -1,9 +1,13 @@
+import logging
+
 from ..facades import AnonymousFacade, AirlineFacade, AdministratorFacade
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from FlightsApi.utils.response_utils import forbidden_response, bad_request_response
+
+logger = logging.getLogger('django')
 
 
 class AirlinesView(APIView): # /airlines
@@ -58,6 +62,7 @@ class AirlinesView(APIView): # /airlines
         try:
             country_id = int(request.data.get('country'))
         except TypeError as e:
+            logger.info(e)
             code, data = bad_request_response("'country' must be an integer.")
             return Response(status=code, data=data)
         

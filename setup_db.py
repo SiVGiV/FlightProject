@@ -25,6 +25,7 @@ def get_connection():
         password=os.getenv('MYSQL_ROOT_PASSWORD'),
     )
     except Exception as e:
+        logger.error(e)
         print(f"failed to connect to { DATABASE_SETTINGS['HOST'] }:3306")
         print(e)
         raise
@@ -39,6 +40,7 @@ def create_schema():
     try:
         connection = get_connection()
     except ConnectionError as e:
+        logger.error(e)
         logger.error("Failed to connect to database.", exc_info=e)    
     
     cursor = connection.cursor()
@@ -48,6 +50,7 @@ def create_schema():
             "CREATE DATABASE IF NOT EXISTS %s;" % DATABASE_SETTINGS['NAME']
         )
     except Exception as e:
+        logger.error(e)
         logger.error("Schema creation failed.", exc_info=e)
     else:
         logger.info("%s schema creation successful." % DATABASE_SETTINGS['NAME'])

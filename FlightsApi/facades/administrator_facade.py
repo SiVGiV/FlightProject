@@ -1,5 +1,6 @@
 # Python builtin imports
 from typing import Tuple
+import logging
 
 # Django imports
 from django.core.exceptions import ValidationError
@@ -13,6 +14,8 @@ from FlightsApi.utils.response_utils import conflict_response, not_found_respons
 
 # Local module imports
 from .facade_base import FacadeBase
+
+logger = logging.getLogger('django')
 
 class AdministratorFacade(FacadeBase):
     def __init__(self, user: dict) -> None:
@@ -41,8 +44,10 @@ class AdministratorFacade(FacadeBase):
         try:
             data = R.get_by_id(DBTables.CUSTOMER, id)
         except (RepoErrors.FetchError, RepoErrors.EntityNotFoundException) as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         else:
             if data:
@@ -65,6 +70,7 @@ class AdministratorFacade(FacadeBase):
         try:
             data = R.get_all(DBTables.CUSTOMER, pagination)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         # Make response
@@ -93,8 +99,10 @@ class AdministratorFacade(FacadeBase):
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not user_created:
@@ -106,8 +114,10 @@ class AdministratorFacade(FacadeBase):
         try:
             R.assign_group_to_user(user_id, group_name='airline')
         except RepoErrors.UserAlreadyInGroupException as e:
+            logger.error(e)
             return conflict_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
                 
         temp_user_data = R.get_by_id(DBTables.USER, user['id'])
@@ -128,9 +138,11 @@ class AdministratorFacade(FacadeBase):
                 user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return internal_error_response(errors=e)
         
@@ -161,8 +173,10 @@ class AdministratorFacade(FacadeBase):
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not user_created:
@@ -174,8 +188,10 @@ class AdministratorFacade(FacadeBase):
         try:
             R.assign_group_to_user(user_id, group_name='customer')
         except RepoErrors.UserAlreadyInGroupException as e:
+            logger.error(e)
             return conflict_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         temp_user_data = R.get_by_id(DBTables.USER, user['id'])
@@ -193,9 +209,11 @@ class AdministratorFacade(FacadeBase):
                 user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return internal_error_response(errors=e)
         
@@ -224,8 +242,10 @@ class AdministratorFacade(FacadeBase):
         try:
             user, user_created = R.add(DBTables.USER, username=username, password=password, email=email)
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not user_created:
@@ -237,8 +257,10 @@ class AdministratorFacade(FacadeBase):
         try:
             R.assign_group_to_user(user_id, group_name='admin')
         except RepoErrors.UserAlreadyInGroupException as e:
+            logger.error(e)
             return conflict_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         temp_user_data = R.get_by_id(DBTables.USER, user['id'])
@@ -254,9 +276,11 @@ class AdministratorFacade(FacadeBase):
                 user=user_id
             )
         except (ValueError, TypeError, ValidationError) as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             R.remove(DBTables.USER, user_id)
             return internal_error_response(errors=e)
         
@@ -279,6 +303,7 @@ class AdministratorFacade(FacadeBase):
         try:
             airline = R.get_by_id(DBTables.AIRLINECOMPANY, airline_id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         
         if not airline:
@@ -287,8 +312,10 @@ class AdministratorFacade(FacadeBase):
         try:
             updated, success = R.update(DBTables.USER, airline['user'], is_active=False)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if updated['is_active'] == False:
@@ -308,8 +335,10 @@ class AdministratorFacade(FacadeBase):
         try:
             customer = R.get_by_id(DBTables.CUSTOMER, customer_id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not customer:
@@ -318,8 +347,10 @@ class AdministratorFacade(FacadeBase):
         try:
             updated, success = R.update(DBTables.USER, customer['user'], is_active=False)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
 
         if updated['is_active'] == False:
@@ -340,8 +371,10 @@ class AdministratorFacade(FacadeBase):
         try:
             admin = R.get_by_id(DBTables.ADMIN, admin_id)
         except RepoErrors.OutOfBoundsException as e:
+            logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
         if not admin:
@@ -350,8 +383,10 @@ class AdministratorFacade(FacadeBase):
         try:
             updated, success = R.update(DBTables.USER, admin['user'], is_active=False)
         except RepoErrors.FetchError as e:
+            logger.error(e)
             return not_found_response(errors=e)
         except Exception as e:
+            logger.error(e)
             return internal_error_response(errors=e)
         
 
