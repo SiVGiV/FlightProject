@@ -158,6 +158,7 @@ class Repository():
             list[dict]: List of all serialized rows from model.
         """
         # Get the instances
+        paginator.total = dbtable.model.objects.count()
         all_objects = dbtable.model.objects.all()[paginator.slice]
         # Serialize them
         result = [dbtable.serializer(obj).data for obj in all_objects]
@@ -377,6 +378,7 @@ class Repository():
             # Finally, of those flights get any that depart on the specified date
             query = query.filter(departure_datetime__date = date)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -385,7 +387,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_airline_id(airline_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_airline_id(airline_id: int, paginator: Paginate) -> List[dict]:
         """
         Returns a list of flights that are owned by the specified airline.
         
@@ -399,6 +401,7 @@ class Repository():
         # Create the query
         query = Flight.objects.filter(airline__pk=airline_id)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -407,7 +410,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_arrival_flights(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_arrival_flights(country_id: int, paginator: Paginate) -> List[dict]:
         """
         Get all flights arriving to a country in the next 12 hours.
 
@@ -424,6 +427,7 @@ class Repository():
         query = query.filter(arrival_datetime__lte=timezone.now() + timedelta(hours=12))
         
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -432,7 +436,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_departure_flights(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_departure_flights(country_id: int, paginator: Paginate) -> List[dict]:
         """
         Get all flights leaving a country in the next 12 hours.
 
@@ -452,6 +456,7 @@ class Repository():
         query = query.filter(departure_datetime__gte=timezone.now())
         query = query.filter(departure_datetime__lte=timezone.now() + timedelta(hours=12))
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -460,7 +465,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_tickets_by_customer(customer_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_tickets_by_customer(customer_id: int, paginator: Paginate) -> List[dict]:
         """
         Fetches all tickets belonging to a customer.
 
@@ -474,6 +479,7 @@ class Repository():
         # Create the query
         query = Ticket.objects.filter(customer__id=customer_id)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         tickets = [DBTables.TICKET.serializer(ticket).data for ticket in query]
@@ -482,7 +488,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_airlines_by_country(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_airlines_by_country(country_id: int, paginator: Paginate) -> List[dict]:
         """
         Get all airlines in a certain country.
 
@@ -496,6 +502,7 @@ class Repository():
         # Create the query
         query = AirlineCompany.objects.filter(country__id=country_id)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         airlines = [DBTables.AIRLINECOMPANY.serializer(airline).data for airline in query]
@@ -504,7 +511,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(str)
-    def get_airlines_by_name(name: str,  paginator: Paginate = Paginate(), allow_deactivated = False) -> List[dict]:
+    def get_airlines_by_name(name: str,  paginator: Paginate, allow_deactivated = False) -> List[dict]:
         """
         Get all airlines whos name contains a str.
 
@@ -523,6 +530,7 @@ class Repository():
             query = query.filter(user__is_active=True)
         
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialized the results
         airlines = [DBTables.AIRLINECOMPANY.serializer(airline).data for airline in query]
@@ -532,7 +540,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_origin(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_origin(country_id: int, paginator: Paginate) -> List[dict]:
         """Get flights that take off from a certain country.
 
         Args:
@@ -545,6 +553,7 @@ class Repository():
         # Create the query
         query = Flight.objects.filter(origin_country__id=country_id)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -553,7 +562,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_destination(country_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_destination(country_id: int, paginator: Paginate) -> List[dict]:
         """Get flights that land in a certain country.
 
         Args:
@@ -566,6 +575,7 @@ class Repository():
         # Create the query
         query = Flight.objects.filter(destination_country__id=country_id)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -574,7 +584,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(Date)
-    def get_flights_by_departure_date(date: Date, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_departure_date(date: Date, paginator: Paginate) -> List[dict]:
         """Get flights that depart on a certain date.
 
         Args:
@@ -587,6 +597,7 @@ class Repository():
         # Create the query
         query = Flight.objects.filter(departure_datetime__date=date)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -595,7 +606,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(Date)
-    def get_flights_by_arrival_date(date: Date, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_arrival_date(date: Date, paginator: Paginate) -> List[dict]:
         """Get flights that arrive on a certain date.
 
         Args:
@@ -608,6 +619,7 @@ class Repository():
         # Create the query
         query = Flight.objects.filter(arrival_datetime__date=date)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]
@@ -616,7 +628,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts(int)
-    def get_flights_by_customer(customer_id: int, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_customer(customer_id: int, paginator: Paginate) -> List[dict]:
         """Fetch all flights for a customer.
 
         Args:
@@ -629,6 +641,7 @@ class Repository():
         # Create the query
         query = Flight.objects.filter(tickets__customer__id=customer_id)
         # Paginate the results
+        paginator.total = query.count()
         query = query.all()[paginator.slice]
         # Serialize the results
         flights = [DBTables.FLIGHT.serializer(flight).data for flight in query]

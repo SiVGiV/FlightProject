@@ -2,7 +2,7 @@ class Paginate():
     """
     A 1 indexed pagination class.
     """
-    def __init__(self, per_page: int = 50, page_number: int = 1):
+    def __init__(self, per_page: int = 50, page_number: int = 1, total: int = 0):
         """
         Create a Paginate object. If any of the arguments is zero or below, doesn't paginate.
 
@@ -12,7 +12,19 @@ class Paginate():
         """
         self.__per_page = per_page if per_page > 0 else 50
         self.__page_number = page_number if page_number > 0 else 1
+        self.__total = total if total >= 0 else 0
         
+    @property
+    def total(self):
+        return self.__total
+        
+    @total.setter
+    def total(self, value):
+        if value >= 0:
+            self.__total = value
+        else:
+            raise ValueError("Pagination total cannot be lower than 0.")
+    
     @property
     def slice(self):
         """
@@ -36,7 +48,7 @@ class Paginate():
             return self.__per_page
         
     def keys(self):
-        return ('page', 'limit')
+        return ('page', 'limit', 'total')
     
     def get_dict(self):
-        return {'limit': self.__per_page, 'page': self.__page_number}
+        return {'limit': self.__per_page, 'page': self.__page_number, 'total': self.__total}
