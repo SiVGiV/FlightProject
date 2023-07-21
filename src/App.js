@@ -5,9 +5,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MyNavBar from './components/navigation/navbar';
 
 // Import pages
-import HomePage from './components/pages';
-import FlightsPage from './components/pages/flights';
-
+import HomePage from './pages';
+import FlightsPage from './pages/flights';
 
 
 const homepage = {

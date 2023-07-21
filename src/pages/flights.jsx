@@ -1,28 +1,26 @@
 import React, { useEffect, useState } from "react";
 import Flight from "./flight";
-import { Accordion } from "react-bootstrap";
-import axios from "axios";
-import { BASE_URL } from "../../config";
-
+import { Accordion, Pagination } from "react-bootstrap";
+import { useParams } from "react-router-dom";
+import API from "../api";
 
 export default function FlightsPage(){
     const [flights, setFlights] = useState([]);
-    const [error, setError] = useState()
-    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState();
+    const [loading, setLoading] = useState(true);
 
+    const { flightPage } = useParams();
     
     useEffect(()=>{
-        axios.get(`${BASE_URL}/flights/`, { params: { limit: 15, page: 1 } })
+        API.flights.get({limit: 10, page: 1})
         .then(response => {
-            console.log("response: " +  JSON.stringify(response.data));
-            setFlights(response.data['data'])
+            setFlights(response.data['data']);
         }, console.log)
         .catch(error => {
             console.log("error: " + error);
             setError(error);
         })
         .finally(() => {
-            console.log('finally');
             setLoading(false);
         })
     }, []);
@@ -41,7 +39,16 @@ export default function FlightsPage(){
     }
     return (
         <Accordion>
-            { flights.map( (flight, index) => <Flight flightData={flight} key={index}/> ) }
+        { 
+            flights.map( (flight, index) =>{
+                return (
+                    <Accordion.Item eventKey={"flight" + flight.id.toString()} key={index}>
+                        <Flight flightData={flight}/>
+                    </Accordion.Item>
+                );
+                }
+            )
+        }
         </Accordion>
     );
 }
