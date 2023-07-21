@@ -90,22 +90,15 @@ class AnonymousFacade(FacadeBase):
         """
         # Get user from request
         user = request.user
-        
-        if user:
-            if user.is_anonymous:
-                request.COOKIES['usertype'] = 'anon'
-                return AnonymousFacade(), ''
-            login(request, user) # Django login function
+        if user.is_authenticated:
+            # Not anonymous user
             facade = AnonymousFacade.facade_from_user(user)
-            if facade:
-                request.COOKIES['usertype'] = facade.usertype()
-                return facade, '' # Return the right facade and an empty reason.
-            else:
-                request.COOKIES['usertype'] = 'anon'
-                return AnonymousFacade(), 'User not assigned to any groups.'
         else:
-            request.COOKIES['usertype'] = 'anon'
-            return AnonymousFacade(), 'A user with this combination of user/password does not exist.'
+            # Anonymous user
+            facade = AnonymousFacade()
+        request.COOKIES['usertype'] = facade.usertype()
+        return facade
+        
     
     def add_customer(self, username, password, email, first_name, last_name, address, phone_number) -> Tuple[int, dict]:
         """Registers a user with a customer role.

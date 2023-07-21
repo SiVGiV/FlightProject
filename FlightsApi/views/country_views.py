@@ -8,10 +8,7 @@ from FlightsApi.utils.response_utils import bad_request_response
 class CountriesView(APIView):
     def get(self, request): # /countries
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Validate pagination inputs
         try:
@@ -27,10 +24,7 @@ class CountriesView(APIView):
 class CountryView(APIView):
     def get(self, request, id: int): # /country/<id>
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Create response
         code, data = facade.get_country_by_id(id)

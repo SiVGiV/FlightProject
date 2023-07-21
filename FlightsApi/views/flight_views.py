@@ -13,10 +13,7 @@ logger = logging.getLogger('django')
 class FlightsView(APIView): # /flights
     def get(self, request):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Validate and fetch request parameters
         try:
@@ -62,10 +59,7 @@ class FlightsView(APIView): # /flights
     
     def post(self, request):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AirlineFacade):
@@ -117,20 +111,14 @@ class FlightsView(APIView): # /flights
     
 class FlightView(APIView): # /flight/<id>
     def get(self, request, id):
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         code, data = facade.get_flight_by_id(id)
         return Response(status=code, data=data)
         
     def patch(self, request, id):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AirlineFacade):
@@ -187,10 +175,7 @@ class FlightView(APIView): # /flight/<id>
     
     def delete(self, request, id):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AirlineFacade):

@@ -16,10 +16,7 @@ class AirlinesView(APIView): # /airlines
         GET /airlines - Get all airlines / filter by name
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Get all the details
         name = request.GET.get('name', '')
@@ -45,10 +42,7 @@ class AirlinesView(APIView): # /airlines
         POST /airlines - Add a new airline
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
 
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):
@@ -83,10 +77,7 @@ class AirlineView(APIView): # /airline/<id>
         GET /airline/<id> - Get airline by id
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Call facade and return response
         code, data = facade.get_airline_by_id(id)
@@ -97,10 +88,7 @@ class AirlineView(APIView): # /airline/<id>
         DELETE /airline/<id> - Deactivate airline account
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):
@@ -116,10 +104,7 @@ class AirlineView(APIView): # /airline/<id>
         PATCH /airline/<id> - Update an airline
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AirlineFacade):

@@ -11,10 +11,7 @@ class AdminsView(APIView): # /admins
         POST /admins - Add a new administrator
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):
@@ -43,10 +40,7 @@ class AdminView(APIView): # /admin/<id>
         DELETE /admin/<int:id> - Deactivate an administrator
         """
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            code, data = bad_request_response(error_msg)
-            return Response(status=code, data=data)
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, AdministratorFacade):

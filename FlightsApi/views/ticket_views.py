@@ -1,4 +1,4 @@
-from ..facades import AnonymousFacade, CustomerFacade, AirlineFacade, AdministratorFacade
+from ..facades import AnonymousFacade, CustomerFacade
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -7,9 +7,7 @@ from rest_framework.response import Response
 class TicketsView(APIView): # /tickets
     def get(self, request):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, CustomerFacade):
@@ -28,9 +26,7 @@ class TicketsView(APIView): # /tickets
     
     def post(self, request):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, CustomerFacade):
@@ -53,9 +49,7 @@ class TicketsView(APIView): # /tickets
 class TicketView(APIView): # /ticket/<id>    
     def delete(self, request, id):
         # Get correct facade
-        facade, error_msg = AnonymousFacade.login(request)
-        if error_msg:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': [error_msg]})
+        facade = AnonymousFacade.login(request)
         
         # Check if the user has the right permissions
         if not isinstance(facade, CustomerFacade):
