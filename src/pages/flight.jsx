@@ -26,7 +26,7 @@ export default function Flight({flightData}){
                 <Accordion.Header>
                     <div className="flightHeaderDiv">
                         <LocationListing country={ origin } isoDate={ formatDate(flightData.departure_datetime) }/>
-                        <b className="destinationArrow">→</b>
+                        <b className="destinationArrow">➜</b>
                         <LocationListing country={ destination } isoDate={ formatDate(flightData.arrival_datetime) }/>
                     </div>
                 </Accordion.Header>
