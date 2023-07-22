@@ -1,5 +1,3 @@
-import { NavbarBrand } from "react-bootstrap";
-import Container from "react-bootstrap/Container";
 import Nav  from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
@@ -37,13 +35,13 @@ function resolvePage(key, value, index){
         if (('navbar' in value) && (!value['navbar'])){
             return <></>;
         }
-        return (<Nav.Link as={ Link } to={ value['url'] } key={ index }>{ key }</Nav.Link>);
+        return (<Nav.Link as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</Nav.Link>);
     }
     return (<></>);
 }
 
 function resolveDropdown(key, value, index){
     if (typeof value == 'object' || value instanceof Object){
-        return (<NavDropdown.Item as={ Link } to={ value['url'] } key={ index }>{ key }</NavDropdown.Item>);
+        return (<NavDropdown.Item as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</NavDropdown.Item>);
     }
 }

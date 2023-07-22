@@ -20,7 +20,8 @@ const pages = {
         'navbar': false
     },
     'Flights': {
-        'url': '/flights',
+        'url': '/flights/:flightPage',
+        'link': '/flights/1/',
         'element': <FlightsPage/>
     }
 }

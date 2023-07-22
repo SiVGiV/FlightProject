@@ -10,13 +10,13 @@ export default class API {
     }
 
     static admins = {
-        get: ({ limit, page }) => axios.get(`${API_URL}/api/admins/`, {
+        get: ({ limit, page }) => axios.get(`${API_URL}/admins/`, {
             params: {
-                limit: limit || "",
-                page: page || ""
+                limit: limit ?? undefined,
+                page: page ?? undefined
             }
         }),
-        post: (params) => axios.post(`${API_URL}/api/admins/`, params),
+        post: (params) => axios.post(`${API_URL}/admins/`, params),
     }
 
     // Country endpoints
@@ -24,10 +24,10 @@ export default class API {
         get: (id) => axios.get(`${API_URL}/country/${id}`)
     }
     static countries = {
-        get: ({ limit, page }) => axios.get(`${API_URL}/api/countries/`, {
+        get: ({ limit, page }) => axios.get(`${API_URL}/countries/`, {
             params: {
-                limit: limit || "",
-                page: page || ""
+                limit: limit ?? undefined,
+                page: page ?? undefined
             }
         }),
     }
@@ -42,11 +42,11 @@ export default class API {
     static flights = {
         get: ({ origin, destination, date, page, limit }) => axios.get(`${API_URL}/flights/`, {
             params: {
-                origin: origin || "",
-                destination: destination || "",
-                date: date || "",
-                page: page || "",
-                limit: limit || ""
+                origin_country: origin ?? undefined,
+                destination_country: destination ?? undefined,
+                date: date ?? undefined,
+                page: page ?? undefined,
+                limit: limit ?? undefined
             }
         }),
         post: (params) => axios.post(`${API_URL}/flights/`, params),
@@ -62,9 +62,9 @@ export default class API {
     static airlines = {
         get: ({ name, limit, page }) => axios.get(`${API_URL}/airlines/`, {
             params: {
-                name: name || "",
-                limit: limit || "",
-                page: page || ""
+                name: name ?? undefined,
+                limit: limit ?? undefined,
+                page: page ?? undefined
             }
         }),
         post: (params) => axios.post(`${API_URL}/airlines/`, params),
@@ -80,8 +80,8 @@ export default class API {
     static customers = {
         get: ({ limit, page }) => axios.get(`${API_URL}/customers/`, {
             params: {
-                limit: limit || "",
-                page: page || ""
+                limit: limit ?? undefined,
+                page: page ?? undefined
             }
         }),
         post: (params) => axios.post(`${API_URL}/customers/`, params),
@@ -95,8 +95,8 @@ export default class API {
     static tickets = {
         get: ({ limit, page }) => axios.get(`${API_URL}/tickets/`, {
             params: {
-                limit: limit || "",
-                page: page || ""
+                limit: limit ?? undefined,
+                page: page ?? undefined
             }
         }),
         post: (params) => axios.post(`${API_URL}/tickets/`, params),
