@@ -1,0 +1,73 @@
+.flightPageContainer{
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    align-content: center;
+}
+
+.flightPageFilters{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 10px;
+}
+
+.pagination{
+    align-self: center;
+    margin: 5px;
+}
+
+.flightHeaderDiv{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    width: 90%;
+}
+
+.destinationArrow{
+    font-size: 55px;
+    font-weight: 900;
+    color: hsl(216, 45%, 66%);
+}
+
+.locationListing{
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+}
+
+
+.country{
+    display: flex;
+    align-items: center;
+}
+
+.country img{
+    margin-right: 15px;
+    max-height: 40px;
+    filter: drop-shadow(1px 1px 2px black)
+}
+
+.countryName{
+    font-size: x-large;
+    font-weight: 600;
+}
+
+.date{
+    padding-top: 10px;
+    padding-bottom: 5px;
+    font-size: large;
+}
+
+.flexBreak{
+    flex-basis: 100%;
+    height: 0px;
+}
+
+.airlineName{
+    font-size: x-large;
+    font-weight: 700;
+    padding-bottom: 15px;
+    
+}
