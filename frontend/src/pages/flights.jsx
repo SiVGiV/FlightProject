@@ -139,7 +139,7 @@ export default function FlightsPage(){
                             <Form.Label>Departure Date</Form.Label>
                             <Form.Control
                                 type="date"
-                                onBlur={(selected) => { setFilters({...filters, date: selected.target.value}) }}
+                                onBlur={(selected) => { if (selected.target.value !== filters.date){setFilters({...filters, date: selected.target.value})} }}
                                 onKeyUp={(selected) => { selected.preventDefault(); if (selected.code === "Enter" || selected.code === "NumpadEnter"){setFilters({...filters, date: selected.target.value})} }}
                                 defaultValue={filters.date ?? ""}
                             />
