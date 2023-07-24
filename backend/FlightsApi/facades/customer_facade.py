@@ -196,8 +196,9 @@ class CustomerFacade(FacadeBase):
         if code != 200:
             return code, data
         # Take out the user data
-        for airline in data['data']:
-            airline.pop('user', None)
+        if 'data' in data:
+            for airline in data['data']:
+                airline.pop('user', None)
         # Return censored result
         return code, data
     
@@ -213,5 +214,6 @@ class CustomerFacade(FacadeBase):
         code, data =  super().get_airline_by_id(id)
         if code != 200:
             return code, data
-        data['data'].pop('user', None)
+        if 'data' in data:
+            data['data'].pop('user', None)
         return code, data

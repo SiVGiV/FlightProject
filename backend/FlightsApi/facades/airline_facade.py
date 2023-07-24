@@ -215,8 +215,9 @@ class AirlineFacade(FacadeBase):
         code, data =  super().get_airlines_by_name(name, limit, page)
         if code != 200:
             return code, data
-        for airline in data['data']:
-            airline.pop('user', None)
+        if 'data' in data:
+            for airline in data['data']:
+                airline.pop('user', None)
         return code, data
     
     def get_airline_by_id(self, id: int):
@@ -232,5 +233,6 @@ class AirlineFacade(FacadeBase):
         if code != 200:
             return code, data
         if self.__user['airline']['id'] != id:
-            data['data'].pop('user', None)
+            if 'data' in data:
+                data['data'].pop('user', None)
         return code, data
