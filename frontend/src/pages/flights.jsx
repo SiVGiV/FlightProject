@@ -24,7 +24,6 @@ export default function FlightsPage(){
     const [pagination, setPagination] = useState();
     const { flightPage } = useParams();
 
-
     
     useEffect(()=>{ // Get countries
         setLoadingCountries(true)
@@ -101,7 +100,6 @@ export default function FlightsPage(){
         );
     }
 
-
     return (
         <>
             <div className="flightPageContainer">
@@ -141,7 +139,8 @@ export default function FlightsPage(){
                             <Form.Label>Departure Date</Form.Label>
                             <Form.Control
                                 type="date"
-                                onChange={(selected) => setFilters({...filters, date: selected.target.value})}
+                                onBlur={(selected) => { setFilters({...filters, date: selected.target.value}) }}
+                                onKeyUp={(selected) => { selected.preventDefault(); if (selected.code === "Enter" || selected.code === "NumpadEnter"){setFilters({...filters, date: selected.target.value})} }}
                                 defaultValue={filters.date ?? ""}
                             />
                         </Form.Group>
@@ -151,7 +150,7 @@ export default function FlightsPage(){
                     loading ? <h1>Loading...</h1> : (
                         <Accordion>
                             {
-                                flights.length == 0 ? <h1>No flights found...</h1> : flights.map( (flight, index) =>
+                                flights.length === 0 ? <h1>No flights found...</h1> : flights.map( (flight, index) =>
                                     <Accordion.Item eventKey={"flight" + flight.id} key={index}>
                                         <Flight flightData={flight}/>
                                     </Accordion.Item>
@@ -165,4 +164,3 @@ export default function FlightsPage(){
         </>
     );
 }
-

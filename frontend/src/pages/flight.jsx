@@ -24,6 +24,8 @@ export default function Flight({flightData}){
             setAirline(airlineResponse.data.data)
             setOrigin(originResponse.data.data);
             setDestination(destinationResponse.data.data)
+        }).catch(error => {
+            console.log(error.data)
         }).finally(() => {
             setLoadingData(false)
         })
@@ -33,7 +35,7 @@ export default function Flight({flightData}){
             loadingData ? <div>Loading flight...</div> : <>
                 <Accordion.Header>
                     <div className="flightHeaderDiv">
-                        <div className="airlineName">{ airline.name }</div>
+                        <div className="airlineName">{ airline?.name }</div>
                         <div className="flexBreak"/>
                         <LocationListing country={ origin } isoDate={ formatDate(flightData.departure_datetime) }/>
                         <b className="destinationArrow">➜</b>
