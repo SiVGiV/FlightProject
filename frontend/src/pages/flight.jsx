@@ -32,19 +32,19 @@ export default function Flight({flightData}){
     }, [ flightData ])
     
     return (
-            loadingData ? <div>Loading flight...</div> : <>
-                <Accordion.Header>
-                    <div className="flightHeaderDiv">
-                        <div className="airlineName">{ airline?.name }</div>
-                        <div className="flexBreak"/>
-                        <LocationListing country={ origin } isoDate={ formatDate(flightData.departure_datetime) }/>
-                        <b className="destinationArrow">➜</b>
-                        <LocationListing country={ destination } isoDate={ formatDate(flightData.arrival_datetime) }/>
-                    </div>
-                </Accordion.Header>
-                <Accordion.Body>
-                </Accordion.Body>
-            </>
+        loadingData ? <div>Loading flight...</div> : <>
+            <Accordion.Header>
+                <div className="flightHeaderDiv">
+                    <div className="airlineName">{ airline?.name }</div>
+                    <div className="flexBreak"/>
+                    <LocationListing country={ origin } isoDate={ formatDate(flightData.departure_datetime) }/>
+                    <b className="destinationArrow">➜</b>
+                    <LocationListing country={ destination } isoDate={ formatDate(flightData.arrival_datetime) }/>
+                </div>
+            </Accordion.Header>
+            <Accordion.Body>
+            </Accordion.Body>
+        </>
     );
 }
 
