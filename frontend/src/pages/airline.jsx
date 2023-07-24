@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Accordion } from "react-bootstrap";
-
 import API from "../api";
-import { formatDate } from "../utils";
 import { BASE_URL } from "../config";
 
-// import '../css/airlinesPage.css';
 
 export default function Flight({airlineData}){
 
@@ -23,18 +19,16 @@ export default function Flight({airlineData}){
         }).finally(() => {
             setLoadingData(false)
         })
-    }, [ airlineData ])
+    }, [ airlineData ]);
     
     return (
-            loadingData ? <div>Loading airline...</div> : <>
-                <div className="airlineHeaderDiv">
-                    <div className="airlineListing">
-                        <div className="country">
-                            <img src={country ? BASE_URL + country.flag : ""} alt=""/>
-                            <div className="airlineName">{ airlineData.name }</div>
-                        </div>
-                    </div>
+        loadingData ? <div>Loading airline...</div> : <>
+            <div className="airlineHeaderDiv">
+                <div className="airlineListing">
+                    <img src={country ? BASE_URL + country.flag : ""} alt=""/>
+                    <div className="airlineName">{ airlineData.name }</div>
                 </div>
-            </>
+            </div>
+        </>
     );
 }

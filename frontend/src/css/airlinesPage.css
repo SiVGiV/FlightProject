@@ -1,0 +1,47 @@
+.airlinesPageContainer{
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    align-content: center;
+}
+
+.airlinesPageFilters{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 10px;
+}
+
+.pagination{
+    align-self: center;
+    margin: 5px;
+}
+
+.airlineHeaderDiv{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    width: 100%;
+    padding: 15px;
+}
+.airlineHeaderDiv ~ .airlineHeaderDiv{
+    border-top: 2px solid black;
+}
+
+.airlineListing{
+    display: flex;
+    align-items: center;
+}
+
+.airlineListing img{
+    margin-right: 15px;
+    max-height: 40px;
+    filter: drop-shadow(1px 1px 2px black)
+}
+
+.airlineName{
+    font-size: x-large;
+    font-weight: 700;
+    padding-bottom: 15px;
+    
+}
