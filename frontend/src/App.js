@@ -1,4 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './css/universal.css'
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // Import components
@@ -9,9 +11,10 @@ import HomePage from './pages';
 import FlightsPage from './pages/flights';
 import AirlinesPage from './pages/airlines';
 
+import { BASE_URL } from './config';
 
 const homepage = {
-    '/': 'Flight Project'
+    '/': <img src={`${BASE_URL}static/images/logo.png`} alt="Flight Project" className='logo'/>
 }
 
 const pages = {
@@ -36,9 +39,11 @@ function App() {
     return (
         <BrowserRouter>
             <MyNavBar homePage={ homepage } pages={ pages } login={undefined} />
-            <Routes>
-                { Object.values(pages).map((page, index) => RouteResolver(page, index)) }
-            </Routes>
+            <div className='page-content'>
+                <Routes>
+                    { Object.values(pages).map((page, index) => RouteResolver(page, index)) }
+                </Routes>
+            </div>
         </BrowserRouter>
     );
 }

@@ -4,7 +4,6 @@ import NavDropdown from "react-bootstrap/NavDropdown"
 import { Link } from "react-router-dom";
 
 
-
 export default function MyNavBar({homePage, pages, login}){
     // pagesObject should contain 'name': 'url' pairs.
     // if instead of a URL the object contains more objects, then they shall be 'name': 'url' pairs for a dropdown menu.
@@ -12,7 +11,7 @@ export default function MyNavBar({homePage, pages, login}){
         <Navbar expand="lg" sticky="top" className="bg-body-tertiary">
             <Navbar.Brand as={ Link } to={ Object.keys(homePage)[0] }>{ Object.values(homePage)[0] }</Navbar.Brand>
 
-            { Object.entries(pages).map(([k, v], index) => resolvePage(k, v, index)) }
+                { Object.entries(pages).map(([k, v], index) => resolvePage(k, v, index)) }
             
             <Nav className="ms-auto">
                 { login }
@@ -25,9 +24,11 @@ function resolvePage(key, value, index){
     // Check for dropdowns first
     if (((typeof value == 'object')|| (value instanceof Object)) && (typeof Object.values(value)[0] == 'object')){
         return (
-            <NavDropdown title={ key } key={ index }>
-                { Object.entries(value).map(([k, v], ind) => resolveDropdown(k, v, ind)) }
-            </NavDropdown>
+            <div className="navbar-item">
+                <NavDropdown title={ key } key={ index }>
+                    { Object.entries(value).map(([k, v], ind) => resolveDropdown(k, v, ind)) }
+                </NavDropdown>
+            </div>
         );
     }
     // Then normal items
@@ -35,7 +36,7 @@ function resolvePage(key, value, index){
         if (('navbar' in value) && (!value['navbar'])){
             return <></>;
         }
-        return (<Nav.Link as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</Nav.Link>);
+        return (<div className="navbar-item"><Nav.Link as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</Nav.Link></div>);
     }
     return (<></>);
 }

@@ -1,0 +1,15 @@
+.logo{
+    height: 60px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.navbar-item{
+    padding: 15px;
+    font-weight: 600;
+    border-left: 2px solid rgb(20, 165, 223);
+}
+
+.page-content{
+    padding: 15px;
+}
