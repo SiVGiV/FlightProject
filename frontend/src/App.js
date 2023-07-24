@@ -7,6 +7,7 @@ import MyNavBar from './components/navigation/navbar';
 // Import pages
 import HomePage from './pages';
 import FlightsPage from './pages/flights';
+import AirlinesPage from './pages/airlines';
 
 
 const homepage = {
@@ -23,6 +24,11 @@ const pages = {
         'url': '/flights/:flightPage',
         'link': '/flights/1/',
         'element': <FlightsPage/>
+    },
+    'Airlines': {
+        'url': '/airlines/:airlinePage',
+        'link': '/airlines/1/',
+        'element': <AirlinesPage/>
     }
 }
 
