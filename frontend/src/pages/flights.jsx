@@ -107,6 +107,7 @@ export default function FlightsPage(){
                     <Form>
                         {
                             loadingCountries ? <></> : 
+                                formError === "" ? <div className="error">{formError}</div> : 
                             <Row>
                                 <h5>
                                     Filter by
