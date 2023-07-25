@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Flight from "./flight";
+import Flight from "../components/flight";
 import { Accordion, Form, Col, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";

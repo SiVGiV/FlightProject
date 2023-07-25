@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Airline from "./airline";
+import Airline from "../components/airline";
 import { Form } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import API from "../api";
