@@ -47,6 +47,11 @@ However, since I wanted the testing data to be meaningful data that can be used 
 
 ## Frontend
 
+### Choices
+
+#### Role Based Access
+When deciding how to display pages and components suited for some roles, I had to consider the security limitations presented by React. Since React is a client side framework, it is not possible to hide components from the user, as the user can simply inspect the page and see the code. Instead of keeping the user's role in the state, I chose to ask the server for the user's role on every role based render, to make sure the user can't change their role by changing the state.
+This method reminds me of the TCP handshake, where the client and server exchange information before starting the connection. While it makes my code more redundant, I feel it's the right method to use in this case.
 
 ## Author
 
