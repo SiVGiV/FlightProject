@@ -32,7 +32,7 @@ class AnonymousFacade(FacadeBase):
         self.__required_group = None # Anonymous users do not need to be a part of a group
     
     @property
-    def usertype():
+    def usertype(self):
         return 'anon'
     
     @property

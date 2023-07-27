@@ -25,7 +25,7 @@ class CustomerFacade(FacadeBase):
         self.__user['customer'] = R.get_by_user_id(DBTables.CUSTOMER, self.__user['id'])
         
     @property
-    def usertype():
+    def usertype(self):
         return 'customer'
         
     @property
