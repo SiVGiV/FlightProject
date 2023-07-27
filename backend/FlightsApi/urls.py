@@ -19,6 +19,8 @@ from .views import *
 
 urlpatterns = [
     path('logout/', logout, name="logout"),
+    path('login/', login, name="login"),
+    path('whoami/', whoami, name="whoami"),
     
     path('admins/', AdminsView.as_view(), name="admins"),
     path('admin/<int:id>/', AdminView.as_view(), name="admin"),

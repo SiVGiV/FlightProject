@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 from datetime import date as Date
 from typing import Tuple
 import logging
@@ -11,17 +11,39 @@ from ..utils.response_utils import not_found_response, bad_request_response, \
 logger = logging.getLogger('django')
 
 class FacadeBase():
-    @staticmethod
-    @abstractmethod
-    def usertype():
+    @abstractproperty
+    def usertype(self):
         pass
         
-    @abstractmethod
+    @abstractproperty
     def required_group(self):
         """
         A required property getter to be overridden by inheriting classes.
         """
         pass
+    
+    @abstractproperty
+    def username(self):
+        pass
+    
+    @abstractproperty
+    def id(self):
+        pass
+    
+    def whoami(self):
+        """
+        Returns the type, username and ID of the user.
+        
+        
+        """
+        data = {
+            'type': self.usertype,
+            'logged_in': self.usertype != 'anon',
+            'username': self.username,
+            'id': self.id
+        }
+        return ok_response(data=data)
+        
     
     @staticmethod
     def get_all_flights(limit: int = 50, page: int = 1) -> Tuple[int, dict]:

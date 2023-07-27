@@ -31,13 +31,21 @@ class AnonymousFacade(FacadeBase):
         super().__init__()
         self.__required_group = None # Anonymous users do not need to be a part of a group
     
-    @staticmethod
+    @property
     def usertype():
         return 'anon'
     
-    @property 
+    @property
     def required_group(self):
         return self.__required_group
+    
+    @property
+    def username(self):
+        return 'Anonymous'
+    
+    @property
+    def id(self):
+        return -1
     
     @staticmethod
     def facade_from_user(user):
@@ -95,7 +103,6 @@ class AnonymousFacade(FacadeBase):
         else:
             # Anonymous user
             facade = AnonymousFacade()
-        request.COOKIES['usertype'] = facade.usertype()
         return facade
         
     

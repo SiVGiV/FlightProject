@@ -25,9 +25,17 @@ class AirlineFacade(FacadeBase):
         self.__user = user
         self.__user['airline'] = R.get_by_user_id(DBTables.AIRLINECOMPANY, self.__user['id'])
     
-    @staticmethod
+    @property
     def usertype():
         return 'airline'
+    
+    @property
+    def username(self):
+        return self.__user['username']
+    
+    @property
+    def id(self):
+        return self.__user['id']
     
     @property 
     def required_group(self):
