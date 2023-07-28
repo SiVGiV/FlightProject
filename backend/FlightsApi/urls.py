@@ -18,9 +18,9 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('logout/', logout, name="logout"),
-    path('login/', login, name="login"),
-    path('whoami/', whoami, name="whoami"),
+    path('logout/', LogoutView.as_view(), name="logout"),
+    path('login/', LoginView.as_view(), name="login"),
+    path('whoami/', WhoAmIView.as_view(), name="whoami"),
     
     path('admins/', AdminsView.as_view(), name="admins"),
     path('admin/<int:id>/', AdminView.as_view(), name="admin"),
