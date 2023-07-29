@@ -1,96 +1,111 @@
-import React from "react";
-import { Form } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Form, Button } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
-import { redirect } from "react-router-dom";
+import { redirect, useParams } from "react-router-dom";
+import API from "../api";
 
-export default function Register(userType) {
+
+export default function Register() {
+    const userType = useParams()?.userType;
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
     const [email, setEmail] = useState("");
     const [fields, setFields] = useState({});
+    const [validated, setValidated] = useState(false);
 
     const [formError, setFormError] = useState("");
 
-    const handleSubmit = () => {
+    const handleSubmit = (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        setValidated(true);
         if (password !== password2){
             setFormError("Passwords do not match!")
-            return
         }
         switch (userType){
-            case "customer":
-                API.customers.post({username, password, password2, email, ...fields})
-                    .then(response => {
-                        redirect("/")
-                    })
-                    .catch(error => {
-                        setFormError(error.response.data)
-                    })
-                break;
             case "airline":
                 API.airlines.post({username, password, password2, email, ...fields})
                 .then(response => {
+                    setValidated(true);
                     redirect("/")
                 })
                 .catch(error => {
-                    setFormError(error.response.data)
+                    console.log(error)
+                    setFormError(error)
                 })
                 break;
             case "admin":
                 API.admins.post({username, password, password2, email, ...fields})
                 .then(response => {
+                    setValidated(true);
                     redirect("/")
                 })
                 .catch(error => {
-                    setFormError(error.response.data)
+                    console.log(error)
+                    setFormError(error)
                 })
                 break;
             default:
-                return null;
+                API.customers.post({username, password, password2, email, ...fields})
+                    .then(response => {
+                        setValidated(true);
+                        redirect("/")
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        setFormError(error)
+                    })
+                break;
         }
     }
 
     return (
-        <Form>
+        <Form noValidate validated={ validated } onSubmit={ handleSubmit }>
             <div id="formError">{formError}</div>
             <Form.Group controlId="formUsername">
                 <Form.Label>Username</Form.Label>
-                <Form.Control type="text" placeholder="Enter username" pattern="^[a-zA-Z0-9]+$" onChange={(e) => setUsername(e.target.value)} />
+                <Form.Control type="text" placeholder="Enter username" pattern="^[a-zA-Z0-9]+$" onChange={(e) => setUsername(e.target.value)} required />
+                <Form.Control.Feedback type="invalid">Username must be alphanumeric</Form.Control.Feedback>
             </Form.Group>
             <Form.Group controlId="formPassword">
                 <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" onChange={(e) => setPassword(e.target.value)} />'
+                <Form.Control type="password" placeholder="Password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" onChange={(e) => setPassword(e.target.value)} required/>
+                <Form.Control.Feedback type="invalid">Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number or special character</Form.Control.Feedback>
             </Form.Group>
             <Form.Group controlId="formPassword2">
                 <Form.Label>Confirm Password</Form.Label>
-                <Form.Control type="password" placeholder="Confirm Password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" onChange={(e) => setPassword2(e.target.value)} />
+                <Form.Control type="password" placeholder="Confirm Password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" onChange={(e) => setPassword2(e.target.value)} required />
             </Form.Group>
             <Form.Group controlId="formEmail">
                 <Form.Label>Email</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" onChange={(e) => setEmail(e.target.value)} />
+                <Form.Control type="email" placeholder="Enter email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" onChange={(e) => setEmail(e.target.value)} required />
+                <Form.Control.Feedback type="invalid">Please enter a valid email address</Form.Control.Feedback>
             </Form.Group>
             <RegistrationRouter userType={ userType } fields={ fields } setFields={ setFields } setFormError={ setFormError }/>
-            <Button variant="primary" type="submit" onClick={ handleSubmit }/>
+            <br/>
+            <Button variant="primary" type="submit" onClick={ handleSubmit }>Register</Button>
         </Form>
-
     );
 }
 
 
 function RegistrationRouter({userType, fields, setFields, setFormError}){
     switch(userType){
-        case "customer":
-            return customerFields({fields, setFields, setFormError});
         case "airline":
-            return airlineFields({fields, setFields, setFormError});
+            return AirlineFields({fields, setFields, setFormError});
         case "admin":
-            return adminFields({fields, setFields, setFormError});
+            return AdminFields({fields, setFields, setFormError});
         default:
-            return <></>;
+            return CustomerFields({fields, setFields, setFormError});
     }
 }
 
-function customerFields({fields, setFields, setFormError}){
+function CustomerFields({fields, setFields, setFormError}){
     return(
         <div id="additionalFields">
             <Form.Group controlId="formFirstName">
@@ -99,21 +114,21 @@ function customerFields({fields, setFields, setFormError}){
             </Form.Group>
             <Form.Group controlId="formLastName">
                 <Form.Label>Last Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter last name" onChange={(e) => setLastName({...fields ,"last_name": e.target.value})} />
+                <Form.Control type="text" placeholder="Enter last name" onChange={(e) => setFields({...fields ,"last_name": e.target.value})} />
             </Form.Group>
             <Form.Group controlId="formAddress">
                 <Form.Label>Address</Form.Label>
-                <Form.Control type="text" placeholder="Enter address" onChange={(e) => setAddress({...fields ,"address": e.target.value})} />
+                <Form.Control type="text" placeholder="Enter address" onChange={(e) => setFields({...fields ,"address": e.target.value})} />
             </Form.Group>
             <Form.Group controlId="formPhone">
                 <Form.Label>Phone</Form.Label>
-                <Form.Control type="text" placeholder="Enter phone" onChange={(e) => setPhone({...fields ,"phone_number": e.target.value})} />
+                <Form.Control type="text" placeholder="Enter phone" onChange={(e) => setFields({...fields ,"phone_number": e.target.value})} />
             </Form.Group>
         </div>
     );
 }
 
-function airlineFields({fields, setFields, setFormError}){
+function AirlineFields({fields, setFields, setFormError}){
     const [countries, setCountries] = useState([]);
     const [selectedAirlineCountry, setSelectedAirlineCountry] = useState([]);
     const [loadingCountries, setLoadingCountries] = useState(true);
@@ -134,7 +149,7 @@ function airlineFields({fields, setFields, setFormError}){
     }, []);
 
     useEffect(()=>{
-        setFields({...fields, "country": selectedAirlineCountry[0].id})
+        setFields({...fields, "country": selectedAirlineCountry[0]?.id})
     }, [selectedAirlineCountry]);
 
     return (
@@ -159,7 +174,7 @@ function airlineFields({fields, setFields, setFormError}){
     );
 }
 
-function adminFields({fields, setFields, setFormError}){
+function AdminFields({fields, setFields, setFormError}){
     return(
         <div id="additionalFields">
             <Form.Group controlId="formFirstName">
@@ -168,7 +183,7 @@ function adminFields({fields, setFields, setFormError}){
             </Form.Group>
             <Form.Group controlId="formLastName">
                 <Form.Label>Last Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter last name" onChange={(e) => setLastName({...fields ,"last_name": e.target.value})} />
+                <Form.Control type="text" placeholder="Enter last name" onChange={(e) => setFields({...fields ,"last_name": e.target.value})} />
             </Form.Group>
         </div>
     );

@@ -10,8 +10,14 @@ import MyNavBar from './components/navigation/navbar';
 import HomePage from './pages';
 import FlightsPage from './pages/flights';
 import AirlinesPage from './pages/airlines';
+import RegisterPage from './pages/register';
+import Welcome from './components/navigation/welcome';
+import LoginPage from './pages/login';
 
 import { BASE_URL } from './config';
+import API from './api';
+
+
 
 const homepage = {
     '/': <img src={`${BASE_URL}static/images/logo.png`} alt="Flight Project" className='logo'/>
@@ -32,13 +38,27 @@ const pages = {
         'url': '/airlines/:airlinePage',
         'link': '/airlines/1/',
         'element': <AirlinesPage/>
+    },
+    'Auth':{
+        'Login': {
+            'url': '/login/',
+            'element': <LoginPage/>,
+            'navbar': true
+        },
+        'Register': {
+            'url': '/register/:userType/',
+            'element': <RegisterPage/>,
+            'link': '/register/customer/',
+            'navbar': true
+        }
     }
 }
+
 
 function App() {
     return (
         <BrowserRouter>
-            <MyNavBar homePage={ homepage } pages={ pages } login={undefined} />
+            <MyNavBar homePage={ homepage } pages={ pages } login={ <Welcome/>} />
             <div className='page-content'>
                 <Routes>
                     { Object.values(pages).map((page, index) => RouteResolver(page, index)) }

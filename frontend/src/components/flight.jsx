@@ -52,7 +52,7 @@ function LocationListing({country, isoDate}){
     return (
         <div className="locationListing">
             <div className="country">
-                <img src={country ? BASE_URL + country.flag : ""} alt=""/>
+                <img src={country ? BASE_URL + "/" + country.flag : ""} alt=""/>
                 <div className="countryName">{ country ? country.name : ""}</div>
             </div>
             <div className="date">{ formatDate(isoDate) }</div>

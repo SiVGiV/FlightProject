@@ -25,7 +25,7 @@ export default function Flight({airlineData}){
         loadingData ? <div>Loading airline...</div> : <>
             <div className="airlineHeaderDiv">
                 <div className="airlineListing">
-                    <img src={country ? BASE_URL + country.flag : ""} alt=""/>
+                    <img src={country ? BASE_URL + "/" + country.flag : ""} alt=""/>
                     <div className="airlineName">{ airlineData.name }</div>
                 </div>
             </div>

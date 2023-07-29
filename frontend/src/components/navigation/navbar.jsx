@@ -36,7 +36,7 @@ function resolvePage(key, value, index){
         if (('navbar' in value) && (!value['navbar'])){
             return <></>;
         }
-        return (<div className="navbar-item"><Nav.Link as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</Nav.Link></div>);
+        return (<div className="navbar-item" key={ index }><Nav.Link as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</Nav.Link></div>);
     }
     return (<></>);
 }

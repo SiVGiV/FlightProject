@@ -32,7 +32,7 @@ export default function FlightsPage(){
             setCountries(response.data.data)
         })
         .catch(error => {
-            console.log(error.response.data.data)
+            console.log(error)
             setFormError("Error loading country list...")
         })
         .finally(() => {
