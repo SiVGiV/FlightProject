@@ -1,7 +1,11 @@
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login, authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from FlightsApi.utils.response_utils import no_content_ok, forbidden_response
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
+from FlightsApi.utils.response_utils import no_content_ok, forbidden_response, bad_request_response
 from FlightsApi.facades import AnonymousFacade
 
 
@@ -13,15 +17,28 @@ class LogoutView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        if request.user.is_authenticated:
-            code, res = no_content_ok()
+        username = request.data.get('username')
+        password = request.data.get('password')
+        if not username or not password:
+            code, res = bad_request_response('username and password are required')
             return Response(status=code, data=res)
-        else:
+        user = authenticate(username=username, password=password)
+        if not user:
             code, res = forbidden_response()
             return Response(status=code, data=res)
-    
+        login(request, user)
+        code, res = no_content_ok()
+        return Response(status=code, data=res)
+
 class WhoAmIView(APIView):
     def get(self, request):
         facade = AnonymousFacade.login(request)
         code, res = facade.whoami()
+        print(res)
         return Response(status=code, data=res)
+
+class CSRFTokenView(APIView):
+    @method_decorator(csrf_exempt)
+    def get(self, request):
+        csrf_token = get_token(request)
+        return Response(status=200, data={'data': {'CSRF-Token': csrf_token}})
