@@ -1,50 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import API from "../../api";
+import { LoginContext } from "../../contexts/auth_contexts";
 
 
 export default function Welcome() {
-    const [loggedIn, setLoggedIn] = useState({});
     const [loadingLogin, setLoadingLogin] = useState(true);
     const [loginError, setLoginError] = useState(false);
     const navigate = useNavigate();
 
+    const [loginValue, setLogin] = useContext(LoginContext);
+
     useEffect(() => {
-        API.auth.csrf().then(response => {console.log(response.data)}).catch(error => {console.log(error)});
         API.auth.whoami()
-        .then(response => {setLoggedIn(response.data); console.log(response.data);})
-        .catch(error => {setLoginError(true); console.log(error);})
-        .finally(() => setLoadingLogin(false))
+            .then(response => { setLogin(response.data); console.log(response.data); })
+            .catch(error => { setLoginError(true); console.log(error); })
+            .finally(() => setLoadingLogin(false))
     }, []);
-    
+
 
     return (
         loadingLogin ? <></> :
-        loginError ? <></> :
-        <div className="welcomeBar">
-            {
-                loggedIn.logged_in ? (`Welcome, ${loggedIn.username}! `) : (`Welcome! Please login to continue.`)
-            }
-            &nbsp;&nbsp;
-            <Button onClick={ loggedIn.logged_in ? () => logout(navigate) : () => login(navigate) } className="navbar-button">
-                {loggedIn.logged_in ? "Logout" : "Login"}
-            </Button>
-        </div>
+            loginError ? <></> :
+                <div className="welcomeBar">
+                    {
+                        loginValue.logged_in ? (`Welcome, ${loginValue.username}! `) : (`Welcome! Please login to continue.`)
+                    }
+                    &nbsp;&nbsp;
+                    <Button onClick={loginValue.logged_in ? () => logout(navigate, setLogin) : () => login(navigate)} className="navbar-button">
+                        {loginValue.logged_in ? "Logout" : "Login"}
+                    </Button>
+                </div>
     );
 }
 
 
-function login(navigate){
+function login(navigate) {
     navigate("/login")
 }
 
-function logout(navigate){
+function logout(navigate, setLogin) {
     API.auth.logout()
-    .then(response => {
-        navigate("/")
-    })
-    .catch(error => {
-        console.log(error)
-    })
+        .then(response => {
+            API.auth.whoami()
+            .then(identity => {
+                setLogin(identity.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            navigate("/login")
+        }
+        )
+        .catch(error => {
+            console.log(error)
+        })
 }

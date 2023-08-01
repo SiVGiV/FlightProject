@@ -1,19 +1,17 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { BASE_URL } from "./config"
 
 const API_URL = `${BASE_URL}/api`
 
-
-
 axios.defaults.xsrfHeaderName = "X-CSRFToken"
-axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfCookieName = 'csrf_token'
 axios.defaults.withCredentials = true
-
 
 export default class API {
     // Auth endpoints
     static auth = {
-        login: ({ username, password }) => axios.post(`${API_URL}/login/`, 
+        login: ({ username, password }) => axios.post(`${API_URL}/login/`,
             {
                 'username': username,
                 'password': password
@@ -22,6 +20,21 @@ export default class API {
         logout: () => axios.post(`${API_URL}/logout/`, {}),
         whoami: () => axios.get(`${API_URL}/whoami/`, {}),
         csrf: () => axios.get(`${API_URL}/csrf/`, {}),
+        refreshCsrf: () => {
+            var csrfToken = Cookies.get('csrf_token');
+            if (csrfToken !== undefined && csrfToken !== null && csrfToken !== '') {
+                axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+            }
+            else {
+                API.auth.csrf().then(response => {
+                    Cookies.set('csrf_token', response.data.data['CSRF-Token']);
+                    axios.defaults.headers.common['X-CSRFToken'] = response.data.data['CSRF-Token'];
+                    console.log('CSRF token set successfully: ' + axios.defaults.headers.common['X-CSRFToken'] + '!');
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+        }
     }
 
     // Admin endpoints
@@ -124,9 +137,3 @@ export default class API {
     }
 }
 
-API.auth.csrf().then(response => {
-    axios.defaults.headers.common['X-CSRFToken'] = response.data.csrfToken;
-    console.log('CSRF token set successfully');
-}).catch(error => {
-    console.log(error);
-});

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { LoginContext } from '../contexts/auth_contexts';
 import API from '../api';
 
 export default function LoginPage(){
@@ -8,6 +10,9 @@ export default function LoginPage(){
     const [password, setPassword] = useState("");
     const [validated, setValidated] = useState(false);
     const [formError, setFormError] = useState("");
+
+    const [login, setLogin] = useContext(LoginContext);
+
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
@@ -16,7 +21,16 @@ export default function LoginPage(){
         .then(response => {
             console.log(response)
             setValidated(true);
-            navigate("/")
+            API.auth.whoami()
+            .then(response => {
+                setLogin(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            .finally(() => {
+                navigate("/")
+            })
         })
         .catch(error => {
             console.log(error)
