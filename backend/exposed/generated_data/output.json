@@ -1,0 +1,104 @@
+{
+    "admins": [
+        {
+            "admin": {
+                "id": 2,
+                "first_name": "\u0639\u0644\u06cc",
+                "last_name": "\u0642\u0627\u0633\u0645\u06cc",
+                "user": 13
+            },
+            "user": {
+                "id": 13,
+                "last_login": null,
+                "is_superuser": false,
+                "username": "redgoose269",
+                "email": "aaly.qsmy@example.com",
+                "is_active": true,
+                "is_staff": false,
+                "date_joined": "2023-08-01T20:55:11.674956Z",
+                "groups": [
+                    1
+                ],
+                "user_permissions": [],
+                "password": "qian"
+            }
+        }
+    ],
+    "airlines": [
+        {
+            "airline": {
+                "id": 2,
+                "name": "Sander Thomsen Airlines",
+                "country": 151,
+                "user": 14
+            },
+            "user": {
+                "id": 14,
+                "last_login": null,
+                "is_superuser": false,
+                "username": "blackgorilla385",
+                "email": "sander.thomsen@example.com",
+                "is_active": true,
+                "is_staff": false,
+                "date_joined": "2023-08-01T20:55:12.571565Z",
+                "groups": [
+                    2
+                ],
+                "user_permissions": [],
+                "password": "eagle1"
+            }
+        }
+    ],
+    "customers": [
+        {
+            "customer": {
+                "id": 10,
+                "first_name": "Jayden",
+                "last_name": "Harrison",
+                "address": "298 N Stelling Rd, Augusta",
+                "phone_number": "(610)-383-6878",
+                "user": 15
+            },
+            "user": {
+                "id": 15,
+                "last_login": null,
+                "is_superuser": false,
+                "username": "orangefish707",
+                "email": "jayden.harrison@example.com",
+                "is_active": true,
+                "is_staff": false,
+                "date_joined": "2023-08-01T20:55:13.544798Z",
+                "groups": [
+                    3
+                ],
+                "user_permissions": [],
+                "password": "1956"
+            }
+        }
+    ],
+    "flights": {
+        "2": [
+            {
+                "id": 1,
+                "departure_datetime": "2025-02-26T10:26:24.278869Z",
+                "arrival_datetime": "2025-02-28T10:07:24.278869Z",
+                "total_seats": 272,
+                "is_canceled": false,
+                "airline": 2,
+                "origin_country": 120,
+                "destination_country": 88
+            }
+        ]
+    },
+    "tickets": {
+        "1": [
+            {
+                "id": 1,
+                "seat_count": 1,
+                "is_canceled": false,
+                "flight": 1,
+                "customer": 10
+            }
+        ]
+    }
+}

@@ -14,7 +14,6 @@ import RegisterPage from './pages/register';
 import Welcome from './components/navigation/welcome';
 import LoginPage from './pages/login';
 
-import { BASE_URL } from './config';
 import API from './api';
 import { useEffect, useState } from 'react';
 

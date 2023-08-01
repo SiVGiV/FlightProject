@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API from "../api";
-import { BASE_URL } from "../config";
+import API, { BASE_URL } from "../api";
 
 
 export default function Flight({airlineData}){

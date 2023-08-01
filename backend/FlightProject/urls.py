@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http.response import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('FlightsApi.urls')),
+    path('healthcheck/', csrf_exempt(lambda r: HttpResponse())),
 ]

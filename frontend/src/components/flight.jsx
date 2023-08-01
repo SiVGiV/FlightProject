@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
 
-import API from "../api";
+import API, { BASE_URL } from "../api";
 import { formatDate } from "../utils";
-import { BASE_URL } from "../config";
 
 import '../css/flightsPage.css';
 

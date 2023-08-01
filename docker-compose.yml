@@ -3,33 +3,46 @@ services:
     image: mysql:latest
     env_file: ./.env
     volumes:
-      - db_data:/var/lib/mysql
+      - db:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=$$MYSQL_ROOT_PASSWORD"]
       start_period: 20s
       interval: 5s
       retries: 5
       timeout: 5s
-  web:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
-    image: sivgiv/flight-project-backend:latest
+# ---------------------------------------------
+  backend:
+    build: ./backend
+    # image: sivgiv/flight-project-backend:latest
     ports:
       - "8000:8000"
     volumes:
-      - backend_data:/app/exposed/
+      - backend:/app/exposed/
     depends_on:
       db:
         condition: service_healthy
         restart: true
     env_file: ./.env
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://localhost:8000/api/flights?limit=0&page=1 || exit 1"]
+      test: curl -f --insecure http://127.0.0.1:8000/healthcheck/
       start_period: 20s
-      interval: 30s
+      interval: 5s
       retries: 3
-      timeout: 10s
+      timeout: 5s
+# ---------------------------------------------
+  frontend:
+    build: ./frontend
+    # image sivgiv/flight-project-frontend:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - frontend:/app/exposed/
+    depends_on:
+      backend:
+        condition: service_healthy
+        restart: true
+    env_file: ./.env
 volumes:
-  db_data:
-  backend_data:
+  db:
+  backend:
+  frontend:

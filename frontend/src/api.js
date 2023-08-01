@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { BASE_URL } from "./config"
+
+export const BASE_URL = process.env.BACKEND_URL ?? 'http://localhost:8000'
 
 const API_URL = `${BASE_URL}/api`
 
@@ -15,25 +16,26 @@ export default class API {
             {
                 'username': username,
                 'password': password
-            }
-        ),
-        logout: () => axios.post(`${API_URL}/logout/`, {}),
+            })
+            .then(response => {
+                API.auth.refreshCsrf();
+                return response;
+            }),
+        logout: () => axios.post(`${API_URL}/logout/`, {})
+            .then(response => {
+                API.auth.refreshCsrf();
+                return response;
+            }),
         whoami: () => axios.get(`${API_URL}/whoami/`, {}),
         csrf: () => axios.get(`${API_URL}/csrf/`, {}),
         refreshCsrf: () => {
-            var csrfToken = Cookies.get('csrf_token');
-            if (csrfToken !== undefined && csrfToken !== null && csrfToken !== '') {
-                axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
-            }
-            else {
-                API.auth.csrf().then(response => {
-                    Cookies.set('csrf_token', response.data.data['CSRF-Token']);
-                    axios.defaults.headers.common['X-CSRFToken'] = response.data.data['CSRF-Token'];
-                    console.log('CSRF token set successfully: ' + axios.defaults.headers.common['X-CSRFToken'] + '!');
-                }).catch(error => {
-                    console.log(error);
-                });
-            }
+            API.auth.csrf().then(response => {
+                Cookies.set('csrf_token', response.data.data['CSRF-Token']);
+                axios.defaults.headers.common['X-CSRFToken'] = response.data.data['CSRF-Token'];
+                console.log('CSRF token set successfully: ' + axios.defaults.headers.common['X-CSRFToken'] + '!');
+            }).catch(error => {
+                console.log(error);
+            });
         }
     }
 
