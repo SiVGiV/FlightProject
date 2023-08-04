@@ -41,6 +41,12 @@ class FlightsView(APIView): # /flights
             code, data = bad_request_response("'date' must be in the ISO 8601 format.")
             return Response(status=code, data=data)
         
+        try:
+            airline_id = int(request.GET.get('airline', 0)) or None
+        except ValueError:
+            code, data = bad_request_response("'airline' must be an integer.")
+            return Response(status=code, data=data)        
+        
         # Validate pagination inputs
         try:
             limit = int(request.GET.get('limit', 50))
@@ -53,6 +59,7 @@ class FlightsView(APIView): # /flights
             origin_country_id=origin_country_id or None,
             destination_country_id=destination_country_id or None,
             date=date,
+            airline_id=airline_id or None,
             limit=limit,
             page=page
         )

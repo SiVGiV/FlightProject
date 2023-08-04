@@ -32,7 +32,7 @@ export default class API {
                 this.auth.refreshCsrf();
                 return response;
             }),
-        whoami: () => axios.get(`${this.API_URL}/whoami/`, {}).then(response => {console.log(response); return response;}),
+        whoami: () => axios.get(`${this.API_URL}/whoami/`, {}),
         refreshCsrf: () => {
             if (Cookies.get('csrftoken') === undefined) {
                 axios.get(`${this.API_URL}/csrf/`, {})
@@ -84,11 +84,12 @@ export default class API {
     }
 
     flights = {
-        get: ({ origin, destination, date, page, limit }) => axios.get(`${this.API_URL}/flights/`, {
+        get: ({ origin, destination, date, airline, page, limit }) => axios.get(`${this.API_URL}/flights/`, {
             params: {
                 origin_country: origin ?? undefined,
                 destination_country: destination ?? undefined,
                 date: date ?? undefined,
+                airline: airline ?? undefined,
                 page: page ?? undefined,
                 limit: limit ?? undefined
             }

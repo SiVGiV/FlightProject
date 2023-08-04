@@ -353,8 +353,8 @@ class Repository():
     
     @staticmethod
     @log_action
-    @accepts((int, type(None)), (int, type(None)), (Date, type(None)))
-    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], paginator: Paginate = Paginate()) -> List[dict]:
+    @accepts((int, type(None)), (int, type(None)), (Date, type(None)), (int, type(None)))
+    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], airline_id: Union[int, None], paginator: Paginate = Paginate()) -> List[dict]:
         """
         Returns a list of flights that fit the parameters.
 
@@ -362,6 +362,7 @@ class Repository():
             origin_country_id (int - Optional): id field of the origin country. If None ignores this while filtering.
             destination_country_id (int - Optional): id field of the destination country. If None ignores this while filtering.
             date (date - Optional): date of departure. If None ignores this while filtering.
+            airline_id (int - Optional): id field of the operating airline. If None ignores this while filtering.
             paginator (Paginate - Optional): A Paginate object if required.
 
         Returns:
@@ -375,8 +376,11 @@ class Repository():
             # Of those flights, get the ones that go to destination_country
             query = query.filter(destination_country__id = destination_country_id)
         if date:
-            # Finally, of those flights get any that depart on the specified date
+            # Of those flights get any that depart on the specified date
             query = query.filter(departure_datetime__date = date)
+        if airline_id:
+            # Of those flights get those that are operated by the specified airline
+            query = query.filter(airline__id = airline_id)        
         # Paginate the results
         paginator.total = query.count()
         query = query.all()[paginator.slice]
