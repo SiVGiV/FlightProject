@@ -39,6 +39,10 @@ class CustomerFacade(FacadeBase):
     @property
     def id(self):
         return self.__user['id']
+    
+    @property
+    def entity_id(self):
+        return self.__user['customer']['id']
 
     def get_customer_by_id(self, id: int):
         """Get a customer's details

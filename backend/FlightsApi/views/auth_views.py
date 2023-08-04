@@ -34,7 +34,6 @@ class WhoAmIView(APIView):
     def get(self, request):
         facade = AnonymousFacade.login(request)
         code, res = facade.whoami()
-        print(res)
         return Response(status=code, data=res)
 
 class CSRFTokenView(APIView):
