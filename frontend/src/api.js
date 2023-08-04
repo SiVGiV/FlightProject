@@ -1,66 +1,74 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export const BASE_URL = process.env.BACKEND_URL ?? 'http://localhost:8000'
-
-const API_URL = `${BASE_URL}/api`
-
 axios.defaults.xsrfHeaderName = "X-CSRFToken"
-axios.defaults.xsrfCookieName = 'csrf_token'
+axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.withCredentials = true
 
+
 export default class API {
+    identity = undefined;
+    BASE_URL = 'localhost:8000'
+    API_URL = 'localhost:8000/api'
+    constructor(base_url) {
+        this.BASE_URL = base_url
+        this.API_URL = base_url + "/api"
+        this.auth.refreshCsrf();
+    }
+
     // Auth endpoints
-    static auth = {
-        login: ({ username, password }) => axios.post(`${API_URL}/login/`,
+    auth = {
+        login: ({ username, password }) => axios.post(`${this.API_URL}/login/`,
             {
                 'username': username,
                 'password': password
             })
             .then(response => {
-                API.auth.refreshCsrf();
+                this.auth.refreshCsrf();
                 return response;
             }),
-        logout: () => axios.post(`${API_URL}/logout/`, {})
+        logout: () => axios.post(`${this.API_URL}/logout/`, {})
             .then(response => {
-                API.auth.refreshCsrf();
+                this.auth.refreshCsrf();
                 return response;
             }),
-        whoami: () => axios.get(`${API_URL}/whoami/`, {}),
-        csrf: () => axios.get(`${API_URL}/csrf/`, {}),
+        whoami: () => axios.get(`${this.API_URL}/whoami/`, {}).then(response => {console.log(response); return response;}),
         refreshCsrf: () => {
-            API.auth.csrf().then(response => {
-                Cookies.set('csrf_token', response.data.data['CSRF-Token']);
-                axios.defaults.headers.common['X-CSRFToken'] = response.data.data['CSRF-Token'];
-                console.log('CSRF token set successfully: ' + axios.defaults.headers.common['X-CSRFToken'] + '!');
-            }).catch(error => {
-                console.log(error);
-            });
+            if (Cookies.get('csrftoken') === undefined) {
+                axios.get(`${this.API_URL}/csrf/`, {})
+                .then(response => {
+                    console.log('CSRF token fetched successfully: ' + Cookies.get('csrftoken') + '!');
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+            axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
+
         }
     }
 
     // Admin endpoints
-    static admin = {
-        delete: (id) => axios.delete(`${API_URL}/admin/${id}/`, {})
+    admin = {
+        delete: (id) => axios.delete(`${this.API_URL}/admin/${id}/`, {})
     }
 
-    static admins = {
-        get: ({ limit, page }) => axios.get(`${API_URL}/admins/`, {
+    admins = {
+        get: ({ limit, page }) => axios.get(`${this.API_URL}/admins/`, {
             params: {
                 limit: limit ?? undefined,
                 page: page ?? undefined
             },
         }),
-        post: (params) => axios.post(`${API_URL}/admins/`, params),
+        post: (params) => axios.post(`${this.API_URL}/admins/`, params),
     }
 
     // Country endpoints
-    static country = {
-        get: (id) => axios.get(`${API_URL}/country/${id}/`)
+    country = {
+        get: (id) => axios.get(`${this.API_URL}/country/${id}/`)
     }
 
-    static countries = {
-        get: ({ limit, page }) => axios.get(`${API_URL}/countries/`, {
+    countries = {
+        get: ({ limit, page }) => axios.get(`${this.API_URL}/countries/`, {
             params: {
                 limit: limit ?? undefined,
                 page: page ?? undefined
@@ -69,14 +77,14 @@ export default class API {
     }
 
     // Flight endpoints
-    static flight = {
-        get: (id) => axios.get(`${API_URL}/flight/${id}/`),
-        patch: (id, params) => axios.patch(`${API_URL}/flight/${id}/`, params),
-        delete: (id) => axios.delete(`${API_URL}/flight/${id}/`),
+    flight = {
+        get: (id) => axios.get(`${this.API_URL}/flight/${id}/`),
+        patch: (id, params) => axios.patch(`${this.API_URL}/flight/${id}/`, params),
+        delete: (id) => axios.delete(`${this.API_URL}/flight/${id}/`),
     }
 
-    static flights = {
-        get: ({ origin, destination, date, page, limit }) => axios.get(`${API_URL}/flights/`, {
+    flights = {
+        get: ({ origin, destination, date, page, limit }) => axios.get(`${this.API_URL}/flights/`, {
             params: {
                 origin_country: origin ?? undefined,
                 destination_country: destination ?? undefined,
@@ -85,57 +93,57 @@ export default class API {
                 limit: limit ?? undefined
             }
         }),
-        post: (params) => axios.post(`${API_URL}/flights/`, params),
+        post: (params) => axios.post(`${this.API_URL}/flights/`, params),
     }
 
     // Airlines endpoints
-    static airline = {
-        get: (id) => axios.get(`${API_URL}/airline/${id}/`),
-        patch: (id, params) => axios.patch(`${API_URL}/airline/${id}/`, params),
-        delete: (id) => axios.delete(`${API_URL}/airline/${id}/`),
+    airline = {
+        get: (id) => axios.get(`${this.API_URL}/airline/${id}/`),
+        patch: (id, params) => axios.patch(`${this.API_URL}/airline/${id}/`, params),
+        delete: (id) => axios.delete(`${this.API_URL}/airline/${id}/`),
     }
 
-    static airlines = {
-        get: ({ name, limit, page }) => axios.get(`${API_URL}/airlines/`, {
+    airlines = {
+        get: ({ name, limit, page }) => axios.get(`${this.API_URL}/airlines/`, {
             params: {
                 name: name ?? undefined,
                 limit: limit ?? undefined,
                 page: page ?? undefined
             }
         }),
-        post: (params) => axios.post(`${API_URL}/airlines/`, params),
+        post: (params) => axios.post(`${this.API_URL}/airlines/`, params),
     }
 
     // Customers endpoints
-    static customer = {
-        get: (id) => axios.get(`${API_URL}/customer/${id}/`),
-        patch: (id, params) => axios.patch(`${API_URL}/customer/${id}/`, params),
-        delete: (id) => axios.delete(`${API_URL}/customer/${id}/`),
+    customer = {
+        get: (id) => axios.get(`${this.API_URL}/customer/${id}/`),
+        patch: (id, params) => axios.patch(`${this.API_URL}/customer/${id}/`, params),
+        delete: (id) => axios.delete(`${this.API_URL}/customer/${id}/`),
     }
 
-    static customers = {
-        get: ({ limit, page }) => axios.get(`${API_URL}/customers/`, {
+    customers = {
+        get: ({ limit, page }) => axios.get(`${this.API_URL}/customers/`, {
             params: {
                 limit: limit ?? undefined,
                 page: page ?? undefined
             }
         }),
-        post: (params) => axios.post(`${API_URL}/customers/`, params),
+        post: (params) => axios.post(`${this.API_URL}/customers/`, params),
     }
 
     // Tickets endpoints
-    static ticket = {
-        delete: (id) => axios.delete(`${API_URL}/ticket/${id}/`),
+    ticket = {
+        delete: (id) => axios.delete(`${this.API_URL}/ticket/${id}/`),
     }
 
-    static tickets = {
-        get: ({ limit, page }) => axios.get(`${API_URL}/tickets/`, {
+    tickets = {
+        get: ({ limit, page }) => axios.get(`${this.API_URL}/tickets/`, {
             params: {
                 limit: limit ?? undefined,
                 page: page ?? undefined
             }
         }),
-        post: (params) => axios.post(`${API_URL}/tickets/`, params),
+        post: (params) => axios.post(`${this.API_URL}/tickets/`, params),
     }
 }
 

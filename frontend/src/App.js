@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/universal.css'
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route, HashRouter, BrowserRouter } from 'react-router-dom';
 
 // Import components
 import MyNavBar from './components/navigation/navbar';
@@ -14,10 +14,11 @@ import RegisterPage from './pages/register';
 import Welcome from './components/navigation/welcome';
 import LoginPage from './pages/login';
 
+import { useState } from 'react';
+import { LoginContext, RefreshLoginContext } from './contexts/auth_contexts';
+import { APIContext } from './contexts/api_context';
 import API from './api';
-import { useEffect, useState } from 'react';
 
-import { LoginContext } from './contexts/auth_contexts';
 
 const homepage = {
     '/': <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Flight Project" className='logo' />
@@ -46,9 +47,8 @@ const pages = {
             'navbar': true
         },
         'Register': {
-            'url': '/register/:userType/',
+            'url': '/register/',
             'element': <RegisterPage />,
-            'link': '/register/customer/',
             'navbar': true
         }
     }
@@ -56,26 +56,31 @@ const pages = {
 
 function App() {
     const [login, setLogin] = useState({});
-    useEffect(() => {
-        API.auth.whoami()
-            .then(res => {
-                if (Object.keys(login).length === 0 && res.data.data !== null) {
-                    setLogin(res.data.data)
-                }
-            }).catch(err => {
-                console.log(err)
-            })
-    }, []);
+    const APIClient = new API(process.env.BACKEND_URL ?? 'http://localhost:8000');
+
+    function refreshLogin() {
+        APIClient.auth.whoami().then(response => {
+            setLogin(response.data.data)
+        })
+        .catch(error => {
+            console.log("Error while refreshing identity: " + error);
+        })
+    }
+
     return (
         <BrowserRouter>
-            <LoginContext.Provider value={[login, setLogin]}>
+            <APIContext.Provider value={APIClient}>
+            <LoginContext.Provider value={login}>
+            <RefreshLoginContext.Provider value={refreshLogin}>
                 <MyNavBar homePage={homepage} pages={pages} login={<Welcome />} />
                 <div className='page-content'>
                     <Routes>
                         {Object.values(pages).map((page, index) => RouteResolver(page, index))}
                     </Routes>
                 </div>
+            </RefreshLoginContext.Provider>
             </LoginContext.Provider>
+            </APIContext.Provider>
         </BrowserRouter>
     );
 }

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import API, { BASE_URL } from "../api";
+import { useContext } from "react";
+import { APIContext } from '../contexts/api_context';
 
 
 export default function Flight({airlineData}){
-
+    const API = useContext(APIContext);
     const [country, setCountry] = useState();
     const [loadingData, setLoadingData] = useState(true);
 
@@ -24,7 +25,7 @@ export default function Flight({airlineData}){
         loadingData ? <div>Loading airline...</div> : <>
             <div className="airlineHeaderDiv">
                 <div className="airlineListing">
-                    <img src={country ? BASE_URL + "/" + country.flag : ""} alt=""/>
+                    <img src={country ? API.BASE_URL + "/" + country.flag : ""} alt=""/>
                     <div className="airlineName">{ airlineData.name }</div>
                 </div>
             </div>

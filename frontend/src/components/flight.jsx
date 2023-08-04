@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Accordion } from "react-bootstrap";
 
-import API, { BASE_URL } from "../api";
+import { APIContext } from '../contexts/api_context';
 import { formatDate } from "../utils";
 
 import '../css/flightsPage.css';
 
 export default function Flight({flightData}){
-
+    const API = useContext(APIContext);
     const [origin, setOrigin] = useState();
     const [destination, setDestination] = useState();
     const [airline, setAirline] = useState();
@@ -36,9 +36,9 @@ export default function Flight({flightData}){
                 <div className="flightHeaderDiv">
                     <div className="airlineName">{ airline?.name }</div>
                     <div className="flexBreak"/>
-                    <LocationListing country={ origin } isoDate={ formatDate(flightData.departure_datetime) }/>
+                    <LocationListing country={ origin } isoDate={ formatDate(flightData.departure_datetime) } baseUrl={API.BASE_URL}/>
                     <b className="destinationArrow">➜</b>
-                    <LocationListing country={ destination } isoDate={ formatDate(flightData.arrival_datetime) }/>
+                    <LocationListing country={ destination } isoDate={ formatDate(flightData.arrival_datetime) } baseUrl={API.BASE_URL}/>
                 </div>
             </Accordion.Header>
             <Accordion.Body>
@@ -47,11 +47,11 @@ export default function Flight({flightData}){
     );
 }
 
-function LocationListing({country, isoDate}){
+function LocationListing({country, isoDate, baseUrl}){
     return (
         <div className="locationListing">
             <div className="country">
-                <img src={country ? BASE_URL + "/" + country.flag : ""} alt=""/>
+                <img src={country ? baseUrl + "/" + country.flag : ""} alt=""/>
                 <div className="countryName">{ country ? country.name : ""}</div>
             </div>
             <div className="date">{ formatDate(isoDate) }</div>

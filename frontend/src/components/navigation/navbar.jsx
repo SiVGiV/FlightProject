@@ -1,12 +1,19 @@
+import React, { useContext, useEffect } from "react";
 import Nav  from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
-import { Link } from "react-router-dom";
-
+import { Link, useLocation } from "react-router-dom";
+import { RefreshLoginContext } from "../../contexts/auth_contexts";
 
 export default function MyNavBar({homePage, pages, login}){
+    const refreshLogin = useContext(RefreshLoginContext);
     // pagesObject should contain 'name': 'url' pairs.
     // if instead of a URL the object contains more objects, then they shall be 'name': 'url' pairs for a dropdown menu.
+    const location = useLocation();
+    useEffect(() => {
+        refreshLogin();
+    }, [ location ]);
+
     return (
         <Navbar expand="lg" sticky="top" className="bg-body-tertiary">
             <Navbar.Brand as={ Link } to={ Object.keys(homePage)[0] }>{ Object.values(homePage)[0] }</Navbar.Brand>

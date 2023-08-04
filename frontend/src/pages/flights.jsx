@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Flight from "../components/flight";
 import { Accordion, Form, Col, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";
-import API from "../api";
+import { APIContext } from "../contexts/api_context";
 
 import { makePagination } from "../utils"
 
 export default function FlightsPage(){
+    const API = useContext(APIContext);
     const [filters, setFilters] = useState({});
     
     const [loading, setLoading] = useState(true);

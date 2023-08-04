@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { LoginContext } from '../contexts/auth_contexts';
-import API from '../api';
+import { APIContext } from '../contexts/api_context';
+import { RefreshLoginContext } from '../contexts/auth_contexts';
 
 export default function LoginPage(){
+    const API = useContext(APIContext);
+    const RefreshLogin = useContext(RefreshLoginContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [validated, setValidated] = useState(false);
     const [formError, setFormError] = useState("");
-
-    const [login, setLogin] = useContext(LoginContext);
 
     const navigate = useNavigate();
 
@@ -19,18 +18,9 @@ export default function LoginPage(){
         event.preventDefault();
         API.auth.login({username, password})
         .then(response => {
-            console.log(response)
+            RefreshLogin();
             setValidated(true);
-            API.auth.whoami()
-            .then(response => {
-                setLogin(response.data.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-            .finally(() => {
-                navigate("/")
-            })
+            navigate("/")
         })
         .catch(error => {
             console.log(error)

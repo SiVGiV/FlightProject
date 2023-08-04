@@ -4,9 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import API from './api';
-
-API.auth.refreshCsrf();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(

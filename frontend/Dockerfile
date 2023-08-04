@@ -7,12 +7,17 @@ RUN mkdir -p $ProjectDir
 WORKDIR $ProjectDir
 COPY . $ProjectDir
 
-RUN npm ci
-RUN npm run build
+RUN npm ci --omit=optional
+
+# PRODUCTION ---------------------------------
+# RUN npm run build
 
 # set environment variables
-ENV NODE_ENV production
+ENV NODE_ENV=development
 
 EXPOSE 3000
 
-CMD [ "npx", "serve", "build" ]
+CMD [ "npm", "start" ]
+
+# PRODUCTION ---------------------------------
+# CMD [ "npx", "serve", "build" ]
