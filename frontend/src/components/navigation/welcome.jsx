@@ -13,7 +13,7 @@ export default function Welcome() {
     return (
         <div className="welcomeBar">
             {
-                loginValue.logged_in ? (`Welcome, ${loginValue.username}! `) : (`Welcome! Please login to continue.`)
+                loginValue.logged_in ? (`Welcome, ${loginValue.entity_name}! `) : (`Welcome! Please login to continue.`)
             }
             &nbsp;&nbsp;
             <Button onClick={loginValue.logged_in ? () => logout(API, navigate) : () => login(navigate)} className="navbar-button">

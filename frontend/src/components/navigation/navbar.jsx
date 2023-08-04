@@ -31,7 +31,7 @@ function resolvePage(key, value, index){
     // Check for dropdowns first
     if (((typeof value == 'object')|| (value instanceof Object)) && (typeof Object.values(value)[0] == 'object')){
         return (
-            <div className="navbar-item">
+            <div className="navbar-item" key={ index }>
                 <NavDropdown title={ key } key={ index }>
                     { Object.entries(value).map(([k, v], ind) => resolveDropdown(k, v, ind)) }
                 </NavDropdown>

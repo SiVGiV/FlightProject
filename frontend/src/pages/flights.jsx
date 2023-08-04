@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useContext } from "react";
 import Flight from "../components/flight";
-import { Card, CardGroup, Form, Col, Row, Button } from "react-bootstrap";
+import { Form, Col, Row, Button } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { APIContext } from "../contexts/api_context";
+import { LoginContext } from "../contexts/auth_contexts";
 
 import { makePagination } from "../utils"
 
 export default function FlightsPage() {
     const API = useContext(APIContext);
+    const login = useContext(LoginContext);
     const [filters, setFilters] = useState({});
 
     const [loading, setLoading] = useState(true);
@@ -19,6 +21,7 @@ export default function FlightsPage() {
     const [selectedOrigin, setSelectedOrigin] = useState([])
     const [selectedDestination, setSelectedDestination] = useState([])
     const [selectedAirline, setSelectedAirline] = useState([])
+    const [onlyMine, setOnlyMine] = useState(false)
     const [selectedDate, setSelectedDate] = useState()
 
     const [pagination, setPagination] = useState();
@@ -27,7 +30,7 @@ export default function FlightsPage() {
     const [loadingCountries, setLoadingCountries] = useState(true)
     const [countries, setCountries] = useState([])
     useEffect(() => { // OnLoad
-        refreshFlights();
+
         setLoadingCountries(true)
         API.countries.get({ limit: 200, page: 1 })
             .then(response => {
@@ -39,6 +42,7 @@ export default function FlightsPage() {
             .finally(() => {
                 setLoadingCountries(false)
             })
+        refreshFlights();
     }, [])
 
 
@@ -64,8 +68,11 @@ export default function FlightsPage() {
 
     function refreshFlights() { // Refresh flights
         setLoading(true);
-        console.log(filters)
-        API.flights.get({ limit: 10, page: flightPage ?? 1, ...filters })
+        var forceAirline = {};
+        if (onlyMine) {
+            forceAirline.airline = login.entity_id;
+        }
+        API.flights.get({ limit: 10, page: flightPage ?? 1, ...filters, ...forceAirline })
             .then(response => {
                 setFlights(response.data?.data ?? []);
                 setPagination(response.data?.pagination ?? []);
@@ -80,16 +87,34 @@ export default function FlightsPage() {
 
     function handleFilter(e) {
         e.preventDefault();
+        e.stopPropagation();
         refreshFlights();
     }
 
+    function handleOnlyMine(e){
+        if(e.target.checked){
+            setOnlyMine(true);
+        }else{
+            setOnlyMine(false);
+        }
+    }
+    useEffect(()=> refreshFlights(), [onlyMine])
+
     useEffect(() => { // Modify filters
-        setFilters({
+        var tempFilters = {
             origin: selectedOrigin[0]?.id,
             destination: selectedDestination[0]?.id,
             date: selectedDate?.target.value,
             airline: selectedAirline[0]?.id
-        })
+        }
+
+        for (var key in tempFilters) {
+            if (tempFilters[key] === undefined) {
+                delete tempFilters[key];
+            }
+        }
+
+        setFilters(tempFilters)
     }, [selectedOrigin, selectedDestination, selectedAirline, selectedDate])
 
     const [activeKey, setActiveKey] = useState(null);
@@ -155,6 +180,17 @@ export default function FlightsPage() {
                                     isLoading={airlinesLoading}
                                 />
                             </Form.Group>
+                            {
+                                login.type === "airline" ?
+                                <Form.Group>
+                                    <Form.Check
+                                        type="switch"
+                                        id="mine-switch"
+                                        label="Only show my flights"
+                                        onChange={handleOnlyMine}
+                                    />
+                                </Form.Group> : <></>
+                            }
                         </Row>
                         <Button variant="primary" type="submit" onClick={handleFilter}>Filter</Button>
                     </Form>
@@ -162,7 +198,7 @@ export default function FlightsPage() {
                 {
                     loading ? <h1>Loading...</h1> :
                         flights.length === 0 ? <h1>No flights found...</h1> : flights.map((flight, index) =>
-                            <Flight flightData={flight} key="index" onClick={handleToggle} />
+                            <Flight flightData={flight} key={index} onClick={ handleToggle } />
                         )
                 }
                 {makePagination(pagination?.page, Math.ceil(pagination?.total / pagination?.limit), "/flights")}
