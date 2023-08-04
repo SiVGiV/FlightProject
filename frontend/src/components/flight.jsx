@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Card, Collapse } from "react-bootstrap";
+import { Card, Collapse, Form, Row, Button } from "react-bootstrap";
 
 import { APIContext } from '../contexts/api_context';
 import { LoginContext } from '../contexts/auth_contexts';
@@ -65,11 +65,11 @@ export default function Flight({ flightData, handleToggle }) {
                 <Collapse in={expanded}>
                     <div className="actions">
                         {
-                            login.type === "customer" ?
-                                <CustomerFlightActions flightData={flightData} /> :
-                                login.type === "airline" ?
-                                    <AirlineFlightActions flightData={flightData} /> :
-                                    <></>
+                        login.type === "customer" ?
+                            <CustomerFlightActions flightData={flightData} /> :
+                            login.type === "airline" ?
+                                <AirlineFlightActions flightData={flightData} /> :
+                                <></>
                         }
                     </div>
                 </Collapse>
@@ -92,7 +92,32 @@ function LocationListing({ country, isoDate, baseUrl }) {
 
 
 function CustomerFlightActions({ flightData }) {
-    return (<>Customer Actions</>);
+    const [seatCount, setSeatCount] = useState(1);
+    const API = useContext(APIContext);
+    
+
+    function purchase() {
+        API.tickets.post({flight_id: flightData.id, seat_count: seatCount}).then(response => {
+            console.log("Purchased ticket")
+            console.log(response)
+        }).catch(error => {
+            
+        })
+    }
+
+    return (
+        <Form>
+            <Row>
+                <Form.Group controlId="formSeatCount">
+                    <Form.Label>Number of seats</Form.Label>
+                    <Form.Control type="number" placeholder="1" min={1} />
+                </Form.Group>
+                <Form.Group controlId="formPurchase">
+                    <Button onClick={() => purchase()}>Purchase</Button>
+                </Form.Group>
+            </Row>
+        </Form>
+    );
 }
 
 function AirlineFlightActions({ flightData }) {

@@ -134,6 +134,10 @@ class CustomerFacade(FacadeBase):
         if success:
             return created_response(data)
         else:
+            print(data)
+            # if 'non_field_errors' in data.get('errors'):
+            #     if data['errors']['non_field_errors'].code == 'unique':
+            #         return conflict_response(errors=["Customer already has a ticket for this flight.", "duplicate_ticket"])
             return bad_request_response(errors=data)
 
 
