@@ -34,6 +34,10 @@ class FacadeBase():
     def entity_id(self):
         pass
     
+    @abstractproperty
+    def entity_name(self):
+        pass
+    
     def whoami(self):
         """
         Returns the type, username and ID of the user.
@@ -41,11 +45,12 @@ class FacadeBase():
         
         """
         data = {
-            'type': self.usertype,
             'logged_in': self.usertype != 'anon',
-            'username': self.username,
             'id': self.id,
-            'entity_id': self.entity_id
+            'type': self.usertype,
+            'username': self.username,
+            'entity_id': self.entity_id,
+            'entity_name': self.entity_name
         }
         return ok_response(data=data)
         

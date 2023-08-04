@@ -41,6 +41,10 @@ class AirlineFacade(FacadeBase):
     def entity_id(self):
         return self.__user['airline']['id']
     
+    @property
+    def entity_name(self):
+        return self.__user['airline']['name']
+    
     @property 
     def required_group(self):
         return self.__required_group

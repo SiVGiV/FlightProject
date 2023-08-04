@@ -51,6 +51,10 @@ class AnonymousFacade(FacadeBase):
     def entity_id(self):
         return -1
     
+    @property
+    def entity_name(self):
+        return 'Anonymous'
+    
     @staticmethod
     def facade_from_user(user):
         """Returns a facade from a django user object.

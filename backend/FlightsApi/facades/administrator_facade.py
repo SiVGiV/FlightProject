@@ -40,6 +40,10 @@ class AdministratorFacade(FacadeBase):
     def entity_id(self):
         return self.__user['admin']['id']
 
+    @property
+    def entity_name(self):
+        return self.__user['admin']['first_name'] + " " + self.__user['admin']['last_name']
+        
     @property 
     def required_group(self):
         return self.__required_group
