@@ -65,11 +65,11 @@ export default function Flight({ flightData, handleToggle }) {
                 <Collapse in={expanded}>
                     <div className="actions">
                         {
-                        login.type === "customer" ?
-                            <CustomerFlightActions flightData={flightData} /> :
-                            login.type === "airline" ?
-                                <AirlineFlightActions flightData={flightData} /> :
-                                <></>
+                            login.type === "customer" ?
+                                <CustomerFlightActions flightData={flightData} /> :
+                                login.type === "airline" ?
+                                    <AirlineFlightActions flightData={flightData} /> :
+                                    <></>
                         }
                     </div>
                 </Collapse>
@@ -94,23 +94,41 @@ function LocationListing({ country, isoDate, baseUrl }) {
 function CustomerFlightActions({ flightData }) {
     const [seatCount, setSeatCount] = useState(1);
     const API = useContext(APIContext);
-    
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
 
     function purchase() {
-        API.tickets.post({flight_id: flightData.id, seat_count: seatCount}).then(response => {
-            console.log("Purchased ticket")
+        API.tickets.post({ flight_id: flightData.id, seat_count: seatCount }).then(response => {
+            setMessage("Purchased ticket")
+            setError("")
             console.log(response)
-        }).catch(error => {
-            
+        }).catch(err => {
+            setMessage("")
+            console.log(err.response)
+            if (err?.response?.data?.errors) {
+                if (err?.response?.data?.errors?.indexOf("duplicate_ticket")) {
+                    setError("You already have a ticket for this flight")
+                }
+                else {
+                    setError(err.response.data.errors[0])
+                }
+            }
+            else if (err?.response?.data?.error) {
+                setError(err.response.data.error)
+            }
+            else {
+                setError("Unknown error")
+            }
         })
     }
-
     return (
         <Form>
             <Row>
+                <p style={{ color: 'green' }}>{message}</p>
+                <p style={{ color: 'red' }}>{error}</p>
                 <Form.Group controlId="formSeatCount">
                     <Form.Label>Number of seats</Form.Label>
-                    <Form.Control type="number" placeholder="1" min={1} />
+                    <Form.Control type="number" placeholder="1" min={1} onChange={(e) => { setSeatCount(e.target.value) }} />
                 </Form.Group>
                 <Form.Group controlId="formPurchase">
                     <Button onClick={() => purchase()}>Purchase</Button>

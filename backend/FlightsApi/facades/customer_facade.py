@@ -127,17 +127,16 @@ class CustomerFacade(FacadeBase):
             logger.error(e)
             return bad_request_response(errors=e)
         except Exception as e:
-            logger.error(e)
+            logger.error(e) 
             return internal_error_response(errors=e)
         
 
         if success:
             return created_response(data)
         else:
-            print(data)
-            # if 'non_field_errors' in data.get('errors'):
-            #     if data['errors']['non_field_errors'].code == 'unique':
-            #         return conflict_response(errors=["Customer already has a ticket for this flight.", "duplicate_ticket"])
+            if 'non_field_errors' in data:
+                if data['non_field_errors'][0].code == 'unique':
+                    return conflict_response(errors=["Customer already has a ticket for this flight.", "duplicate_ticket"])
             return bad_request_response(errors=data)
 
 
