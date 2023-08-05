@@ -204,8 +204,10 @@ export default function FlightsPage() {
                                     </Form.Group> : <></>
                             }
                         </Row>
-                        <Button variant="primary" type="submit" onClick={handleFilter}>Filter</Button>
-                        {login.type === 'airline' ? <Button onClick={() => setShowCreate(true)}>Create a new flight</Button> : <></>}
+                        <Row className="filterButtons">
+                            <Button variant="primary" type="submit" onClick={handleFilter}>Filter</Button>
+                            {login.type === 'airline' ? <Button onClick={() => setShowCreate(true)}>Create a new flight</Button> : <></>}
+                        </Row>
                     </Form>
                     <FlightCreationModal showCreate={showCreate} onHide={onHideCreationModal} countries={countries} forceRender={forceRender} />
                 </div>
@@ -287,7 +289,7 @@ function FlightCreationModal({ showCreate, onHide, countries, forceRender }) {
                             </Form.Group>
                             <Form.Group controlId="formDeparture" as={Col}>
                                 <Form.Label>Departure Date and Time</Form.Label>
-                                <Datetime dateFormat={"MMMM Do, YYYY"} timeFormat={"[at] HH:mm"} value={new Date(selectedDepartureDate)} onChange={(e) => { if(e?._isValid) setSelectedDepartureDate(e._d.toJSON()); }} />
+                                <Datetime dateFormat={"MMMM Do, YYYY"} timeFormat={"[at] HH:mm"} value={new Date(selectedDepartureDate)} onChange={(e) => { if (e?._isValid) setSelectedDepartureDate(e._d.toJSON()); }} />
                             </Form.Group>
                         </Col>
                         <Col>
@@ -304,7 +306,7 @@ function FlightCreationModal({ showCreate, onHide, countries, forceRender }) {
                             </Form.Group>
                             <Form.Group controlId="formDeparture">
                                 <Form.Label>Arrival Date and Time</Form.Label>
-                                <Datetime dateFormat={"MMMM Do, YYYY"} timeFormat={"[at] HH:mm"} value={new Date(selectedArrivalDate)} onChange={(e) => { if(e?._isValid) setSelectedArrivalDate(e._d.toJSON()); }} />
+                                <Datetime dateFormat={"MMMM Do, YYYY"} timeFormat={"[at] HH:mm"} value={new Date(selectedArrivalDate)} onChange={(e) => { if (e?._isValid) setSelectedArrivalDate(e._d.toJSON()); }} />
                             </Form.Group>
                         </Col>
                     </Row>

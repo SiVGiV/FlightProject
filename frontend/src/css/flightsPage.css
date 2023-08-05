@@ -81,3 +81,14 @@
     border-width: 2px;
     padding: 10px;
 }
+
+.filterButtons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px;
+}
+.filterButtons button{
+    width: auto;
+}
