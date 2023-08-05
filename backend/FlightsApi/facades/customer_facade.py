@@ -167,7 +167,7 @@ class CustomerFacade(FacadeBase):
             return forbidden_response()
         
         try:
-            data, success = R.update(DBTables.TICKET, id=ticket_id, is_canceled=True)
+            data, success = R.update(DBTables.TICKET, id=ticket_id, is_cancelled=True)
         except RepoErrors.FetchError as e:
             logger.error(e)
             return not_found_response(errors=e)
@@ -239,4 +239,4 @@ class CustomerFacade(FacadeBase):
     
     
     def get_flights_by_parameters(self, *args, **kwargs):
-        return super().get_flights_by_parameters(*args, **kwargs, allow_canceled = False)
+        return super().get_flights_by_parameters(*args, **kwargs, allow_cancelled = False)

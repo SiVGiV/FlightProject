@@ -354,7 +354,7 @@ class Repository():
     @staticmethod
     @log_action
     @accepts((int, type(None)), (int, type(None)), (Date, type(None)), (int, type(None)), bool)
-    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], airline_id: Union[int, None], allow_canceled: bool, paginator: Paginate = Paginate()) -> List[dict]:
+    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], airline_id: Union[int, None], allow_cancelled: bool, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Returns a list of flights that fit the parameters.
 
@@ -381,8 +381,8 @@ class Repository():
         if airline_id:
             # Of those flights get those that are operated by the specified airline
             query = query.filter(airline__id = airline_id)        
-        if not allow_canceled:
-            query = query.filter(is_canceled=False)
+        if not allow_cancelled:
+            query = query.filter(is_cancelled=False)
         # Paginate the results
         paginator.total = query.count()
         query = query.all()[paginator.slice]
@@ -703,8 +703,8 @@ class Repository():
             return False, 'the flight does not exist'
         
         flight = Flight.objects.get(pk=id)
-        if flight.is_canceled:
-            return False, 'the flight was canceled'
+        if flight.is_cancelled:
+            return False, 'the flight was cancelled'
         
         flight_happened = flight.departure_datetime <= timezone.now()
         if flight_happened:
@@ -714,7 +714,7 @@ class Repository():
         total_booked_seats = 0
         # Count how many seats were booked
         for ticket in all_tickets:
-            total_booked_seats +=  0 if ticket['is_canceled'] else ticket['seat_count']
+            total_booked_seats +=  0 if ticket['is_cancelled'] else ticket['seat_count']
         # Check if there are enough seats to fulfill this order
         if total_booked_seats + seat_count > flight.total_seats:
             return False, f'the flight only has {flight.total_seats - total_booked_seats} seat(s) left'

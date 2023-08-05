@@ -910,13 +910,13 @@ class TestAirlineFacade(TestCase):
     def test_cancel_flight_success(self, mock_repo):
         # Mock setup
         mock_repo.get_by_id.return_value = {'airline': 1}
-        mock_repo.update.return_value = ({'is_canceled': True}, True)
+        mock_repo.update.return_value = ({'is_cancelled': True}, True)
         # Function call
         result = self.facade.cancel_flight(1)
         # Assertions
         self.assertEqual(result[0], 204) 
         mock_repo.get_by_id.assert_called_with(DBTables.FLIGHT, 1)
-        mock_repo.update.assert_called_with(DBTables.FLIGHT, id=1, is_canceled=True)
+        mock_repo.update.assert_called_with(DBTables.FLIGHT, id=1, is_cancelled=True)
     
     @patch('FlightsApi.facades.airline_facade.R')
     def test_cancel_flight_errors(self, mock_repo):
@@ -927,7 +927,7 @@ class TestAirlineFacade(TestCase):
             mock_repo.get_by_id.return_value = {'airline': 1}
             
             mock_repo.update.reset_mock(return_value=True, side_effect=True)
-            mock_repo.update.return_value = ({'is_canceled': True}, True)
+            mock_repo.update.return_value = ({'is_cancelled': True}, True)
             
         with self.subTest('Flight ID out of bounds'):
             reset_mocks()
@@ -980,7 +980,7 @@ class TestAirlineFacade(TestCase):
             
         with self.subTest('Failed update'):
             reset_mocks()
-            mock_repo.update.return_value = ({'is_canceled': False}, False)
+            mock_repo.update.return_value = ({'is_cancelled': False}, False)
             result = self.facade.cancel_flight(1)
             self.assertEqual(result[0], 500) 
             self.assertIn('unexpected error', result[1]['error'])
@@ -1099,13 +1099,13 @@ class TestCustomerFacade(TestCase):
     @patch('FlightsApi.facades.customer_facade.R')
     def test_cancel_ticket_success(self, mock_repo):
         mock_repo.get_by_id.return_value = {'customer': 1}
-        mock_repo.update.return_value = {'is_canceled': True}, True
+        mock_repo.update.return_value = {'is_cancelled': True}, True
         
         result = self.facade.cancel_ticket(1)
         
-        self.assertEqual(result, (200, {'data': {'is_canceled': True}}))
+        self.assertEqual(result, (200, {'data': {'is_cancelled': True}}))
         mock_repo.get_by_id.assert_called_with(DBTables.TICKET, 1)
-        mock_repo.update.assert_called_with(DBTables.TICKET, id=1, is_canceled=True)
+        mock_repo.update.assert_called_with(DBTables.TICKET, id=1, is_cancelled=True)
     
     @patch('FlightsApi.facades.customer_facade.R')
     def test_cancel_ticket_errors(self, mock_repo):
@@ -1115,7 +1115,7 @@ class TestCustomerFacade(TestCase):
             mock_repo.get_by_id.reset_mock(return_value=True, side_effect=True)
             mock_repo.get_by_id.return_value = {'customer': 1}
             mock_repo.update.reset_mock(return_value=True, side_effect=True)
-            mock_repo.update.return_value = {'is_canceled': True}, True
+            mock_repo.update.return_value = {'is_cancelled': True}, True
             
         with self.subTest('ID out of bounds'):
             reset_mocks()
@@ -1161,7 +1161,7 @@ class TestCustomerFacade(TestCase):
             
         with self.subTest("Ticket wasn't updated"):
             reset_mocks()
-            mock_repo.update.return_value = {'is_canceled': False}, False
+            mock_repo.update.return_value = {'is_cancelled': False}, False
             result = self.facade.cancel_ticket(1)
             self.assertEqual(result[0], 500) 
             self.assertIn('unexpected error', result[1]['error'])

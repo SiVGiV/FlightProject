@@ -106,7 +106,7 @@ class FacadeBase():
         return ok_response(data=data)
     
     @staticmethod
-    def get_flights_by_parameters(origin_country_id: int = None, destination_country_id: int = None, date: Date = None, airline_id: int = None, limit: int = 50, page: int = 1, allow_canceled: bool = True) -> Tuple[int, dict]:
+    def get_flights_by_parameters(origin_country_id: int = None, destination_country_id: int = None, date: Date = None, airline_id: int = None, limit: int = 50, page: int = 1, allow_cancelled: bool = True) -> Tuple[int, dict]:
         """Get all flights and filter by given parameters.
 
         Args:
@@ -125,7 +125,7 @@ class FacadeBase():
         
         # Fetch data and handle exceptions
         try:
-            data = R.get_flights_by_parameters(origin_country_id, destination_country_id, date, airline_id, pagination, allow_canceled)
+            data = R.get_flights_by_parameters(origin_country_id, destination_country_id, date, airline_id, allow_cancelled, pagination)
         except ValueError as e:
             return bad_request_response(errors=e)
         except Exception as e:

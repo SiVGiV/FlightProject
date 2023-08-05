@@ -202,7 +202,7 @@ class AirlineFacade(FacadeBase):
             return forbidden_response()
         
         try:
-            data, success = R.update(DBTables.FLIGHT, id=flight_id, is_canceled=True)
+            data, success = R.update(DBTables.FLIGHT, id=flight_id, is_cancelled=True)
         except RepoErrors.FetchError as e:
             logger.error(e)
             return not_found_response(errors=e)
@@ -213,7 +213,7 @@ class AirlineFacade(FacadeBase):
             logger.error(e)
             return internal_error_response(errors=e)
         
-        if not data['is_canceled']:
+        if not data['is_cancelled']:
             return internal_error_response()
         return no_content_ok()
         

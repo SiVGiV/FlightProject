@@ -223,4 +223,4 @@ class AnonymousFacade(FacadeBase):
         return code, data
 
     def get_flights_by_parameters(self, *args, **kwargs):
-        return super().get_flights_by_parameters(*args, **kwargs, allow_canceled = False)
+        return super().get_flights_by_parameters(*args, **kwargs, allow_cancelled = False)

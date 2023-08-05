@@ -18,12 +18,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='flight',
-            name='is_canceled',
+            name='is_cancelled',
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='ticket',
-            name='is_canceled',
+            name='is_cancelled',
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
