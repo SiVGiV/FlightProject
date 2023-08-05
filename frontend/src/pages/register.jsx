@@ -3,7 +3,7 @@ import { Form, Button } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { useNavigate } from "react-router-dom";
 import { LoginContext, RefreshLoginContext } from "../contexts/auth_contexts";
-import { APIContext } from "../contexts/api_context";
+import { APIContext } from "../contexts/api_contexts";
 
 
 export default function Register() {

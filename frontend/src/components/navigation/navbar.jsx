@@ -3,10 +3,11 @@ import Nav  from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
 import { Link, useLocation } from "react-router-dom";
-import { RefreshLoginContext } from "../../contexts/auth_contexts";
+import { LoginContext, RefreshLoginContext } from "../../contexts/auth_contexts";
 
 export default function MyNavBar({homePage, pages, login}){
     const refreshLogin = useContext(RefreshLoginContext);
+    const loginDetails = useContext(LoginContext);
     // pagesObject should contain 'name': 'url' pairs.
     // if instead of a URL the object contains more objects, then they shall be 'name': 'url' pairs for a dropdown menu.
     const location = useLocation();
@@ -18,7 +19,7 @@ export default function MyNavBar({homePage, pages, login}){
         <Navbar expand="lg" sticky="top" className="bg-body-tertiary">
             <Navbar.Brand as={ Link } to={ Object.keys(homePage)[0] }>{ Object.values(homePage)[0] }</Navbar.Brand>
 
-                { Object.entries(pages).map(([k, v], index) => resolvePage(k, v, index)) }
+                { Object.entries(pages).map(([k, v], index) => resolvePage(k, v, index, loginDetails)) }
             
             <Nav className="ms-auto">
                 { login }
@@ -27,13 +28,13 @@ export default function MyNavBar({homePage, pages, login}){
     );
 }
 
-function resolvePage(key, value, index){
+function resolvePage(key, value, index, loginDetails){
     // Check for dropdowns first
     if (((typeof value == 'object')|| (value instanceof Object)) && (typeof Object.values(value)[0] == 'object')){
         return (
             <div className="navbar-item" key={ index }>
                 <NavDropdown title={ key } key={ index }>
-                    { Object.entries(value).map(([k, v], ind) => resolveDropdown(k, v, ind)) }
+                    { Object.entries(value).map(([k, v], ind) => resolveDropdown(k, v, ind, loginDetails)) }
                 </NavDropdown>
             </div>
         );
@@ -43,13 +44,20 @@ function resolvePage(key, value, index){
         if (('navbar' in value) && (!value['navbar'])){
             return <></>;
         }
+        if (('onlyFor' in value) && (value['onlyFor'] !== loginDetails.type)){
+            return <></>;
+        }
         return (<div className="navbar-item" key={ index }><Nav.Link as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</Nav.Link></div>);
     }
     return (<></>);
 }
 
-function resolveDropdown(key, value, index){
+function resolveDropdown(key, value, index, loginDetails){
     if (typeof value == 'object' || value instanceof Object){
+        if (('onlyFor' in value) && (value['onlyFor'] !== loginDetails.type)){
+            return <></>;
+        }
         return (<NavDropdown.Item as={ Link } to={ value['link'] ?? value['url'] } key={ index }>{ key }</NavDropdown.Item>);
     }
+    return (<></>);
 }

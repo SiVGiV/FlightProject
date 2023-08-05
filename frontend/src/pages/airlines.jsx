@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import Airline from "../components/airline";
 import { Form } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import { APIContext } from "../contexts/api_context";
+import { APIContext } from "../contexts/api_contexts";
 
 import '../css/airlinesPage.css';
 

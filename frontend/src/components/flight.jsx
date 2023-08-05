@@ -1,15 +1,20 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Card, Collapse, Form, Row, Button } from "react-bootstrap";
+import { Card, Collapse, Form, Row, Col, Button } from "react-bootstrap";
+import "react-datetime/css/react-datetime.css";
+import Datetime from "react-datetime";
 
-import { APIContext } from '../contexts/api_context';
+import { APIContext } from '../contexts/api_contexts';
 import { LoginContext } from '../contexts/auth_contexts';
 import { formatDate } from "../utils";
 
+import { Typeahead } from "react-bootstrap-typeahead";
+
 import '../css/flightsPage.css';
 
-export default function Flight({ flightData, handleToggle }) {
+export default function Flight({ flightData, allCountries, forceRender }) {
     const API = useContext(APIContext);
     const login = useContext(LoginContext);
+
     const [origin, setOrigin] = useState();
     const [destination, setDestination] = useState();
     const [airline, setAirline] = useState();
@@ -18,19 +23,16 @@ export default function Flight({ flightData, handleToggle }) {
     const [expandable, setExpandable] = useState(false);
     useEffect(() => {
         setLoadingData(true)
-        Promise.all([
-            API.airline.get(flightData.airline),
-            API.country.get(flightData.origin_country),
-            API.country.get(flightData.destination_country),
-        ]).then(([airlineResponse, originResponse, destinationResponse]) => {
-            setAirline(airlineResponse.data.data)
-            setOrigin(originResponse.data.data);
-            setDestination(destinationResponse.data.data)
-        }).catch(error => {
-            console.log(error.data)
-        }).finally(() => {
-            setLoadingData(false)
-        })
+        setOrigin(allCountries.find(country => country.id === flightData.origin_country))
+        setDestination(allCountries.find(country => country.id === flightData.destination_country))
+        API.airline.get(flightData.airline)
+            .then((airlineResponse) => {
+                setAirline(airlineResponse.data.data)
+            }).catch(error => {
+                console.log(error.data)
+            }).finally(() => {
+                setLoadingData(false)
+            })
 
         switch (login.type) {
             case "airline":
@@ -45,7 +47,7 @@ export default function Flight({ flightData, handleToggle }) {
                 setExpandable(false);
                 break;
         }
-    }, [flightData, login])
+    }, [flightData, login, allCountries])
 
     function handleExpand(e) {
         setExpanded((!expanded) && expandable);
@@ -53,7 +55,7 @@ export default function Flight({ flightData, handleToggle }) {
 
     return (
         loadingData ? <div>Loading flight...</div> : <>
-            <Card >
+            <Card key={flightData.id} className={(flightData.is_cancelled ? "cancelled" : "normal") + "FlightCard flightCard" + (expandable ? " expandableCard" : "")}>
                 <div className="flightHeaderDiv" aria-expanded={expanded} onMouseUp={handleExpand} aria-controls={`flight${flightData.id}`}>
                     <div className="airlineName">{airline?.name}</div>
                     <div className="flexBreak" />
@@ -68,7 +70,7 @@ export default function Flight({ flightData, handleToggle }) {
                             login.type === "customer" ?
                                 <CustomerFlightActions flightData={flightData} /> :
                                 login.type === "airline" ?
-                                    <AirlineFlightActions flightData={flightData} /> :
+                                    <AirlineFlightActions flightData={flightData} allCountries={allCountries} forceRender={forceRender} /> :
                                     <></>
                         }
                     </div>
@@ -138,7 +140,118 @@ function CustomerFlightActions({ flightData }) {
     );
 }
 
-function AirlineFlightActions({ flightData }) {
+function AirlineFlightActions({ flightData, allCountries, forceRender }) {
+    const API = useContext(APIContext);
 
-    return (<>Airline Actions</>);
+    const [selectedOrigin, setSelectedOrigin] = useState([])
+    const [selectedDestination, setSelectedDestination] = useState([])
+    const [selectedDepartureDate, setSelectedDepartureDate] = useState()
+    const [selectedArrivalDate, setSelectedArrivalDate] = useState()
+    const [seatCount, setSeatCount] = useState()
+    const [flightCanceled, setFlightCanceled] = useState()
+
+    const [formError, setFormError] = useState("")
+    const [formSuccess, setFormSuccess] = useState("")
+
+    useEffect(() => {
+        setSelectedOrigin([allCountries.find(country => country.id === flightData.origin_country)])
+        setSelectedDestination([allCountries.find(country => country.id === flightData.destination_country)])
+        setSelectedDepartureDate(flightData.departure_datetime)
+        setSelectedArrivalDate(flightData.arrival_datetime)
+        setSeatCount(flightData.total_seats)
+        setFlightCanceled(flightData.is_cancelled)
+    }, [allCountries, flightData]);
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setFormError("")
+        setFormSuccess("")
+        API.flight.patch(flightData.id, {
+            origin_country: selectedOrigin[0]?.id,
+            destination_country: selectedDestination[0]?.id,
+            departure_datetime: selectedDepartureDate,
+            arrival_datetime: selectedArrivalDate,
+            total_seats: seatCount,
+            is_cancelled: flightCanceled
+        }).then(response => {
+            setFormSuccess("Flight updated! Refreshing...")
+            setTimeout(() => {
+                forceRender(Math.random())
+            }, 1000)
+        }).catch(response => {
+            setFormError("Error updating flight")
+        })
+    }
+
+    function handleCancel(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        API.flight.delete(flightData.id).then(response => {
+            setFormSuccess("Flight deleted! Refreshing...")
+            setTimeout(() => {
+                forceRender(Math.random())
+            }, 1000)
+        }).catch(response => {
+            setFormError("Error deleting flight")
+        })
+    }
+    return (
+        <Form className="flightUpdateForm">
+            <fieldset disabled={flightData.is_cancelled}>
+
+            <p className="formError">{formError}</p>
+            <p className="formSuccess">{formSuccess}</p>
+            <Row>
+
+                <Col>
+                    <Form.Group controlId="formOrigin" as={Col}>
+                        <Form.Label>Origin</Form.Label>
+                        <Typeahead
+                            id="basic-typeahead-single"
+                            labelKey="name"
+                            onChange={setSelectedOrigin}
+                            options={allCountries}
+                            placeholder="Choose a country..."
+                            selected={selectedOrigin}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="formDeparture" as={Col}>
+                        <Form.Label>Departure Date and Time</Form.Label>
+                        <Datetime timeFormat={"HH:mm"} value={new Date(selectedDepartureDate)} onChange={(e) => { if(e?._isValid) setSelectedDepartureDate(e._d.toJSON());}} />
+                    </Form.Group>
+                </Col>
+                <Col>
+                    <Form.Group controlId="formDestination">
+                        <Form.Label>Destination</Form.Label>
+                        <Typeahead
+                            id="basic-typeahead-single"
+                            labelKey="name"
+                            onChange={setSelectedDestination}
+                            options={allCountries}
+                            placeholder="Choose a country..."
+                            selected={selectedDestination}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="formDeparture">
+                        <Form.Label>Arrival Date and Time</Form.Label>
+                        <Datetime timeFormat={"HH:mm"} value={new Date(selectedArrivalDate)} onChange={(e) => { if(e?._isValid) setSelectedArrivalDate(e._d.toJSON());}} />
+                    </Form.Group>
+                </Col>
+            </Row>
+            <Row>
+                <Form.Group controlId="formSeatCount">
+                    <Form.Label>Number of seats</Form.Label>
+                    <Form.Control type="number" defaultValue={seatCount} min={1} onChange={(e) => { setSeatCount(e.target.value) }} />
+                </Form.Group>
+            </Row>
+                <Form.Group controlId="formSubmit">
+                    <Button onClick={handleSubmit}>Update</Button>
+                </Form.Group>
+                <Form.Group controlId="formCancel">
+                    <Button variant="danger" onClick={handleCancel}>Cancel</Button>
+                </Form.Group>
+            </fieldset>
+        </Form>
+    );
 }

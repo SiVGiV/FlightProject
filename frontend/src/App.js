@@ -1,7 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/universal.css'
 
-import { Routes, Route, HashRouter, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { useState } from 'react';
 
 // Import components
 import MyNavBar from './components/navigation/navbar';
@@ -10,13 +11,15 @@ import MyNavBar from './components/navigation/navbar';
 import HomePage from './pages';
 import FlightsPage from './pages/flights';
 import AirlinesPage from './pages/airlines';
-import RegisterPage from './pages/register';
+import TicketsPage from './pages/tickets';
+
 import Welcome from './components/navigation/welcome';
+
+import RegisterPage from './pages/register';
 import LoginPage from './pages/login';
 
-import { useState } from 'react';
 import { LoginContext, RefreshLoginContext } from './contexts/auth_contexts';
-import { APIContext } from './contexts/api_context';
+import { APIContext } from './contexts/api_contexts';
 import API from './api';
 
 
@@ -40,17 +43,20 @@ const pages = {
         'link': '/airlines/1/',
         'element': <AirlinesPage />
     },
-    'Auth': {
-        'Login': {
-            'url': '/login/',
-            'element': <LoginPage />,
-            'navbar': true
-        },
-        'Register': {
-            'url': '/register/',
-            'element': <RegisterPage />,
-            'navbar': true
-        }
+    'Tickets': {
+        'url': '/tickets/',
+        'element': <TicketsPage />,
+        'onlyFor': 'customer'
+    },
+    'Login': {
+        'url': '/login/',
+        'element': <LoginPage />,
+        'navbar': false
+    },
+    'Register': {
+        'url': '/register/',
+        'element': <RegisterPage />,
+        'navbar': false
     }
 }
 
@@ -61,26 +67,29 @@ function App() {
     function refreshLogin() {
         APIClient.auth.whoami().then(response => {
             setLogin(response.data.data)
-        })
-        .catch(error => {
+        }).catch(error => {
             console.log("Error while refreshing identity: " + error);
         })
     }
 
     return (
         <BrowserRouter>
+
             <APIContext.Provider value={APIClient}>
-            <LoginContext.Provider value={login}>
-            <RefreshLoginContext.Provider value={refreshLogin}>
-                <MyNavBar homePage={homepage} pages={pages} login={<Welcome />} />
-                <div className='page-content'>
-                    <Routes>
-                        {Object.values(pages).map((page, index) => RouteResolver(page, index))}
-                    </Routes>
-                </div>
-            </RefreshLoginContext.Provider>
-            </LoginContext.Provider>
+                <LoginContext.Provider value={login}>
+                    <RefreshLoginContext.Provider value={refreshLogin}>
+
+                        <MyNavBar homePage={homepage} pages={pages} login={<Welcome />} />
+                        <div className='page-content'>
+                            <Routes>
+                                {Object.values(pages).map((page, index) => RouteResolver(page, index))}
+                            </Routes>
+                        </div>
+
+                    </RefreshLoginContext.Provider>
+                </LoginContext.Provider>
             </APIContext.Provider>
+
         </BrowserRouter>
     );
 }

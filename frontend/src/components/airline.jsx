@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useContext } from "react";
-import { APIContext } from '../contexts/api_context';
+import { APIContext } from '../contexts/api_contexts';
 
 
 export default function Flight({airlineData}){

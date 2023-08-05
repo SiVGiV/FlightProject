@@ -1,7 +1,7 @@
 export default function HomePage() {
     return (
-        <>
-            Welcome to this manager or whatever!
-        </>
+        <h1>
+            Welcome to my project!
+        </h1>
     );
 }
