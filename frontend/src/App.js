@@ -12,6 +12,7 @@ import HomePage from './pages';
 import FlightsPage from './pages/flights';
 import AirlinesPage from './pages/airlines';
 import TicketsPage from './pages/tickets';
+import UsersPage from './pages/users';
 
 import Welcome from './components/navigation/welcome';
 
@@ -47,6 +48,11 @@ const pages = {
         'url': '/tickets/',
         'element': <TicketsPage />,
         'onlyFor': 'customer'
+    },
+    'Users': {
+        'url': '/users/',
+        'element': <UsersPage />,
+        'onlyFor': 'admin'
     },
     'Login': {
         'url': '/login/',
