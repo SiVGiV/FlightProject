@@ -236,3 +236,7 @@ class CustomerFacade(FacadeBase):
         if 'data' in data:
             data['data'].pop('user', None)
         return code, data
+    
+    
+    def get_flights_by_parameters(*args, **kwargs):
+        super().get_flights_by_parameters(*args, **kwargs, allow_canceled = False)

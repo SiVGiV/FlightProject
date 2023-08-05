@@ -353,8 +353,8 @@ class Repository():
     
     @staticmethod
     @log_action
-    @accepts((int, type(None)), (int, type(None)), (Date, type(None)), (int, type(None)))
-    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], airline_id: Union[int, None], paginator: Paginate = Paginate()) -> List[dict]:
+    @accepts((int, type(None)), (int, type(None)), (Date, type(None)), (int, type(None)), bool)
+    def get_flights_by_parameters(origin_country_id: Union[int, None], destination_country_id: Union[int, None], date: Union[Date, None], airline_id: Union[int, None], allow_canceled: bool, paginator: Paginate = Paginate()) -> List[dict]:
         """
         Returns a list of flights that fit the parameters.
 
@@ -381,6 +381,8 @@ class Repository():
         if airline_id:
             # Of those flights get those that are operated by the specified airline
             query = query.filter(airline__id = airline_id)        
+        if not allow_canceled:
+            query = query.filter(is_canceled=False)
         # Paginate the results
         paginator.total = query.count()
         query = query.all()[paginator.slice]
