@@ -206,7 +206,7 @@ export default function FlightsPage() {
                         </Row>
                         <Row className="filterButtons">
                             <Button variant="primary" type="submit" onClick={handleFilter}>Filter</Button>
-                            {login.type === 'airline' ? <Button onClick={() => setShowCreate(true)}>Create a new flight</Button> : <></>}
+                            {login.type === 'airline' ? <Button variant="success" onClick={() => setShowCreate(true)}>Create a new flight</Button> : <></>}
                         </Row>
                     </Form>
                     <FlightCreationModal showCreate={showCreate} onHide={onHideCreationModal} countries={countries} forceRender={forceRender} />
