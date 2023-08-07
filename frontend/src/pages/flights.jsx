@@ -45,7 +45,8 @@ export default function FlightsPage() {
                 setPagination(response.data?.pagination ?? []);
             })
             .catch(error => {
-                setFlightsError(error.response.data);
+                var error_details = error?.response?.data?.error ?? error?.response?.data?.errors?.join(", ") ?? ""
+                setFlightsError("Error getting flights! " + error_details);
             })
             .finally(() => {
                 setLoading(false);
@@ -213,7 +214,7 @@ export default function FlightsPage() {
                 </div>
                 {
                     loading ? <h1>Loading...</h1> :
-                        flightsError ? <h1>{flightsError.error}</h1> :
+                        flightsError ? <h1>{flightsError}</h1> :
                             flights.length === 0 ? <h1>No flights found...</h1> : flights.map((flight, index) =>
                                 <Flight flightData={flight} key={index} onClick={handleToggle} allCountries={countries} forceRender={forceRender} />
                             )
@@ -258,7 +259,9 @@ function FlightCreationModal({ showCreate, onHide, countries, forceRender }) {
                 onHide()
             }, 1000)
         }).catch(response => {
-            setFormError("Error updating flight")
+            console.log(response)
+            var error_details = response?.response?.data?.error ?? response?.response?.data?.errors?.join(", ") ?? ""
+            setFormError("Error updating flight! " + error_details)
         })
     }
 

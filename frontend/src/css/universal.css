@@ -17,3 +17,13 @@
 .page-content{
     padding: 15px;
 }
+
+.errorMessage{
+    color: red;
+    font-weight: 600;
+}
+
+.successMessage{
+    color: green;
+    font-weight: 600;
+}

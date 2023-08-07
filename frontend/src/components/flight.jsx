@@ -179,8 +179,9 @@ function AirlineFlightActions({ flightData, allCountries, forceRender }) {
             setTimeout(() => {
                 forceRender(Math.random())
             }, 1000)
-        }).catch(response => {
-            setFormError("Error updating flight")
+        }).catch(error => {
+            var error_details = error?.response?.data?.error ?? error?.response?.data?.errors?.join(", ") ?? ""
+            setFormError("Error updating flights! " + error_details);
         })
     }
 
@@ -200,8 +201,8 @@ function AirlineFlightActions({ flightData, allCountries, forceRender }) {
         <Form className="flightUpdateForm">
             <fieldset disabled={flightData.is_cancelled}>
 
-            <p className="formError">{formError}</p>
-            <p className="formSuccess">{formSuccess}</p>
+            <p className="errorMessage">{formError}</p>
+            <p className="successMessage">{formSuccess}</p>
             <Row>
 
                 <Col>
