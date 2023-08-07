@@ -7,6 +7,8 @@ urlpatterns = [
     path('whoami/', WhoAmIView.as_view(), name="whoami"),
     path('csrf/', CSRFTokenView.as_view(), name="csrf"),
     
+    path('users/<str:usertype>/', UsersView.as_view(), name="users"),
+        
     path('admins/', AdminsView.as_view(), name="admins"),
     path('admin/<int:id>/', AdminView.as_view(), name="admin"),
     

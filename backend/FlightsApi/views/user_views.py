@@ -43,12 +43,12 @@ class CSRFTokenView(APIView):
         return Response(status=200, data={'data': {'CSRF-Token': csrf_token}})
     
     
-class UserView(APIView):
-    def get(self, request):
+class UsersView(APIView):
+    def get(self, request, usertype):
         facade = AnonymousFacade.login(request)
         if not isinstance(facade, AdministratorFacade):
             code, res = forbidden_response()
             return Response(status=code, data=res)
         
-        code, res = facade.get_users_by_usertype(request.GET.get('usertype'))
+        code, res = facade.get_users_by_usertype(usertype)
         return Response(status=code, data=res)

@@ -47,6 +47,11 @@ export default class API {
         }
     }
 
+    // User endpoints
+    users = {
+        get: (usertype) => axios.get(`${this.API_URL}/users/${usertype}/`, {}),
+    }
+
     // Admin endpoints
     admin = {
         delete: (id) => axios.delete(`${this.API_URL}/admin/${id}/`, {})
