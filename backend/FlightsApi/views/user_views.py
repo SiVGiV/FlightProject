@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import get_token
 from FlightsApi.utils.response_utils import no_content_ok, forbidden_response, bad_request_response
-from FlightsApi.facades import AnonymousFacade
+from FlightsApi.facades import AnonymousFacade, AdministratorFacade
 
 
 class LogoutView(APIView):
@@ -41,3 +41,14 @@ class CSRFTokenView(APIView):
     def get(self, request):
         csrf_token = get_token(request)
         return Response(status=200, data={'data': {'CSRF-Token': csrf_token}})
+    
+    
+class UserView(APIView):
+    def get(self, request):
+        facade = AnonymousFacade.login(request)
+        if not isinstance(facade, AdministratorFacade):
+            code, res = forbidden_response()
+            return Response(status=code, data=res)
+        
+        code, res = facade.get_users_by_usertype(request.GET.get('usertype'))
+        return Response(status=code, data=res)

@@ -722,6 +722,41 @@ class Repository():
         return True, 'the flight can be booked'
     
     @staticmethod
+    @accepts(DBTables)
+    def get_users_by_usertype(usertype: DBTables) -> List[dict]:
+        if not usertype in (DBTables.ADMIN, DBTables.AIRLINECOMPANY, DBTables.CUSTOMER):
+            raise ValueError("User type must be one of the following: ADMIN, AIRLINECOMPANY, CUSTOMER")
+        # Get the users
+        
+        match (usertype):
+            case DBTables.ADMIN:
+                group = Group.objects.get_or_create(name="admin")
+                users = User.objects.filter(group__id=group.id)
+                users = [DBTables.USER.serializer(user).data for user in users]
+                for user in users:
+                    user['admin'] = Admin.objects.filter(user__id=user.id).first()
+                    
+            case DBTables.AIRLINECOMPANY:
+                group = Group.objects.get_or_create(name="airline")
+                users = User.objects.filter(group__id=group.id)
+                users = [DBTables.USER.serializer(user).data for user in users]
+                for user in users:
+                    user['airline'] = AirlineCompany.objects.filter(user__id=user.id).first()
+
+            case DBTables.CUSTOMER:
+                group = Group.objects.get_or_create(name="customer")
+                users = User.objects.filter(group__id=group.id)
+                users = [DBTables.USER.serializer(user).data for user in users]
+                for user in users:
+                    user['customer'] = Customer.objects.filter(user__id=user.id).first()
+            case other:
+                raise ValueError("User type must be one of the following: ADMIN, AIRLINECOMPANY, CUSTOMER")
+        
+        # Serialize the users
+        return users
+    
+    
+    @staticmethod
     @accepts(int, str)
     def assign_group_to_user(user_id: int, group_name: str) -> dict:
         """Adds a user to a specific group.

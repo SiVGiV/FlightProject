@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from dateutil import parser
 from datetime import datetime
+from django.utils import timezone
 
 from FlightsApi.utils.response_utils import bad_request_response, forbidden_response
 
@@ -99,7 +100,13 @@ class FlightsView(APIView): # /flights
             arrival_datetime_str = request.data['arrival_datetime']
             departure_datetime = parser.parse(departure_datetime_str)
             arrival_datetime = parser.parse(arrival_datetime_str)
-            if not datetime.now() < departure_datetime:
+            
+            if departure_datetime.tzinfo is None:
+                departure_datetime = timezone.make_aware(departure_datetime)
+            if arrival_datetime.tzinfo is None:
+                arrival_datetime = timezone.make_aware(arrival_datetime)
+            
+            if not timezone.make_aware(datetime.now()) < departure_datetime:
                 code, data = bad_request_response("departure_datetime must be in the future.")
                 return Response(status=code, data=data)
             if not departure_datetime < arrival_datetime:
@@ -166,19 +173,34 @@ class FlightView(APIView): # /flight/<id>
             arrival_datetime_str = request.data.get('arrival_datetime')
             if departure_datetime_str:
                 departure_datetime = parser.parse(departure_datetime_str)
-                if not datetime.now() < departure_datetime:
+                if departure_datetime.tzinfo is None:
+                    departure_datetime = timezone.make_aware(departure_datetime)
+                if not timezone.make_aware(datetime.now()) < departure_datetime:
                     code, data = bad_request_response("departure_datetime must be in the future.")
                     return Response(status=code, data=data)
+                if not arrival_datetime_str:
+                    temp_arrival_datetime = parser.parse(existing_flight['arrival_datetime'])
+                    if temp_arrival_datetime.tzinfo is None:
+                        temp_arrival_datetime = timezone.make_aware(temp_arrival_datetime)
+                    if not departure_datetime < temp_arrival_datetime:
+                        code, data = bad_request_response("departure_datetime must be before arrival_datetime.")
+                        return Response(status=code, data=data)
             else:
                 departure_datetime = None
             if arrival_datetime_str:
                 arrival_datetime = parser.parse(arrival_datetime_str)
+                if arrival_datetime.tzinfo is None:
+                    arrival_datetime = timezone.make_aware(arrival_datetime)
                 if departure_datetime:
                     if not departure_datetime < arrival_datetime:
                         code, data = bad_request_response("arrival_datetime must be after departure_datetime.")
                         return Response(status=code, data=data)
                 else:
-                    if not parser.parse(existing_flight['departure_datetime']) < arrival_datetime:
+                    temp_departure_datetime = parser.parse(existing_flight['departure_datetime'])
+                    if temp_departure_datetime.tzinfo is None:
+                        temp_departure_datetime = timezone.make_aware(temp_departure_datetime)
+                    
+                    if not temp_departure_datetime < arrival_datetime:
                         code, data = bad_request_response("arrival_datetime must be after departure_datetime.")
                         return Response(status=code, data=data)
             else:

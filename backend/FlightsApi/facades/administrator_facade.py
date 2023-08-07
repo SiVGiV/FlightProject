@@ -307,6 +307,23 @@ class AdministratorFacade(FacadeBase):
 
         return created_response(data)
     
+    
+    
+    def get_users_by_usertype(self, usertype: str):
+        """Returns a list of users by usertype."""
+        match (usertype):
+            case 'admin':
+                data = R.get_users_by_usertype(usertype=DBTables.ADMIN)
+                return ok_response(data)
+            case 'airline':
+                data = R.get_users_by_usertype(usertype=DBTables.AIRLINECOMPANY)
+                return ok_response(data)
+            case 'customer':
+                data = R.get_users_by_usertype(usertype=DBTables.CUSTOMER)
+                return ok_response(data)
+            case _:
+                return bad_request_response('Invalid usertype')
+    
     def deactivate_airline(self, airline_id: int) -> Tuple[int, dict]:
         """Deactivates an airline account
 
