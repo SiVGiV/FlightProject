@@ -312,13 +312,13 @@ class AdministratorFacade(FacadeBase):
     def get_users_by_usertype(self, usertype: str):
         """Returns a list of users by usertype."""
         match (usertype):
-            case 'admin':
+            case 'admins':
                 data = R.get_users_by_usertype(usertype=DBTables.ADMIN)
                 return ok_response(data)
-            case 'airline':
+            case 'airlines':
                 data = R.get_users_by_usertype(usertype=DBTables.AIRLINECOMPANY)
                 return ok_response(data)
-            case 'customer':
+            case 'customers':
                 data = R.get_users_by_usertype(usertype=DBTables.CUSTOMER)
                 return ok_response(data)
             case _:

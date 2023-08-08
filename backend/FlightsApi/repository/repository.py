@@ -730,25 +730,25 @@ class Repository():
         
         match (usertype):
             case DBTables.ADMIN:
-                group = Group.objects.get_or_create(name="admin")
-                users = User.objects.filter(group__id=group.id)
+                users = User.objects.filter(groups__name="admin")
                 users = [DBTables.USER.serializer(user).data for user in users]
                 for user in users:
-                    user['admin'] = Admin.objects.filter(user__id=user.id).first()
+                    admin = Admin.objects.filter(user__id=user['id']).first()
+                    user['admin'] = DBTables.ADMIN.serializer(admin).data if admin else None
                     
             case DBTables.AIRLINECOMPANY:
-                group = Group.objects.get_or_create(name="airline")
-                users = User.objects.filter(group__id=group.id)
+                users = User.objects.filter(groups__name="airline")
                 users = [DBTables.USER.serializer(user).data for user in users]
                 for user in users:
-                    user['airline'] = AirlineCompany.objects.filter(user__id=user.id).first()
+                    airline = AirlineCompany.objects.filter(user__id=user['id']).first()
+                    user['airline'] = DBTables.AIRLINECOMPANY.serializer(airline).data if airline else None
 
             case DBTables.CUSTOMER:
-                group = Group.objects.get_or_create(name="customer")
-                users = User.objects.filter(group__id=group.id)
+                users = User.objects.filter(groups__name="customer")
                 users = [DBTables.USER.serializer(user).data for user in users]
                 for user in users:
-                    user['customer'] = Customer.objects.filter(user__id=user.id).first()
+                    customer = Customer.objects.filter(user__id=user['id']).first()
+                    user['customer'] = DBTables.CUSTOMER.serializer(customer).data if customer else None
             case other:
                 raise ValueError("User type must be one of the following: ADMIN, AIRLINECOMPANY, CUSTOMER")
         
