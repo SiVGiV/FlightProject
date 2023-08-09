@@ -36,6 +36,8 @@ It is recommended to run this image as part of [this docker-compose](https://git
 * `DJANGO_SUPERUSER_USERNAME` - The Backend's superuser username
 * `DJANGO_SUPERUSER_PASSWORD` -  The Backend's superuser password
 * `DJANGO_SUPERUSER_EMAIL` -  The Backend's superuser email
+* `DJANGO_SUPERUSER_FIRST_NAME` -  The Backend's superuser first name
+* `DJANGO_SUPERUSER_LAST_NAME` -  The Backend's superuser last name
 
 #### Volumes
 It is recommended to create a volume that binds to `/app/exposed/` for access to the logs and any generated data, but it is not necessary.
