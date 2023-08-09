@@ -3,6 +3,7 @@ import './css/universal.css'
 
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { useState } from 'react';
+import { Spinner } from 'react-bootstrap';
 
 // Import components
 import MyNavBar from './components/navigation/navbar';
@@ -50,8 +51,14 @@ const pages = {
         'onlyFor': 'customer'
     },
     'Users': {
-        'url': '/users/',
-        'element': <UsersPage />,
+        'All Users': {
+            'url': '/users/',
+            'element': <UsersPage />,
+        },
+        'New Users': {
+            'url': '/register/',
+            'element': <RegisterPage />,
+        },
         'onlyFor': 'admin'
     },
     'Login': {
@@ -59,11 +66,6 @@ const pages = {
         'element': <LoginPage />,
         'navbar': false
     },
-    'Register': {
-        'url': '/register/',
-        'element': <RegisterPage />,
-        'navbar': false
-    }
 }
 
 function App() {
@@ -84,7 +86,7 @@ function App() {
             <APIContext.Provider value={APIClient}>
                 <LoginContext.Provider value={login}>
                     <RefreshLoginContext.Provider value={refreshLogin}>
-
+                        
                         <MyNavBar homePage={homepage} pages={pages} login={<Welcome />} />
                         <div className='page-content'>
                             <Routes>

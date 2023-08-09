@@ -71,10 +71,6 @@
     
 }
 
-.cancelledFlightCard{
-    background-color: hsla(0, 100%, 50%, 0.233);
-}
-
 .expandableCard{
     cursor: pointer;
     border-width: 2px;

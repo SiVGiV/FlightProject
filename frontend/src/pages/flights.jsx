@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import Flight from "../components/flight";
-import { Form, Col, Row, Button, Modal } from "react-bootstrap";
+import { Form, Col, Row, Button, Modal, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { APIContext } from "../contexts/api_contexts";
@@ -213,7 +213,8 @@ export default function FlightsPage() {
                     <FlightCreationModal showCreate={showCreate} onHide={onHideCreationModal} countries={countries} forceRender={forceRender} />
                 </div>
                 {
-                    loading ? <h1>Loading...</h1> :
+                    loading ? <div style={{ display: "flex", justifyContent: "center", padding: "50px" }}><Spinner animation="border" /></div>
+                        :
                         flightsError ? <h1>{flightsError}</h1> :
                             flights.length === 0 ? <h1>No flights found...</h1> : flights.map((flight, index) =>
                                 <Flight flightData={flight} key={index} onClick={handleToggle} allCountries={countries} forceRender={forceRender} />

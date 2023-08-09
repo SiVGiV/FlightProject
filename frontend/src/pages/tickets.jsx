@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import { Button } from "react-bootstrap";
+import React, { useState, useContext, useEffect } from "react";
+import { Button, Spinner } from "react-bootstrap";
 import { LoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
 import API from "../api";
@@ -28,7 +28,7 @@ export default function TicketsPage() {
             }).finally(() => {
                 setLoading(false);
             });
-    }, [ forceReload ]);
+    }, [forceReload]);
 
     if (login.type !== "customer") {
         return <></>;
@@ -38,7 +38,7 @@ export default function TicketsPage() {
             (error) ? <h1>Error: {error}</h1> :
                 <div className="ticketRowContainer">
                     <h1>Tickets</h1>
-                    {tickets.map((ticket, index) => (<Ticket ticket={ticket} key={index} forceReload={forceReloadMethod}/>))}
+                    {tickets.map((ticket, index) => (<Ticket ticket={ticket} key={index} forceReload={forceReloadMethod} />))}
                 </div>
     );
 }
@@ -78,11 +78,11 @@ function Ticket({ ticket, forceReload }) {
             });
     }, []);
 
-    function handleCancel(){
-        API.ticket.delete(ticket.id).then((res)=>{
+    function handleCancel() {
+        API.ticket.delete(ticket.id).then((res) => {
             alert("Ticket cancelled successfully.");
             forceReload(Math.random());
-        }).catch((err)=>{
+        }).catch((err) => {
             alert("Error cancelling ticket: " + err?.response?.data?.message);
         });
     }
@@ -91,7 +91,8 @@ function Ticket({ ticket, forceReload }) {
     return (
         <div className={"ticketRow" + (ticket.is_cancelled ? " cancelledTicketRow" : "")}>
             {
-                (loading) ? <h3>Loading ticket...</h3> :
+                (loading) ? <div style={{ display: "flex", justifyContent: "center", padding: "50px" }}><Spinner animation="border" /></div>
+                    :
                     (error) ? <h3>Error: {error}</h3> :
                         <>
                             <div className="ticketIdField">#{ticket.id}</div>

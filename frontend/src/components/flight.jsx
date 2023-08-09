@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Card, Collapse, Form, Row, Col, Button } from "react-bootstrap";
+import { Card, Collapse, Form, Row, Col, Button, Spinner } from "react-bootstrap";
 import "react-datetime/css/react-datetime.css";
 import Datetime from "react-datetime";
 
 import { APIContext } from '../contexts/api_contexts';
 import { LoginContext } from '../contexts/auth_contexts';
-import { formatDate } from "../utils";
+import { formatDate, ValidationButton } from "../utils";
 
 import { Typeahead } from "react-bootstrap-typeahead";
 
@@ -54,29 +54,30 @@ export default function Flight({ flightData, allCountries, forceRender }) {
     }
 
     return (
-        loadingData ? <div>Loading flight...</div> : <>
-            <Card key={flightData.id} className={(flightData.is_cancelled ? "cancelled" : "normal") + "FlightCard flightCard" + (expandable ? " expandableCard" : "")}>
-                <div className="flightHeaderDiv" aria-expanded={expanded} onMouseUp={handleExpand} aria-controls={`flight${flightData.id}`}>
-                    <div className="airlineName">{airline?.name}</div>
-                    <div className="flexBreak" />
-                    <LocationListing country={origin} isoDate={formatDate(flightData.departure_datetime)} baseUrl={API.BASE_URL} />
-                    <b className="destinationArrow">➜</b>
-                    <LocationListing country={destination} isoDate={formatDate(flightData.arrival_datetime)} baseUrl={API.BASE_URL} />
-                </div>
-
-                <Collapse in={expanded}>
-                    <div className="actions">
-                        {
-                            login.type === "customer" ?
-                                <CustomerFlightActions flightData={flightData} /> :
-                                login.type === "airline" ?
-                                    <AirlineFlightActions flightData={flightData} allCountries={allCountries} forceRender={forceRender} /> :
-                                    <></>
-                        }
+        loadingData ? <div style={{ display: "flex", justifyContent: "center", padding: "50px" }}><Spinner animation="border" /></div>
+            : <>
+                <Card key={flightData.id} className={(flightData.is_cancelled ? "cancelled " : "") + "FlightCard flightCard" + (expandable ? " expandableCard" : "")}>
+                    <div className="flightHeaderDiv" aria-expanded={expanded} onMouseUp={handleExpand} aria-controls={`flight${flightData.id}`}>
+                        <div className="airlineName">{airline?.name}</div>
+                        <div className="flexBreak" />
+                        <LocationListing country={origin} isoDate={formatDate(flightData.departure_datetime)} baseUrl={API.BASE_URL} />
+                        <b className="destinationArrow">➜</b>
+                        <LocationListing country={destination} isoDate={formatDate(flightData.arrival_datetime)} baseUrl={API.BASE_URL} />
                     </div>
-                </Collapse>
-            </Card>
-        </>
+
+                    <Collapse in={expanded}>
+                        <div className="actions">
+                            {
+                                login.type === "customer" ?
+                                    <CustomerFlightActions flightData={flightData} /> :
+                                    login.type === "airline" ?
+                                        <AirlineFlightActions flightData={flightData} allCountries={allCountries} forceRender={forceRender} /> :
+                                        <></>
+                            }
+                        </div>
+                    </Collapse>
+                </Card>
+            </>
     );
 }
 
@@ -112,7 +113,7 @@ function CustomerFlightActions({ flightData }) {
                     setError("You already have a ticket for this flight")
                 }
                 else {
-                    setError(err.response.data.errors[0])
+                    setError(err.response.data.errors.join(", "))
                 }
             }
             else if (err?.response?.data?.error) {
@@ -133,7 +134,7 @@ function CustomerFlightActions({ flightData }) {
                     <Form.Control type="number" placeholder="1" min={1} onChange={(e) => { setSeatCount(e.target.value) }} />
                 </Form.Group>
                 <Form.Group controlId="formPurchase">
-                    <Button onClick={() => purchase()}>Purchase</Button>
+                    <ValidationButton onClick={() => purchase()}>Purchase</ValidationButton>
                 </Form.Group>
             </Row>
         </Form>
@@ -201,56 +202,56 @@ function AirlineFlightActions({ flightData, allCountries, forceRender }) {
         <Form className="flightUpdateForm">
             <fieldset disabled={flightData.is_cancelled}>
 
-            <p className="errorMessage">{formError}</p>
-            <p className="successMessage">{formSuccess}</p>
-            <Row>
+                <p className="errorMessage">{formError}</p>
+                <p className="successMessage">{formSuccess}</p>
+                <Row>
 
-                <Col>
-                    <Form.Group controlId="formOrigin" as={Col}>
-                        <Form.Label>Origin</Form.Label>
-                        <Typeahead
-                            id="basic-typeahead-single"
-                            labelKey="name"
-                            onChange={setSelectedOrigin}
-                            options={allCountries}
-                            placeholder="Choose a country..."
-                            selected={selectedOrigin}
-                        />
+                    <Col>
+                        <Form.Group controlId="formOrigin" as={Col}>
+                            <Form.Label>Origin</Form.Label>
+                            <Typeahead
+                                id="basic-typeahead-single"
+                                labelKey="name"
+                                onChange={setSelectedOrigin}
+                                options={allCountries}
+                                placeholder="Choose a country..."
+                                selected={selectedOrigin}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formDeparture" as={Col}>
+                            <Form.Label>Departure Date and Time</Form.Label>
+                            <Datetime timeFormat={"HH:mm"} value={new Date(selectedDepartureDate)} onChange={(e) => { if (e?._isValid) setSelectedDepartureDate(e._d.toJSON()); }} />
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group controlId="formDestination">
+                            <Form.Label>Destination</Form.Label>
+                            <Typeahead
+                                id="basic-typeahead-single"
+                                labelKey="name"
+                                onChange={setSelectedDestination}
+                                options={allCountries}
+                                placeholder="Choose a country..."
+                                selected={selectedDestination}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formDeparture">
+                            <Form.Label>Arrival Date and Time</Form.Label>
+                            <Datetime timeFormat={"HH:mm"} value={new Date(selectedArrivalDate)} onChange={(e) => { if (e?._isValid) setSelectedArrivalDate(e._d.toJSON()); }} />
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Form.Group controlId="formSeatCount">
+                        <Form.Label>Number of seats</Form.Label>
+                        <Form.Control type="number" defaultValue={seatCount} min={1} onChange={(e) => { setSeatCount(e.target.value) }} />
                     </Form.Group>
-                    <Form.Group controlId="formDeparture" as={Col}>
-                        <Form.Label>Departure Date and Time</Form.Label>
-                        <Datetime timeFormat={"HH:mm"} value={new Date(selectedDepartureDate)} onChange={(e) => { if(e?._isValid) setSelectedDepartureDate(e._d.toJSON());}} />
-                    </Form.Group>
-                </Col>
-                <Col>
-                    <Form.Group controlId="formDestination">
-                        <Form.Label>Destination</Form.Label>
-                        <Typeahead
-                            id="basic-typeahead-single"
-                            labelKey="name"
-                            onChange={setSelectedDestination}
-                            options={allCountries}
-                            placeholder="Choose a country..."
-                            selected={selectedDestination}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formDeparture">
-                        <Form.Label>Arrival Date and Time</Form.Label>
-                        <Datetime timeFormat={"HH:mm"} value={new Date(selectedArrivalDate)} onChange={(e) => { if(e?._isValid) setSelectedArrivalDate(e._d.toJSON());}} />
-                    </Form.Group>
-                </Col>
-            </Row>
-            <Row>
-                <Form.Group controlId="formSeatCount">
-                    <Form.Label>Number of seats</Form.Label>
-                    <Form.Control type="number" defaultValue={seatCount} min={1} onChange={(e) => { setSeatCount(e.target.value) }} />
-                </Form.Group>
-            </Row>
+                </Row>
                 <Form.Group controlId="formSubmit">
                     <Button onClick={handleSubmit}>Update</Button>
                 </Form.Group>
                 <Form.Group controlId="formCancel">
-                    <Button variant="danger" onClick={handleCancel}>Cancel</Button>
+                    <ValidationButton variant="danger" onClick={handleCancel}>Cancel</ValidationButton>
                 </Form.Group>
             </fieldset>
         </Form>
