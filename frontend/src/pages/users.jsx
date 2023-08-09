@@ -117,30 +117,28 @@ function UserList({ users, userType, forceReload }) {
 
     return (
         <div className="userGrid">
-            <>
-                <div className="columnHeader column-1" >
-                    User ID
-                </div>
-                <div className="columnHeader column-2" >
-                    Username
-                </div>
-                <div className="columnHeader column-3" >
-                    Name
-                </div>
-                <div className="columnHeader column-4">
-                    E-Mail
-                </div>
-                <div className="columnHeader column-5">
-                    {userType === "customers" ? "Customer" : userType === "admins" ? "Admin" : "Airline"} ID
-                </div>
-                <div className="columnHeader column-6">
-                    Deactivate
-                </div>
+            <div className="columnHeader column-1" >
+                User ID
+            </div>
+            <div className="columnHeader column-2" >
+                Username
+            </div>
+            <div className="columnHeader column-3" >
+                Name
+            </div>
+            <div className="columnHeader column-4">
+                E-Mail
+            </div>
+            <div className="columnHeader column-5">
+                {userType === "customers" ? "Customer" : userType === "admins" ? "Admin" : "Airline"} ID
+            </div>
+            <div className="columnHeader column-6">
+                Deactivate
+            </div>
 
-                {users.map((user, index) =>
-                    <User profile={userConverter(user)} forceReload={forceReload} key={index} />
-                )}
-            </>
+            {users?.map((user, index) =>
+                <User profile={userConverter(user)} forceReload={forceReload} key={index} />
+            )}
         </div>
     );
 }
