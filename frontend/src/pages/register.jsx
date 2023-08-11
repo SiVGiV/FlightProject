@@ -50,7 +50,6 @@ export default function Register() {
             event.preventDefault();
             event.stopPropagation();
         }
-        setValidated(true);
         if (password !== password2) {
             setFormError("Passwords do not match!");
             event.preventDefault();
@@ -67,6 +66,7 @@ export default function Register() {
                     .catch(error => {
                         console.log(error);
                         setFormError(error.response.data.data);
+                        setValidated(false);
                     });
                 break;
             case "admin":
@@ -79,6 +79,7 @@ export default function Register() {
                     .catch(error => {
                         console.log(error);
                         setFormError(error.response.data.data);
+                        setValidated(false);
                     });
                 break;
             default:
@@ -91,6 +92,7 @@ export default function Register() {
                     .catch(error => {
                         console.log(error);
                         setFormError(error.response.data.data);
+                        setValidated(false);
                     });
                 break;
         }

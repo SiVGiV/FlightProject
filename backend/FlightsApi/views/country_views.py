@@ -13,9 +13,13 @@ class CountriesView(APIView):
         # Validate pagination inputs
         try:
             limit = int(request.GET.get('limit', 50))
+        except TypeError:
+            code, data = bad_request_response('Pagination limit is not a valid integer.')
+            return Response(status=code, data=data)
+        try:
             page = int(request.GET.get('page', 1))
-        except ValueError:
-            code, data = bad_request_response('Pagination limit or page are not integers.')
+        except TypeError:
+            code, data = bad_request_response('Pagination page is not a valid integer.')
             return Response(status=code, data=data)
         
         code, data = facade.get_all_countries(limit=limit, page=page)

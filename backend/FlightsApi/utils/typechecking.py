@@ -1,7 +1,7 @@
 from functools import wraps
 from inspect import getargs
 from .exceptions import IncorrectTypePassedToFunctionException
-from .utils import ordinal
+from .general import ordinal
 
 def accepts(*types, throw: Exception = IncorrectTypePassedToFunctionException):
     """

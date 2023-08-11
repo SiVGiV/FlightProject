@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from FlightsApi.utils.response_utils import forbidden_response, bad_request_response
+from FlightsApi.utils import StringValidation
 
 logger = logging.getLogger('django')
 
@@ -24,9 +25,13 @@ class AirlinesView(APIView): # /airlines
         # Validate pagination inputs
         try:
             limit = int(request.GET.get('limit', 50))
+        except TypeError:
+            code, data = bad_request_response('Pagination limit is not a valid integer.')
+            return Response(status=code, data=data)
+        try:
             page = int(request.GET.get('page', 1))
         except TypeError:
-            code, data = bad_request_response('Pagination limit or page are not integers.')
+            code, data = bad_request_response('Pagination page is not a valid integer.')
             return Response(status=code, data=data)
         
         # Call facade and return response
@@ -50,15 +55,39 @@ class AirlinesView(APIView): # /airlines
             return Response(status=code, data=data)
         
         username = request.data.get('username')
-        password = request.data.get('password')
-        email = request.data.get('email')
-        name = request.data.get('name')
-        try:
-            country_id = int(request.data.get('country'))
-        except TypeError as e:
-            logger.info(e)
-            code, data = bad_request_response("'country' must be an integer.")
+        if not username:
+            code, data = bad_request_response("Username is required.")
             return Response(status=code, data=data)
+        
+        password = request.data.get('password')
+        if not password:
+            code, data = bad_request_response("Password is required.")
+            return Response(status=code, data=data)
+        if not StringValidation.is_valid_password(password):
+            code, data = bad_request_response("Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.")
+            return Response(status=code, data=data)
+                
+        email = request.data.get('email')
+        if not email:
+            code, data = bad_request_response("Email is required.")
+            return Response(status=code, data=data)
+        if not StringValidation.is_valid_email(email):
+            code, data = bad_request_response("Email is invalid.")
+            return Response(status=code, data=data)
+                
+        name = request.data.get('name')
+        if not name:
+            code, data = bad_request_response("Name is required.")
+            return Response(status=code, data=data)
+        
+        country_id = request.data.get('country')
+        if not country_id:
+            code, data = bad_request_response("Country is required.")
+            return Response(status=code, data=data)
+        if not StringValidation.is_natural_int(country_id):
+            code, data = bad_request_response("Country must be a natural integer.")
+            return Response(status=code, data=data)
+        country_id = int(country_id)
         
         code, data = facade.add_airline(
             username=username,
@@ -115,12 +144,13 @@ class AirlineView(APIView): # /airline/<id>
         name = request.PATCH.get('name', '')
         if name:
             update_fields['name'] = name
-        try:
-            country_id = int(request.PATCH.get('country', ''))
-        except TypeError:
-            code, data = bad_request_response('Country ID must be an integer.')
-            return Response(status=code, data=data)
+            
+        country_id = request.PATCH.get('country', '')
         if country_id:
+            if not StringValidation.is_natural_int(country_id):
+                code, data = bad_request_response('Country ID must be a natural integer.')
+                return Response(status=code, data=data)
+            country_id = int(country_id)
             update_fields['country'] = country_id
 
         code, data = facade.update_airline(**update_fields)
