@@ -67,14 +67,12 @@ def make_superuser_admin(*args):
     superuser = User.objects.get(username=args[0])
     group, created = Group.objects.get_or_create(name='admin')
     superuser.groups.add(group)
-    
-    Admin.objects.create(
+    admin = Admin.objects.create(
         first_name=os.getenv('DJANGO_SUPERUSER_FIRST_NAME', "Admin"),
         last_name=os.getenv('DJANGO_SUPERUSER_LAST_NAME', ""),
         user=superuser)
-    
     superuser.save()
-    
+    print(f"Created Superuser: User: {superuser.id}, Admin: {admin.id}")
     
 def redirect_cmdline(cmd_name: str):
     """Redirects a command to the right function

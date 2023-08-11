@@ -181,13 +181,9 @@ function UserList({ users, userType, forceReload }) {
                 </div>
                 <div className="columnHeader column-6">Deactivate</div>
 
-                {users.map((user, index) => (
-                    <User
-                        profile={userConverter(user)}
-                        forceReload={forceReload}
-                        key={index}
-                    />
-                ))}
+                {users?.map((user, index) =>
+                    <User profile={userConverter(user)} forceReload={forceReload} key={index} />
+                )}
             </>
         </div>
     );
