@@ -1,33 +1,33 @@
-.cancelled{
+.cancelled {
     background-color: hsla(0, 100%, 50%, 0.233) !important;
 }
 
-.logo{
+.logo {
     height: 60px;
     margin-left: 10px;
     margin-right: 10px;
 }
 
-.navbar-item{
+.navbar-item {
     padding: 15px;
     font-weight: 600;
     border-left: 2px solid rgb(20, 165, 223);
 }
 
-.navbar-button{
+.navbar-button {
     margin: 5px;
 }
 
-.page-content{
+.page-content {
     padding: 15px;
 }
 
-.errorMessage{
+.errorMessage {
     color: red;
     font-weight: 600;
 }
 
-.successMessage{
+.successMessage {
     color: green;
     font-weight: 600;
 }
