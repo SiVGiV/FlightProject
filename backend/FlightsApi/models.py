@@ -116,6 +116,3 @@ class Ticket(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tickets')
     seat_count = models.IntegerField()
     is_cancelled = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ('flight', 'customer',)
