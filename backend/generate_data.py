@@ -67,7 +67,10 @@ def generate_data(admins, airlines, customers, flights, tickets):
 
     for index in range(admins):
         user = RandomUser()
-        password = user.get_password()
+        password = ""
+        while len(password) < 8:
+            user = RandomUser()
+            password = "Aa1!" + user.get_password()
         request_body = {
             'username': user.get_username(),
             'password': password,
@@ -88,7 +91,10 @@ def generate_data(admins, airlines, customers, flights, tickets):
     
     for index in range(airlines):
         user = RandomUser()
-        password = user.get_password()
+        password = ""
+        while len(password) < 8:
+            user = RandomUser()
+            password = "Aa1!" + user.get_password()
         request_body = {
             'username': user.get_username(),
             'password': password,
@@ -109,7 +115,10 @@ def generate_data(admins, airlines, customers, flights, tickets):
 
     for index in range(customers):
         user = RandomUser()
-        password = user.get_password()
+        password = ""
+        while len(password) < 8:
+            user = RandomUser()
+            password = "Aa1!" + user.get_password()
         request_body = {
             'username': user.get_username(),
             'password': password,
@@ -117,7 +126,7 @@ def generate_data(admins, airlines, customers, flights, tickets):
             'first_name': user.get_first_name(),
             'last_name': user.get_last_name(),
             'address': user.get_street() + ', ' + user.get_city(),
-            'phone_number': user.get_phone()
+            'phone_number': "050-1" + str(index).zfill(6) # This would probably be a problem if we had more than 10 million customers
         }
         response = client.post(API_URL + "customers/", data={**request_body, 'csrftoken': client.cookies.get('csrftoken')}, headers={'X-CSRFToken': client.cookies.get('csrftoken')})
         if response.status_code == 201:
