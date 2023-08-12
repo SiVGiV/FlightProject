@@ -24,7 +24,7 @@ class LoginView(APIView):
             return Response(status=code, data=res)
         user = authenticate(username=username, password=password)
         if not user:
-            code, res = forbidden_response()
+            code, res = bad_request_response("This combination of username and password does not exist.")
             return Response(status=code, data=res)
         login(request, user)
         code, res = no_content_ok()
