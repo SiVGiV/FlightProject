@@ -105,4 +105,4 @@ class StringValidation:
             bool: True if the string is a valid phone number, False otherwise
         """
         # use regex to check if the phone number is valid
-        return bool(re.match(r"^(?:(?:(\+?972|\(\+?972\)|\+?\(972\))(?:\s|\.|-)?([1-9]\d?))|(0[23489]{1})|(0[57]{1}[0-9]))(?:\s|\.|-)?([^0\D]{1}\d{2}(?:\s|\.|-)?\d{4})$", s))
+        return bool(re.match(r"^(\+)?([ 0-9-]){10,16}$", s))

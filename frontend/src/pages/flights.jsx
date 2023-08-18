@@ -35,6 +35,7 @@ export default function FlightsPage() {
     const refreshFlights = useCallback(() => {
         // Refresh flights
         setLoading(true);
+        setFlightsError(null);
         var forceAirline = {};
         if (onlyMine) {
             forceAirline.airline = login.entity_id;
@@ -142,7 +143,6 @@ export default function FlightsPage() {
         console.log(e);
         // setActiveKey( === eventKey ? null : eventKey);
     };
-
     const [showCreate, setShowCreate] = useState(false);
 
     function onHideCreationModal() {
@@ -153,7 +153,7 @@ export default function FlightsPage() {
         <>
             <div className="flightPageContainer">
                 <div className="flightPageFilters">
-                    <Form>
+                    <Form onSubmit={e => e.preventDefault()}>
                         <Row>
                             <h5>Filter by</h5>
                             <Form.Group as={Col}>

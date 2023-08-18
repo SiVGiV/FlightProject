@@ -16,6 +16,7 @@ export default function Register() {
     const [fieldErrors, setFieldErrors] = useState({});
     const [validated, setValidated] = useState(false);
     const [formError, setFormError] = useState("");
+    const [formSuccess, setFormSuccess] = useState("");
     const navigate = useNavigate();
 
     const setAndValidateField = (field, value, validationFunctions) => {
@@ -27,6 +28,7 @@ export default function Register() {
             setFields({ ...fields, [field]: value });
             setFieldErrors({ ...fieldErrors, [field]: false });
         } else {
+            setFields({ ...fields, [field]: undefined });
             setFieldErrors({ ...fieldErrors, [field]: true });
         }
     };
@@ -37,7 +39,6 @@ export default function Register() {
     const [userType, setUserType] = useState("customer");
 
     useEffect(() => {
-        console.log(loginData.type);
         switch (loginData.type) {
             case "admin":
                 setSelectUserTypeVisibility({});
@@ -53,61 +54,56 @@ export default function Register() {
                 break;
         }
     }, [loginData]);
+
     const handleSubmit = event => {
         setFormError(undefined);
         const form = event.currentTarget;
-        if (!form.checkValidity()) {
-            event.preventDefault();
+        event.preventDefault();
+        if (form.checkValidity() === false) {
             event.stopPropagation();
             return;
         }
+        setValidated(true);
+        var promise = API.customers.post;
         switch (userType) {
             case "airline":
-                API.airlines
-                    .post(fields)
-                    .then(response => {
-                        setValidated(true);
-                        navigate("/");
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        setFormError(
-                            ParseErrorObjects(error.response.data).join("\n")
-                        );
-                        setValidated(false);
-                    });
+                promise = API.airlines.post(fields);
                 break;
             case "admin":
-                API.admins
-                    .post(fields)
-                    .then(response => {
-                        setValidated(true);
-                        navigate("/");
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        setFormError(
-                            ParseErrorObjects(error.response.data).join("\n")
-                        );
-                        setValidated(false);
-                    });
+                promise = API.admins.post(fields);
                 break;
             default:
-                API.customers
-                    .post(fields)
-                    .then(response => {
-                        setValidated(true);
-                        navigate("/");
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        setFormError(
-                            ParseErrorObjects(error.response.data).join("\n")
-                        );
-                        setValidated(false);
-                    });
+                promise = API.customers.post(fields);
                 break;
         }
+        promise
+            .then(response => {
+                if(loginData.type === "anon"){
+                    API.auth.login({username: fields.username, password: fields.password})
+                    .then(response => {
+                        navigate("/");
+                    }).catch(error => {
+                        console.log(error);
+                        setFormError(
+                            ParseErrorObjects(error?.response?.data).join("\n")
+                        );
+                    });
+                }else{
+                    // Add success message
+                    setFormSuccess("Registration successful!");
+                    // Clear form
+                    setFields({});
+                    setFieldErrors({});
+                    setValidated(false);
+
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                setFormError(
+                    ParseErrorObjects(error?.response.data).join("\n")
+                );
+            });
     };
 
     function onUserTypeChange(e) {
@@ -127,7 +123,7 @@ export default function Register() {
                     id="customerUserTypeRadio"
                     selected
                 />
-                <label for="customerUserTypeRadio">Customer</label>
+                <label htmlFor="customerUserTypeRadio">Customer</label>
                 <br />
                 <input
                     type="radio"
@@ -135,7 +131,7 @@ export default function Register() {
                     name="userType"
                     id="airlineUserTypeRadio"
                 />
-                <label for="airlineUserTypeRadio">Airline</label>
+                <label htmlFor="airlineUserTypeRadio">Airline</label>
                 <br />
                 <input
                     type="radio"
@@ -143,11 +139,12 @@ export default function Register() {
                     name="userType"
                     id="adminUserTypeRadio"
                 />
-                <label for="adminUserTypeRadio">Admin</label>
+                <label htmlFor="adminUserTypeRadio">Admin</label>
                 <br />
             </div>
             <Form validated={validated} onSubmit={handleSubmit}>
-                <div id="formError">{formError}</div>
+                <h3 className="error">{formError}</h3>
+                <h3 className="message">{formSuccess}</h3>
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control
@@ -384,7 +381,6 @@ export function AirlineFields({
     }, []);
 
     useEffect(() => {
-        console.log(selectedAirlineCountry);
         setAndValidateField("country", selectedAirlineCountry[0]?.id, [
             required ? Validations.validateRequired : () => true,
         ]);

@@ -43,7 +43,7 @@ export default function TicketsPage() {
     ) : (
         <div className="ticketRowContainer">
             <h1>Tickets</h1>
-            {tickets.map((ticket, index) => (
+            {tickets?.map((ticket, index) => (
                 <Ticket
                     ticket={ticket}
                     key={index}

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import Airline from "../components/airline";
-import { Form, Spinner } from "react-bootstrap";
+import { Form, Spinner, Button } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { APIContext } from "../contexts/api_contexts";
 
@@ -19,7 +19,9 @@ export default function AirlinesPage() {
     const [pagination, setPagination] = useState();
     const { airlinesPage } = useParams();
 
-    useEffect(() => {
+    useEffect(() => {refreshAirlines()}, [airlinesPage]);
+
+    const refreshAirlines = useCallback(() => {
         // Refresh airlines
         setLoading(true);
         API.airlines
@@ -34,7 +36,7 @@ export default function AirlinesPage() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [airlinesPage, filters]);
+    }, [airlinesPage, filters])
 
     if (loading) {
         return (
@@ -68,15 +70,9 @@ export default function AirlinesPage() {
                         <Form.Control
                             type="text"
                             placeholder="Airline Name..."
-                            onBlur={e => {
-                                if (filters.name !== e.target.value) {
-                                    setFilters({
-                                        ...filters,
-                                        name: e.target.value,
-                                    });
-                                }
-                            }}
+                            onChange={e => setFilters({ ...filters, name: e.target.value })}
                         />
+                        <Button onClick={refreshAirlines}>Filter</Button>
                     </Form>
                 </div>
                 {loading ? (
