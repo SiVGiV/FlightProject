@@ -57,7 +57,7 @@ class TicketsView(APIView): # /tickets
             code, data = bad_request_response('Seat count must be a natural number.')
             return Response(status=code, data=data)
         
-        code, data = facade.add_ticket(flight_id=flight_id, seat_count=seat_count)
+        code, data = facade.add_ticket(flight_id=int(flight_id), seat_count=int(seat_count))
         return Response(status=code, data=data)
     
 class TicketView(APIView): # /ticket/<id>    
