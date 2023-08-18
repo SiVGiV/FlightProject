@@ -141,11 +141,11 @@ class AirlineView(APIView): # /airline/<id>
             return Response(status=code, data=data)
         
         update_fields = {}
-        name = request.PATCH.get('name', '')
+        name = request.data.get('name', '')
         if name:
             update_fields['name'] = name
             
-        country_id = request.PATCH.get('country', '')
+        country_id = request.data.get('country', '')
         if country_id:
             if not StringValidation.is_natural_int(country_id):
                 code, data = bad_request_response('Country ID must be a natural integer.')

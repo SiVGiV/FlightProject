@@ -21,19 +21,26 @@ class FlightsView(APIView): # /flights
         # Validate and fetch request parameters
         
         origin_country_id = request.GET.get('origin_country')
-        if origin_country_id and not StringValidation.is_natural_int(origin_country_id):
-            code, data = bad_request_response("Origin country must be a natural number.")
-            return Response(status=code, data=data)
+        if origin_country_id:
+            if not StringValidation.is_natural_int(origin_country_id):
+                code, data = bad_request_response("Origin country must be a natural number.")
+                return Response(status=code, data=data)
+            origin_country_id = int(origin_country_id)
             
         destination_country_id = request.GET.get('destination_country')
-        if destination_country_id and not StringValidation.is_natural_int(destination_country_id):
-            code, data = bad_request_response("Destination country must be a natural number.")
-            return Response(status=code, data=data)
+        if destination_country_id:
+            if not StringValidation.is_natural_int(destination_country_id):
+                code, data = bad_request_response("Destination country must be a natural number.")
+                return Response(status=code, data=data)
+            destination_country_id = int(destination_country_id)
         
         airline_id = request.GET.get('airline')
-        if airline_id and not StringValidation.is_natural_int(airline_id):
-            code, data = bad_request_response("Airline must be a natural number.")
-            return Response(status=code, data=data)
+        if airline_id:
+            if not StringValidation.is_natural_int(airline_id):
+                code, data = bad_request_response("Airline must be a natural number.")
+                return Response(status=code, data=data)
+            airline_id = int(airline_id)
+        
         
         date_str = request.GET.get('date')
         if date_str:
@@ -79,7 +86,7 @@ class FlightsView(APIView): # /flights
             return Response(status=code, data=data)
         
         # Origin Country Validation
-        origin_country_id = request.GET.get('origin_country')
+        origin_country_id = request.data.get('origin_country')
         if not origin_country_id:
             code, data = bad_request_response("Origin country is required.")
             return Response(status=code, data=data)
@@ -88,21 +95,12 @@ class FlightsView(APIView): # /flights
             return Response(status=code, data=data)
             
         # Destination Country Validation
-        destination_country_id = request.GET.get('destination_country')
+        destination_country_id = request.data.get('destination_country')
         if not destination_country_id:
             code, data = bad_request_response("Destination country is required.")
             return Response(status=code, data=data)
         if not StringValidation.is_natural_int(destination_country_id):
             code, data = bad_request_response("Destination country must be a natural number.")
-            return Response(status=code, data=data)
-        
-        # Airline Validation
-        airline_id = request.GET.get('airline')
-        if not airline_id:
-            code, data = bad_request_response("Airline is required.")
-            return Response(status=code, data=data)
-        if not StringValidation.is_natural_int(airline_id):
-            code, data = bad_request_response("Airline must be a natural number.")
             return Response(status=code, data=data)
         
         # Total Seats Validation
@@ -120,15 +118,13 @@ class FlightsView(APIView): # /flights
             code, data = bad_request_response("Departure datetime is required.")
             return Response(status=code, data=data)
         try:
-            departure_datetime = parser.parse(departure_datetime_str).date()
+            departure_datetime = parser.parse(departure_datetime_str)
         except ValueError as e:
             logger.debug(e)
             code, data = bad_request_response("Departure datetime must be a valid date (formatted in ISO 8601).")
             return Response(status=code, data=data)
         
-        if departure_datetime.tzinfo is not None:
-            departure_datetime = timezone.make_naive(departure_datetime)
-        if not datetime.now(tz=None) < departure_datetime:
+        if not datetime.now(tz=departure_datetime.tzinfo) < departure_datetime:
             code, data = bad_request_response("departure_datetime must be in the future.")
             return Response(status=code, data=data)
 
@@ -138,14 +134,12 @@ class FlightsView(APIView): # /flights
             code, data = bad_request_response("Arrival datetime is required.")
             return Response(status=code, data=data)
         try:
-            arrival_datetime = parser.parse(arrival_datetime_str).date()
+            arrival_datetime = parser.parse(arrival_datetime_str)
         except ValueError as e:
             logger.debug(e)
             code, data = bad_request_response("Arrival datetime must be a valid date (formatted in ISO 8601).")
             return Response(status=code, data=data)
         
-        if arrival_datetime.tzinfo is not None:
-            arrival_datetime = timezone.make_naive(arrival_datetime)
         if not departure_datetime < arrival_datetime:
             code, data = bad_request_response("arrival_datetime must be after departure_datetime.")
             return Response(status=code, data=data)
@@ -176,7 +170,7 @@ class FlightView(APIView): # /flight/<id>
             return Response(status=code, data=data)
         
         # Check if flight exists
-        status, existing_flight = facade.get_flight_by_id(id)[1]
+        status, existing_flight = facade.get_flight_by_id(id)
         if not status == 200:
             return Response(status=status, data=existing_flight)
 
@@ -216,7 +210,7 @@ class FlightView(APIView): # /flight/<id>
 
             if departure_datetime.tzinfo is not None:
                 departure_datetime = timezone.make_naive(departure_datetime)
-            if not datetime.now(tz=None) < departure_datetime:
+            if not datetime.now(tz=departure_datetime.tzinfo) < departure_datetime:
                 code, data = bad_request_response("Departure date/time must be in the future.")
                 return Response(status=code, data=data)
             if not arrival_datetime_str: 

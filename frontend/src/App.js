@@ -3,7 +3,6 @@ import "./css/universal.css";
 
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { useState } from "react";
-import { Spinner } from "react-bootstrap";
 
 // Import components
 import MyNavBar from "./components/navigation/navbar";
@@ -15,7 +14,7 @@ import AirlinesPage from "./pages/airlines";
 import TicketsPage from "./pages/tickets";
 import UsersPage from "./pages/users";
 
-import Welcome from "./components/navigation/welcome";
+import Welcome from "./components/navigation/loginbar";
 
 import RegisterPage from "./pages/register";
 import LoginPage from "./pages/login";

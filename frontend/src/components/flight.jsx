@@ -13,7 +13,7 @@ import Datetime from "react-datetime";
 
 import { APIContext } from "../contexts/api_contexts";
 import { LoginContext } from "../contexts/auth_contexts";
-import { formatDate, ValidationButton } from "../utils";
+import { formatDate, ParseErrorObjects, ValidationButton } from "../utils";
 
 import { Typeahead } from "react-bootstrap-typeahead";
 
@@ -162,18 +162,15 @@ function CustomerFlightActions({ flightData }) {
             .catch(err => {
                 setMessage("");
                 console.log(err.response);
-                if (err?.response?.data?.errors) {
-                    if (
-                        err?.response?.data?.errors?.indexOf("duplicate_ticket")
-                    ) {
+                var errors = ParseErrorObjects(err.response?.data);
+                if (errors) {
+                    if (errors.indexOf("duplicate_ticket")) {
                         setError("You already have a ticket for this flight");
                     } else {
-                        setError(err.response.data.errors.join(", "));
+                        setError(errors.join(", "));
                     }
-                } else if (err?.response?.data?.error) {
-                    setError(err.response.data.error);
                 } else {
-                    setError("Unknown error");
+                    setError(errors);
                 }
             });
     }

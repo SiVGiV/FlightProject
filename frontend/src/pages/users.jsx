@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { LoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
 import { Tabs, Tab, Spinner } from "react-bootstrap";
-import { ValidationButton } from "../utils";
+import { ParseErrorObjects, ValidationButton } from "../utils";
 import "../css/usersPage.css";
 
 export default function UsersPage() {
@@ -24,7 +24,7 @@ export default function UsersPage() {
                 setUsers(res.data.data);
             })
             .catch(err => {
-                setError(err.response.data.error);
+                setError(ParseErrorObjects(err.response.data).join("\n"));
             })
             .finally(() => {
                 setLoading(false);
@@ -201,7 +201,7 @@ function User({ profile }) {
                         setActive(false);
                     })
                     .catch(err => {
-                        console.log(err.response.data.error);
+                        console.log(ParseErrorObjects(err.response.data).join("\n"));
                     });
                 break;
             case "airline":
@@ -211,7 +211,7 @@ function User({ profile }) {
                         setActive(false);
                     })
                     .catch(err => {
-                        console.log(err.response.data.error);
+                        console.log(ParseErrorObjects(err.response.data).join("\n"));
                     });
                 break;
             case "customer":
@@ -221,7 +221,7 @@ function User({ profile }) {
                         setActive(false);
                     })
                     .catch(err => {
-                        console.log(err.response.data.error);
+                        console.log(ParseErrorObjects(err.response.data).join("\n"));
                     });
                 break;
             default:

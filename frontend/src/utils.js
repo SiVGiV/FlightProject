@@ -55,3 +55,15 @@ export function ValidationButton(props) {
             </div>
         );
 }
+
+
+export function ParseErrorObjects(obj){
+    var errors = [];
+    if (typeof obj === 'string' || obj instanceof String){
+        return [obj];
+    }
+    for (var key in obj){
+        errors.push(...ParseErrorObjects(obj[key]));
+    }
+    return errors;
+}

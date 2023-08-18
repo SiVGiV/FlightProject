@@ -48,15 +48,17 @@ def is_airline(user: User):
 
 class StringValidation:
     @staticmethod
-    def is_natural_int(s: str):
+    def is_natural_int(s):
         """Checks if a string is a natural number
 
         Args:
-            s (str): A string to check
+            s (str): A string (or int) to check
 
         Returns:
             bool: True if the string is a natural number, False otherwise
         """
+        if isinstance(s, int):
+            return True
         try:
             return bool(re.match(r"^[0]*[1-9]\d*$", s))
         except ValueError:

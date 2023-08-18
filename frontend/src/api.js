@@ -135,8 +135,7 @@ export default class API {
     // Customers endpoints
     customer = {
         get: id => axios.get(`${this.API_URL}/customer/${id}/`),
-        patch: (id, params) =>
-            axios.patch(`${this.API_URL}/customer/${id}/`, params),
+        patch: (id, params) => {console.log(params); return axios.patch(`${this.API_URL}/customer/${id}/`, params)},
         delete: id => axios.delete(`${this.API_URL}/customer/${id}/`),
     };
 

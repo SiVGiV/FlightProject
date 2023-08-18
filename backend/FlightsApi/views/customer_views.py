@@ -167,6 +167,5 @@ class CustomerView(APIView): # /customer/<id>
                 code, data = bad_request_response("Enter a valid Israeli phone number.")
                 return Response(status=code, data=data)
             update_fields['phone_number'] = phone_number
-
         code, data = facade.update_customer(id, **update_fields)
         return Response(status=code, data=data)

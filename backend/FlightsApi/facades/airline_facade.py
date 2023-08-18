@@ -60,7 +60,7 @@ class AirlineFacade(FacadeBase):
             Tuple[int, dict]: A response tuple containing status code and data/errors.
         """
         try:
-            data = R.get_flights_by_airline_id(self.__user['airline']['id'])
+            data = R.get_flights_by_airline_id(int(self.entity_id))
         except Exception as e:
             logger.error(e)
             return internal_error_response(errors=e)
@@ -68,7 +68,7 @@ class AirlineFacade(FacadeBase):
         pagination = Paginate(limit, page)
         return ok_response(data=data, pagination=pagination)
 
-    def update_airline(self, name: str = None, country_id: int = None) -> Tuple[int, dict]:
+    def update_airline(self, name: str = None, country: int = None) -> Tuple[int, dict]:
         """Updates the airline.
 
         Args:
@@ -81,11 +81,11 @@ class AirlineFacade(FacadeBase):
         updated_fields = {}
         if name:
             updated_fields.update(name=name)
-        if country_id:
-            updated_fields.update(country_id=country_id)
+        if country:
+            updated_fields.update(country=country)
         
         try:
-            data, success = R.update(DBTables.AIRLINECOMPANY, self.__user['airline']['id'], **updated_fields)
+            data, success = R.update(DBTables.AIRLINECOMPANY, int(self.entity_id), **updated_fields)
         except RepoErrors.FetchError as e:
             logger.error(e)
             return not_found_response(errors=e)
@@ -116,7 +116,7 @@ class AirlineFacade(FacadeBase):
         try:
             data, success = R.add(
                 DBTables.FLIGHT,
-                airline=self.__user['airline']['id'],
+                airline=int(self.entity_id),
                 origin_country=origin_id,
                 destination_country=destination_id,
                 departure_datetime=departure_datetime,
@@ -156,7 +156,7 @@ class AirlineFacade(FacadeBase):
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         # Make sure this airline owns the flight
-        if not flight['airline'] == self.__user['airline']['id']:
+        if not flight['airline'] == int(self.entity_id):
             return forbidden_response()
 
         try:
@@ -198,7 +198,7 @@ class AirlineFacade(FacadeBase):
         if not flight:
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
-        if not flight['airline'] == self.__user['airline']['id']:
+        if not flight['airline'] == int(self.entity_id):
             return forbidden_response()
         
         try:
@@ -248,7 +248,7 @@ class AirlineFacade(FacadeBase):
         code, data =  super().get_airline_by_id(id)
         if code != 200:
             return code, data
-        if self.__user['airline']['id'] != id:
+        if int(self.entity_id) != id:
             if 'data' in data:
                 data['data'].pop('user', None)
         return code, data

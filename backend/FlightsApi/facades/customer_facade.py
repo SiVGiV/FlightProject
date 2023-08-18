@@ -57,7 +57,7 @@ class CustomerFacade(FacadeBase):
         Returns:
             Tuple[int, dict]: A response tuple containing [status code, response data/errors]
         """
-        if not self.__user['customer']['id'] == id:
+        if not int(self.entity_id) == id:
             return forbidden_response()
         
         try:
@@ -84,11 +84,11 @@ class CustomerFacade(FacadeBase):
         Returns:
             Tuple[int, dict]: A response tuple containing [status code, response data/errors]
         """
-        if not self.__user['customer']['id'] == id:
+        if not int(self.entity_id) == id:
             return forbidden_response()
         
         try:
-            data, success = R.update(DBTables.CUSTOMER, self.__user['customer']['id'], **updated_fields)
+            data, success = R.update(DBTables.CUSTOMER, int(self.entity_id), **updated_fields)
         except RepoErrors.FetchError as e:
             logger.error(e)
             return not_found_response(errors=e)
@@ -122,7 +122,7 @@ class CustomerFacade(FacadeBase):
         
         # Create ticket
         try:
-            data, success = R.add(DBTables.TICKET, flight=flight_id, customer=self.__user['customer']['id'], seat_count=seat_count)
+            data, success = R.add(DBTables.TICKET, flight=flight_id, customer=int(self.entity_id), seat_count=seat_count)
         except (ValueError, TypeError, ValidationError) as e:
             logger.error(e)
             return bad_request_response(errors=e)
@@ -163,7 +163,7 @@ class CustomerFacade(FacadeBase):
             return not_found_response(errors=RepoErrors.EntityNotFoundException())
         
         #  Check if this customer owns the ticket
-        if not ticket['customer'] == self.__user['customer']['id']:
+        if not ticket['customer'] == int(self.entity_id):
             return forbidden_response()
         
         try:
@@ -193,7 +193,7 @@ class CustomerFacade(FacadeBase):
         pagination = Paginate(limit, page)
 
         try:
-            data = R.get_tickets_by_customer(self.__user['customer']['id'], pagination)
+            data = R.get_tickets_by_customer(int(self.entity_id), pagination)
         except Exception as e:
             logger.error(e)
             return internal_error_response(errors=e)

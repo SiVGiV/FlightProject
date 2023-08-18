@@ -4,20 +4,32 @@ import { Typeahead } from "react-bootstrap-typeahead";
 import { useNavigate } from "react-router-dom";
 import { LoginContext, RefreshLoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
+import { ParseErrorObjects } from "../utils";
+import { Validations } from "../validations";
 
 export default function Register() {
     const API = useContext(APIContext);
     const loginData = useContext(LoginContext);
     const refreshLoginData = useContext(RefreshLoginContext);
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [password2, setPassword2] = useState("");
-    const [email, setEmail] = useState("");
     const [fields, setFields] = useState({});
+    const [fieldErrors, setFieldErrors] = useState({});
     const [validated, setValidated] = useState(false);
     const [formError, setFormError] = useState("");
     const navigate = useNavigate();
+
+    const setAndValidateField = (field, value, validationFunctions) => {
+        var passedValidation = true;
+        validationFunctions.forEach(validator => {
+            passedValidation &&= validator(value);
+        });
+        if (passedValidation) {
+            setFields({ ...fields, [field]: value });
+            setFieldErrors({ ...fieldErrors, [field]: false });
+        } else {
+            setFieldErrors({ ...fieldErrors, [field]: true });
+        }
+    };
 
     const [selectUserTypeVisibility, setSelectUserTypeVisibility] = useState({
         display: "none",
@@ -41,57 +53,57 @@ export default function Register() {
                 break;
         }
     }, [loginData]);
-    // TODO Check if usertype is valid for registering, if not redirect to login
-
     const handleSubmit = event => {
         setFormError(undefined);
         const form = event.currentTarget;
-        if (form.checkValidity() === false) {
+        if (!form.checkValidity()) {
             event.preventDefault();
             event.stopPropagation();
-        }
-        if (password !== password2) {
-            setFormError("Passwords do not match!");
-            event.preventDefault();
-            event.stopPropagation();
+            return;
         }
         switch (userType) {
             case "airline":
                 API.airlines
-                    .post({ username, password, password2, email, ...fields })
+                    .post(fields)
                     .then(response => {
                         setValidated(true);
                         navigate("/");
                     })
                     .catch(error => {
                         console.log(error);
-                        setFormError(error.response.data.data);
+                        setFormError(
+                            ParseErrorObjects(error.response.data).join("\n")
+                        );
                         setValidated(false);
                     });
                 break;
             case "admin":
                 API.admins
-                    .post({ username, password, password2, email, ...fields })
+                    .post(fields)
                     .then(response => {
                         setValidated(true);
                         navigate("/");
                     })
                     .catch(error => {
                         console.log(error);
-                        setFormError(error.response.data.data);
+                        setFormError(
+                            ParseErrorObjects(error.response.data).join("\n")
+                        );
                         setValidated(false);
                     });
                 break;
             default:
                 API.customers
-                    .post({ username, password, password2, email, ...fields })
+                    .post(fields)
                     .then(response => {
                         setValidated(true);
                         navigate("/");
                     })
                     .catch(error => {
                         console.log(error);
-                        setFormError(error.response.data.data);
+                        setFormError(
+                            ParseErrorObjects(error.response.data).join("\n")
+                        );
                         setValidated(false);
                     });
                 break;
@@ -134,19 +146,25 @@ export default function Register() {
                 <label for="adminUserTypeRadio">Admin</label>
                 <br />
             </div>
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form validated={validated} onSubmit={handleSubmit}>
                 <div id="formError">{formError}</div>
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Enter username"
-                        pattern="^[a-zA-Z0-9]+$"
-                        onChange={e => setUsername(e.target.value)}
+                        onChange={e =>
+                            setAndValidateField("username", e.target.value, [
+                                Validations.validateUsername,
+                                Validations.validateRequired,
+                            ])
+                        }
+                        isInvalid={fieldErrors.username}
                         required
                     />
                     <Form.Control.Feedback type="invalid">
-                        Username must be alphanumeric
+                        Username must be alphanumeric and at least 3 characters
+                        long
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group controlId="formPassword">
@@ -154,8 +172,13 @@ export default function Register() {
                     <Form.Control
                         type="password"
                         placeholder="Password"
-                        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                        onChange={e => setPassword(e.target.value)}
+                        onChange={e =>
+                            setAndValidateField("password", e.target.value, [
+                                Validations.validatePassword,
+                                Validations.validateRequired,
+                            ])
+                        }
+                        isInvalid={fieldErrors.password}
                         required
                     />
                     <Form.Control.Feedback type="invalid">
@@ -169,18 +192,31 @@ export default function Register() {
                     <Form.Control
                         type="password"
                         placeholder="Confirm Password"
-                        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                        onChange={e => setPassword2(e.target.value)}
+                        onChange={e =>
+                            setAndValidateField("password2", e.target.value, [
+                                password2 => password2 === fields.password,
+                                Validations.validateRequired,
+                            ])
+                        }
+                        isInvalid={fieldErrors.password2}
                         required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        Passwords do not match
+                    </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group controlId="formEmail">
                     <Form.Label>Email</Form.Label>
                     <Form.Control
                         type="email"
-                        placeholder="Enter email"
-                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                        onChange={e => setEmail(e.target.value)}
+                        placeholder="Email"
+                        onChange={e =>
+                            setAndValidateField("email", e.target.value, [
+                                Validations.validateEmail,
+                                Validations.validateRequired,
+                            ])
+                        }
+                        isInvalid={fieldErrors.email}
                         required
                     />
                     <Form.Control.Feedback type="invalid">
@@ -191,10 +227,12 @@ export default function Register() {
                     userType={userType}
                     fields={fields}
                     setFields={setFields}
+                    fieldErrors={fieldErrors}
+                    setAndValidateField={setAndValidateField}
                     setFormError={setFormError}
                 />
                 <br />
-                <Button variant="primary" type="submit" onClick={handleSubmit}>
+                <Button variant="primary" type="submit">
                     Register
                 </Button>
             </Form>
@@ -202,69 +240,131 @@ export default function Register() {
     );
 }
 
-function RegistrationRouter({ userType, fields, setFields, setFormError }) {
+function RegistrationRouter({
+    userType,
+    setFormError,
+    fieldErrors,
+    setAndValidateField,
+}) {
     switch (userType) {
         case "airline":
-            return AirlineFields({ fields, setFields, setFormError });
+            return AirlineFields({
+                fieldErrors,
+                setAndValidateField,
+                required: true,
+            });
         case "admin":
-            return AdminFields({ fields, setFields, setFormError });
+            return AdminFields({
+                fieldErrors,
+                setAndValidateField,
+                required: true,
+            });
         default:
-            return CustomerFields({ fields, setFields, setFormError });
+            return CustomerFields({
+                setFormError,
+                fieldErrors,
+                setAndValidateField,
+                required: true,
+            });
     }
 }
 
-function CustomerFields({ fields, setFields, setFormError }) {
+export function CustomerFields({
+    setAndValidateField,
+    fieldErrors,
+    placeholders,
+    required,
+}) {
+    if (placeholders === undefined) placeholders = {};
+    if (required === undefined) required = false;
     return (
         <div id="additionalFields">
             <Form.Group controlId="formFirstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter first name"
+                    placeholder={placeholders["first_name"] ?? "First name"}
                     onChange={e =>
-                        setFields({ ...fields, first_name: e.target.value })
+                        setAndValidateField("first_name", e.target.value, [
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    isInvalid={fieldErrors.first_name}
+                    required={required}
                 />
             </Form.Group>
             <Form.Group controlId="formLastName">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter last name"
+                    placeholder={placeholders["last_name"] ?? "Last name"}
                     onChange={e =>
-                        setFields({ ...fields, last_name: e.target.value })
+                        setAndValidateField("last_name", e.target.value, [
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    isInvalid={fieldErrors.last_name}
+                    required={required}
                 />
             </Form.Group>
             <Form.Group controlId="formAddress">
                 <Form.Label>Address</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter address"
+                    placeholder={placeholders["address"] ?? "Address"}
                     onChange={e =>
-                        setFields({ ...fields, address: e.target.value })
+                        setAndValidateField("address", e.target.value, [
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    isInvalid={fieldErrors.address}
+                    required={required}
                 />
             </Form.Group>
             <Form.Group controlId="formPhone">
                 <Form.Label>Phone</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter phone"
+                    placeholder={placeholders["phone_number"] ?? "Phone"}
                     onChange={e =>
-                        setFields({ ...fields, phone_number: e.target.value })
+                        setAndValidateField("phone_number", e.target.value, [
+                            Validations.validatePhone,
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    isInvalid={fieldErrors.phone_number}
+                    required={required}
                 />
+                <Form.Control.Feedback type="invalid">
+                    Please enter a valid Israeli phone number
+                </Form.Control.Feedback>
             </Form.Group>
         </div>
     );
 }
 
-function AirlineFields({ fields, setFields, setFormError }) {
+export function AirlineFields({
+    setAndValidateField,
+    setFormError,
+    placeholders,
+    required,
+    fieldErrors,
+}) {
     const API = useContext(APIContext);
     const [countries, setCountries] = useState([]);
     const [selectedAirlineCountry, setSelectedAirlineCountry] = useState([]);
     const [loadingCountries, setLoadingCountries] = useState(true);
+
+    if (placeholders === undefined) placeholders = {};
+    if (required === undefined) required = false;
 
     useEffect(() => {
         // Get countries
@@ -275,7 +375,7 @@ function AirlineFields({ fields, setFields, setFormError }) {
                 setCountries(response.data.data);
             })
             .catch(error => {
-                console.log(error.response.data.data);
+                console.log(error?.response.data.data);
                 setFormError("Error loading country list...");
             })
             .finally(() => {
@@ -284,7 +384,10 @@ function AirlineFields({ fields, setFields, setFormError }) {
     }, []);
 
     useEffect(() => {
-        setFields({ ...fields, country: selectedAirlineCountry[0]?.id });
+        console.log(selectedAirlineCountry);
+        setAndValidateField("country", selectedAirlineCountry[0]?.id, [
+            required ? Validations.validateRequired : () => true,
+        ]);
     }, [selectedAirlineCountry]);
 
     return (
@@ -293,10 +396,16 @@ function AirlineFields({ fields, setFields, setFormError }) {
                 <Form.Label>Airline Name</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter airline name"
+                    placeholder={placeholders["name"] ?? "Airline Name"}
                     onChange={e =>
-                        setFields({ ...fields, airlineName: e.target.value })
+                        setAndValidateField("name", e.target.value, [
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    required={required}
+                    isInvalid={fieldErrors.name}
                 />
             </Form.Group>
             <Form.Group controlId="formAirlineCountry">
@@ -307,37 +416,55 @@ function AirlineFields({ fields, setFields, setFormError }) {
                     onChange={setSelectedAirlineCountry}
                     options={countries}
                     placeholder={
-                        loadingCountries ? "Loading..." : "Select a country"
+                        loadingCountries
+                            ? "Loading..."
+                            : countries.find(
+                                  country =>
+                                      country.id === placeholders["country"]
+                              )?.name ?? "Select a country"
                     }
                     selected={selectedAirlineCountry}
                     disabled={loadingCountries}
+                    required={required}
+                    isInvalid={fieldErrors.country}
                 />
             </Form.Group>
         </div>
     );
 }
 
-function AdminFields({ fields, setFields, setFormError }) {
+function AdminFields({ setAndValidateField, required }) {
+    if (required === undefined) required = false;
     return (
         <div id="additionalFields">
             <Form.Group controlId="formFirstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter first name"
+                    placeholder="First name"
                     onChange={e =>
-                        setFields({ ...fields, first_name: e.target.value })
+                        setAndValidateField("first_name", e.target.value, [
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    required={required}
                 />
             </Form.Group>
             <Form.Group controlId="formLastName">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                     type="text"
-                    placeholder="Enter last name"
+                    placeholder="Last name"
                     onChange={e =>
-                        setFields({ ...fields, last_name: e.target.value })
+                        setAndValidateField("last_name", e.target.value, [
+                            required
+                                ? Validations.validateRequired
+                                : () => true,
+                        ])
                     }
+                    required={required}
                 />
             </Form.Group>
         </div>

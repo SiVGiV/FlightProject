@@ -167,29 +167,29 @@ def generate_data(admins, airlines, customers, flights, tickets):
     tickets_dict = {}
     ticket_index = 1
     total_tickets = tickets * total_flights
-    for airline, flights in flight_dict.items():
-        for flight in flights:
-            tickets_dict[flight['id']] = {}
-            tickets_list = []
-            for index in range(tickets):
-                customer = customers_list[randint(0, len(customers_list) - 1)]
-                logout(client)
-                login(client, customer['user']['username'], customer['user']['password'])
+    if len(customers_list) > 0:
+        for airline, flights in flight_dict.items():
+            for flight in flights:
+                tickets_dict[flight['id']] = {}
+                tickets_list = []
+                for index in range(tickets):
+                    customer = customers_list[randint(0, len(customers_list) - 1)]
+                    logout(client)
+                    login(client, customer['user']['username'], customer['user']['password'])
 
-                request_body = {
-                    'flight_id': int(flight['id']),
-                    'seat_count': randint(1,5) 
-                }
-                response = client.post(API_URL + "tickets/", data={**request_body, 'csrftoken': client.cookies.get('csrftoken')}, headers={'X-CSRFToken': client.cookies.get('csrftoken')})
-                if response.status_code == 201:
-                    tickets_list.append(response.json()['data'])
-                    print(f'Created ticket {ticket_index}/{total_tickets}...')
-                    ticket_index += 1
-                else:
-                    print(response.json())
-                    
-            tickets_dict[flight['id']] = tickets_list
-                    
+                    request_body = {
+                        'flight_id': int(flight['id']),
+                        'seat_count': randint(1,5) 
+                    }
+                    response = client.post(API_URL + "tickets/", data={**request_body, 'csrftoken': client.cookies.get('csrftoken')}, headers={'X-CSRFToken': client.cookies.get('csrftoken')})
+                    if response.status_code == 201:
+                        tickets_list.append(response.json()['data'])
+                        print(f'Created ticket {ticket_index}/{total_tickets}...')
+                        ticket_index += 1
+                    else:
+                        print(response.json())
+                        
+                tickets_dict[flight['id']] = tickets_list
     output_dict = {
         'admins': admins_list,
         'airlines': airlines_list,
