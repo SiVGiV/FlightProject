@@ -6,7 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
     LoginContext,
     RefreshLoginContext,
-} from "../../contexts/auth_contexts";
+} from "../contexts/auth_contexts";
 
 export default function MyNavBar({ homePage, pages, login }) {
     const refreshLogin = useContext(RefreshLoginContext);

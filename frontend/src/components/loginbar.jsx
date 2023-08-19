@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { LoginContext } from "../../contexts/auth_contexts";
-import { APIContext } from "../../contexts/api_contexts";
-import { AirlineFields, CustomerFields } from "../../pages/register";
-import { ParseErrorObjects } from "../../utils";
+import { LoginContext } from "../contexts/auth_contexts";
+import { APIContext } from "../contexts/api_contexts";
+import { AirlineFields, CustomerFields } from "../pages/register";
+import { ParseErrorObjects } from "../../utilities/helpers";
 
 export default function Welcome() {
     const API = useContext(APIContext);
