@@ -7,7 +7,7 @@ import { APIContext } from "../contexts/api_contexts";
 import { LoginContext } from "../contexts/auth_contexts";
 import Datetime from "react-datetime";
 
-import { makePagination } from "../utils";
+import { makePagination } from "../utilities/helpers";
 
 export default function FlightsPage() {
     const API = useContext(APIContext);
@@ -140,7 +140,6 @@ export default function FlightsPage() {
 
     const handleToggle = e => {
         e.stopPropagation();
-        console.log(e);
         // setActiveKey( === eventKey ? null : eventKey);
     };
     const [showCreate, setShowCreate] = useState(false);
@@ -319,7 +318,6 @@ function FlightCreationModal({ showCreate, onHide, countries, forceRender }) {
                 }, 1000);
             })
             .catch(response => {
-                console.log(response);
                 var error_details =
                     response?.response?.data?.error ??
                     response?.response?.data?.errors?.join(", ") ??

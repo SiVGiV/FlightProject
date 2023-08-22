@@ -155,7 +155,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ['http://frontend:3000', 'https://frontend:3000', 'http://localhost:3000', 'https://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ['http://frontend:3000', 'https://frontend:3000', 'http://localhost:3000', 'https://localhost:3000', 'http://85.130.197.24:3000']
 
 # CSRF_COOKIE_SAMESITE = 'None'
 # CSRF_COOKIE_SECURE = True

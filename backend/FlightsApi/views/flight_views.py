@@ -75,7 +75,6 @@ class FlightsView(APIView): # /flights
         )
         return Response(status=code, data=data)
         
-    
     def post(self, request):
         # Get correct facade
         facade = AnonymousFacade.login(request)

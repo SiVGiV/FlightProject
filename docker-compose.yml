@@ -42,15 +42,7 @@ services:
         condition: service_healthy
         restart: true
     env_file: ./.env
-    # networks:
-    #   - hostnet
-    #   - default
 volumes:
   db:
   backend:
   frontend:
-# networks:
-#     hostnet:
-#       external: true
-#       name: host
-#     default:

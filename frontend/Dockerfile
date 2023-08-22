@@ -10,14 +10,15 @@ COPY . $ProjectDir
 RUN npm ci --omit=optional
 
 # PRODUCTION ---------------------------------
-# RUN npm run build
+RUN npm run build
+RUN npm install -g serve
 
 # set environment variables
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+# CMD [ "npm", "start" ]
 
 # PRODUCTION ---------------------------------
-# CMD [ "npx", "serve", "build" ]
+CMD [ "serve", "-s", "build", "-l", "tcp://0.0.0.0:3000" ]

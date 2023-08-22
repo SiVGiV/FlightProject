@@ -1,0 +1,1645 @@
+openapi: "3.0.0"
+
+info:
+  title: Flight Management Backend API
+  version: "1.2"
+
+servers:
+  - url: http://{host}:8000/
+    variables:
+      host:
+        default: !!str 85.130.197.24
+
+tags:
+  - name: Utility
+    description: Utility endpoints
+  - name: Auth
+    description: Authorization related operations
+  - name: Users
+    description: User related operations
+  - name: Admins
+    description: Admin related operations
+  - name: Airlines
+    description: Airline related operations
+  - name: Customers
+    description: Customer related operations
+  - name: Flights
+    description: Flight related operations
+  - name: Tickets
+    description: Ticket related operations
+  - name: Countries
+    description: Country related operations
+
+components:
+  schemas:
+    # Admins
+    Admins:
+      title: Admins
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Admin"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    Admin:
+      title: Admin
+      required:
+        - first_name
+        - last_name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the administrator
+          example: 92
+          readOnly: true
+        first_name:
+          type: string
+          example: Natalie
+          description: First name
+        last_name:
+          type: string
+          example: Mandes
+          description: Last name
+        user:
+          type: integer
+          example: 65
+          description: Identifier of a user (Foreign key)
+
+    # Airlines
+    Airlines:
+      title: Airlines
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Airline"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    Airline:
+      title: Airline
+      required:
+        - name
+        - country
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the airline
+          example: 94
+          readOnly: true
+        name:
+          type: string
+          example: Air Pegasus
+          description: Operating name
+        country:
+          type: integer
+          example: 2
+          description: Identifier of a country (Foreign key)
+        user:
+          type: integer
+          example: 40
+          description: Identifier of a user (Foreign key)
+
+    # Customers
+    Customers:
+      title: Customers
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Customer"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    Customer:
+      title: Customer
+      required:
+        - first_name
+        - last_name
+        - address
+        - phone_number
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the customer
+          example: 34
+          readOnly: true
+        first_name:
+          type: string
+          example: Simon
+          description: First name
+        last_name:
+          type: string
+          example: Johnson
+          description: Last name
+        address:
+          type: string
+          example: 23 Regent Street
+          description: Full address
+        phone_number:
+          type: string
+          example: +972-57-5633459
+          description: Phone number
+          pattern: '^(\+)?([ 0-9-]){10,16}$'
+        user:
+          type: integer
+          example: 37
+          description: Identifier of a user (Foreign key)
+
+    # Flights
+    Flights:
+      title: Flights
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Flight"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    Flight:
+      title: Flight
+      required:
+        - airline
+        - origin_country
+        - destination_country
+        - departure_datetime
+        - arrival_datetime
+        - total_seats
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the flight
+          example: 86
+          readOnly: true
+        airline:
+          type: integer
+          example: 42
+          description: Identifier of an operating airline (Foreign key)
+        origin_country:
+          type: integer
+          example: 102
+          description: Identifier of an origin country (Foreign key)
+        destination_country:
+          type: integer
+          example: 77
+          description: Identifier of a destination country (Foreign key)
+        departure_datetime:
+          type: string
+          example: 2023‐08‐22T16:35:47Z
+          description: Date and time of departure
+          format: date-time
+        arrival_datetime:
+          type: string
+          example: 2023‐08‐22T20:35:47Z
+          description: Date and time of arrival
+          format: date-time
+        total_seats:
+          type: integer
+          example: 300
+          description: Total available seats on the flight
+        is_cancelled:
+          type: boolean
+          example: false
+          readOnly: true
+          description: Whether the flight is cancelled or not
+
+    # Tickets
+    Tickets:
+      title: Tickets
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ticket"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    Ticket:
+      title: Ticket
+      required:
+        - flight
+        - customer
+        - seat_count
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the flight
+          example: 78
+          readOnly: true
+        flight:
+          type: integer
+          example: 54
+          description: Identifier of a flight (Foreign key)
+        customer:
+          type: integer
+          example: 24
+          description: Identifier of a customer (Foreign key)
+        seat_count:
+          type: integer
+          example: 2
+          description: Amount of seats purchased
+        is_cancelled:
+          type: boolean
+          example: false
+          description: Whether the ticket is cancelled or not
+
+    # Countries
+    Countries:
+      title: Countries
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Country"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    Country:
+      title: Country
+      required:
+        - name
+        - symbol
+        - flag
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the country
+          example: 85
+          readOnly: true
+        name:
+          type: string
+          example: Kazakhstan
+          description: Country name
+          readOnly: true
+        symbol:
+          type: string
+          pattern: "[a-z]{2}"
+          example: kz
+          description: Two letter country identifier
+          readOnly: true
+        flag:
+          type: string
+          example: "static/countries/flags/kz.png"
+          description: Path extension for flag image
+          readOnly: true
+
+    # Users
+    User:
+      title: User
+      required:
+        - username
+        - password
+        - email
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of the user
+          example: 3
+          readOnly: true
+        username:
+          type: string
+          example: "flightproject123"
+          description: Username
+        password:
+          type: string
+          description: Password
+          example: "Fl!ghtPr0ject"
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}'
+          writeOnly: true
+        email:
+          type: string
+          format: email
+          example: "flight@project.com"
+          description: Email
+        is_active:
+          type: boolean
+          readOnly: true
+          example: true
+          description: Whether the user is active or not
+        date_joined:
+          type: string
+          readOnly: true
+          description: The user's creation date
+          format: date-time
+        groups:
+          type: array
+          readOnly: true
+          items:
+            type: integer
+            description: A user group identifier (Foreign key)
+          description: A list of groups the user is a member of
+
+    AdminUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            admin:
+              $ref: "#/components/schemas/Admin"
+
+    AirlineUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            airline:
+              $ref: "#/components/schemas/Airline"
+
+    CustomerUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            customer:
+              $ref: "#/components/schemas/Customer"
+
+    # Identity
+    Identity:
+      title: Identity
+      type: object
+      properties:
+        logged_in:
+          type: boolean
+          readOnly: true
+          example: true
+          description: Whether or not the the user is anonymous
+        id:
+          $ref: "#/components/schemas/User/properties/id"
+          description: The logged in user's username
+        type:
+          type: string
+          readOnly: true
+          enum: ["anon", "customer", "airline", "admin"]
+          description: The logged in user's type
+        username:
+          $ref: "#/components/schemas/User/properties/username"
+          description: The logged in user's username
+        entity_id:
+          anyOf:
+            - $ref: "#/components/schemas/Customer/properties/id"
+            - $ref: "#/components/schemas/Airline/properties/id"
+            - $ref: "#/components/schemas/Admin/properties/id"
+          description: The logged in user's profile id
+        entity_name:
+          type: string
+          readOnly: true
+          description: The logged in user's profile name (airline name / joined first and last names)
+
+    # Credentials
+    Credentials:
+      title: Credentials
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          $ref: "#/components/schemas/User/properties/username"
+        password:
+          $ref: "#/components/schemas/User/properties/password"
+
+    # Pagination
+    Pagination:
+      title: Pagination
+      description: A pagination descriptor
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: Maximum amount of items in page
+          minimum: 0
+          example: 50
+        page:
+          type: integer
+          description: Page number
+          minimum: 1
+          example: 1
+        total:
+          type: integer
+          description: Total amount of items
+          minimum: 0
+          example: 231
+
+    # Errors
+    SingleError:
+      title: SingleError
+      description: A failure response containing a single error
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message
+          example: "You do not own this entity and cannot make changes to it."
+
+    ServerError:
+      title: ServerError
+      description: A failure response containing a single server error (mostly aimed at status 500)
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message
+          example: "The server encountered an unexpected error."
+
+    MultipleErrors:
+      title: MultipleErrors
+      description: A failure response containing multiple errors
+      type: object
+      properties:
+        errors:
+          oneOf:
+            - type: object
+              items:
+                type: string
+            - type: array
+              items:
+                type: string
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: header
+      name: Cookie (sessionid)
+
+    CSRF-Token:
+      type: apiKey
+      in: header
+      name: X-CSRFToken
+
+paths:
+  # DONE
+  /healthcheck/:
+    get:
+      summary: Checks the service's health
+      description: Allowed for all users. _No CSRF token required_.
+      tags:
+        - Utility
+      responses:
+        "204":
+          description: Service Alive
+  
+  # DONE
+  /api/csrf/:
+    get:
+      summary: Fetches a csrf token
+      description: Allowed for all users. _No CSRF token required_. Sets a CSRF cookie named 'csrftoken'.
+      tags:
+        - Auth
+      responses:
+        "200":
+          description: Successful fetch
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Sets a CSRF cookie named 'csrftoken'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      CSRF-Token:
+                        type: string
+                        description: A CSRF token
+                        example: "OWY4NmQwODE4ODRjN2Q2NTlhMmZlYWEwYzU1YWQwMTVhM2"
+  
+  # DONE
+  /api/login/:
+    post:
+      summary: Logs a user in using their credentials
+      description: Allowed for anonymous users. Sets a session cookie named 'sessionid'.
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "204":
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Sets a session cookie named 'sessionid'
+        "400":
+          description: Login unsuccessful
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/logout/:
+    post:
+      summary: Logs out current user
+      description: Allowed for logged in users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Auth
+      responses:
+        204:
+          description: Logged out
+        403:
+          description: User was not logged in
+  
+  # DONE
+  /api/whoami/:
+    get:
+      summary: Get the logged in user's identity
+      description: Allowed for all users. _CSRF token required_. Returns a JSON object containing the logged in user's identity.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Auth
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Identity"
+  
+  # DONE
+  /api/users/admin/:
+    get:
+      summary: Fetches all of the admin users
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdminUser"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/users/airline/:
+    get:
+      summary: Fetches all of the airline users
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AirlineUser"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/users/customer/:
+    get:
+      summary: Fetches all of the customer users
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CustomerUser"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/admins/:
+    post:
+      summary: Creates a new admin user
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Admins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - email
+                - first_name
+                - last_name
+              properties:
+                username:
+                  $ref: "#/components/schemas/User/properties/username"
+                password:
+                  $ref: "#/components/schemas/User/properties/password"
+                email:
+                  $ref: "#/components/schemas/User/properties/email"
+                first_name:
+                  $ref: "#/components/schemas/Admin/properties/first_name"
+                last_name:
+                  $ref: "#/components/schemas/Admin/properties/last_name"
+      responses:
+        "201":
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admin:
+                    $ref: "#/components/schemas/Admin"
+                  user:
+                    $ref: "#/components/schemas/User"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the server end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/admin/{adminid}/:
+    parameters:
+      - in: path
+        name: adminid
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: The admin ID
+    delete:
+      summary: Deactivates an admin user
+      description: Allowed only for admin users. _CSRF token required_. Admins cannot deactivate themselves.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Admins
+      responses:
+        "204":
+          description: Successful deactivation
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/airlines/:
+    get:
+      summary: Fetches all of the airline users
+      description: Allowed for any users. _CSRF token required_.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Airlines
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: A partial name to match to - case insensitive, matches any part of the name
+        - in: query
+          name: page
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/page"
+          description: The page number
+        - in: query
+          name: limit
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/limit"
+          description: The amount of items per page
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Airlines"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    post:
+      summary: Creates a new airline user
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Airlines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - email
+                - name
+                - country
+              properties:
+                username:
+                  $ref: "#/components/schemas/User/properties/username"
+                password:
+                  $ref: "#/components/schemas/User/properties/password"
+                email:
+                  $ref: "#/components/schemas/User/properties/email"
+                name:
+                  $ref: "#/components/schemas/Airline/properties/name"
+                country:
+                  $ref: "#/components/schemas/Airline/properties/country"
+      responses:
+        "201":
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  airline:
+                    $ref: "#/components/schemas/Airline"
+                  user:
+                    $ref: "#/components/schemas/User"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the server end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/airline/{airlineid}/:
+    parameters:
+      - in: path
+        name: airlineid
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: The airline ID
+    get:
+      summary: Fetches an airline user
+      description: Allowed for any users. _CSRF token not required_.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Airlines
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Airline"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    delete:
+      summary: Deactivates an airline user
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Airlines
+      responses:
+        "204":
+          description: Successful deactivation
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    patch:
+      summary: Updates an airline profile
+      description: Allowed only for airline users. _CSRF token required_. Airline users can only update their own profile.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Airlines
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: "#/components/schemas/Airline/properties/name"
+                country:
+                  $ref: "#/components/schemas/Airline/properties/country"
+      responses:
+        "200":
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Airline"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/customers/:
+    get:
+      summary: Fetches all of the customers
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Customers
+      parameters:
+        - in: query
+          name: page
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/page"
+          description: The page number
+        - in: query
+          name: limit
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/limit"
+          description: The amount of items per page
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customers"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    post:
+      summary: Creates a new customer user
+      description: Allowed only for admin users and anonymous users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - email
+                - first_name
+                - last_name
+              properties:
+                username:
+                  $ref: "#/components/schemas/User/properties/username"
+                password:
+                  $ref: "#/components/schemas/User/properties/password"
+                email:
+                  $ref: "#/components/schemas/User/properties/email"
+                first_name:
+                  $ref: "#/components/schemas/Customer/properties/first_name"
+                last_name:
+                  $ref: "#/components/schemas/Customer/properties/last_name"
+      responses:
+        "201":
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:
+                    $ref: "#/components/schemas/Customer"
+                  user:
+                    $ref: "#/components/schemas/User"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the server end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/customer/{customerid}/:
+    parameters:
+      - in: path
+        name: customerid
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: The customer ID
+    get:
+      summary: Fetches a customer user
+      description: Allowed only for admin users and customer users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Customers
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    delete:
+      summary: Deactivates a customer user
+      description: Allowed only for admin users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Customers
+      responses:
+        "204":
+          description: Successful deactivation
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    patch:
+      summary: Updates a customer profile
+      description: Allowed only for customer users. _CSRF token required_. Customer users can only update their own profile.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  $ref: "#/components/schemas/Customer/properties/first_name"
+                last_name:
+                  $ref: "#/components/schemas/Customer/properties/last_name"
+                address:
+                  $ref: "#/components/schemas/Customer/properties/address"
+                phone_number:
+                  $ref: "#/components/schemas/Customer/properties/phone_number"
+      responses:
+        "200":
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/flights/:
+    get:
+      summary: Fetches all of the flights
+      description: Allowed for any users. _CSRF token required_.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Flights
+      parameters:
+        - in: query
+          name: airline
+          schema:
+            $ref: "#/components/schemas/Flight/properties/airline"
+          description: The airline ID
+        - in: query
+          name: origin_country
+          schema:
+            $ref: "#/components/schemas/Flight/properties/origin_country"
+          description: The origin country ID
+        - in: query
+          name: destination_country
+          schema:
+            $ref: "#/components/schemas/Flight/properties/destination_country"
+          description: The destination country ID
+        - in: query
+          name: page
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/page"
+          description: The page number
+        - in: query
+          name: limit
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/limit"
+          description: The amount of items per page
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flights"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+    post:
+      summary: Creates a new flight
+      description: Allowed only for airline users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Flights
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - origin_country
+                - destination_country
+                - departure_datetime
+                - arrival_datetime
+                - total_seats
+              properties:
+                origin_country:
+                  $ref: "#/components/schemas/Flight/properties/origin_country"
+                destination_country:
+                  $ref: "#/components/schemas/Flight/properties/destination_country"
+                departure_datetime:
+                  $ref: "#/components/schemas/Flight/properties/departure_datetime"
+                arrival_datetime:
+                  $ref: "#/components/schemas/Flight/properties/arrival_datetime"
+                total_seats:
+                  $ref: "#/components/schemas/Flight/properties/total_seats"
+      responses:
+        "201":
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flight:
+                    $ref: "#/components/schemas/Flight"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/flight/{flightid}/:
+    parameters:
+      - in: path
+        name: flightid
+        required: true
+        schema:
+          $ref: "#/components/schemas/Flight/properties/airline"
+    get:
+      summary: Fetches a flight
+      description: Allowed for any users. _CSRF token required_.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Flights
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flight"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    patch:
+      summary: Updates a flight
+      description: Allowed only for airline users. _CSRF token required_. Airline users can only update their own flights.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Flights
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                origin_country:
+                  $ref: "#/components/schemas/Flight/properties/origin_country"
+                destination_country:
+                  $ref: "#/components/schemas/Flight/properties/destination_country"
+                departure_datetime:
+                  $ref: "#/components/schemas/Flight/properties/departure_datetime"
+                arrival_datetime:
+                  $ref: "#/components/schemas/Flight/properties/arrival_datetime"
+                total_seats:
+                  $ref: "#/components/schemas/Flight/properties/total_seats"
+      responses:
+        "200":
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flight"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    delete:
+      summary: Cancels a flight
+      description: Allowed only for airline users. _CSRF token required_. Airline users can only cancel their own flights.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Flights
+      responses:
+        "204":
+          description: Successful cancellation
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/tickets/:
+    get:
+      summary: Fetches tickets
+      description: Allowed only for customer users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Tickets
+      parameters:
+        - in: query
+          name: page
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/page"
+          description: The page number
+        - in: query
+          name: limit
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/limit"
+          description: The amount of items per page
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tickets"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+
+    post:
+      summary: Creates a new ticket
+      description: Allowed only for customer users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - flight
+                - customer
+                - seat_count
+              properties:
+                flight:
+                  $ref: "#/components/schemas/Ticket/properties/flight"
+                customer:
+                  $ref: "#/components/schemas/Ticket/properties/customer"
+                seat_count:
+                  $ref: "#/components/schemas/Ticket/properties/seat_count"
+      responses:
+        "201":
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/ticket/{ticketid}/:
+    parameters:
+      - in: path
+        name: ticketid
+        required: true
+        schema:
+          $ref: "#/components/schemas/Ticket/properties/id"
+        description: The ticket ID
+    delete:
+      summary: Cancels a ticket
+      description: Allowed only for customer users. _CSRF token required_.
+      security:
+        - sessionAuth: []
+        - CSRF-Token: []
+      tags:
+        - Tickets
+      responses:
+        "204":
+          description: Successful cancellation
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/countries/:
+    get:
+      summary: Fetches countries
+      description: Allowed for any users. _CSRF token required_.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Countries
+      parameters:
+        - in: query
+          name: page
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/page"
+          description: The page number
+        - in: query
+          name: limit
+          schema:
+            $ref: "#/components/schemas/Pagination/properties/limit"
+          description: The amount of items per page
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Countries"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+  
+  # DONE
+  /api/country/{countryid}/:
+    parameters:
+      - in: path
+        name: airlineid
+        required: true
+        schema:
+          $ref: "#/components/schemas/Country/properties/id"
+        description: The country ID
+    get:
+      summary: Fetches a country
+      description: Allowed for any users. _CSRF token required_.
+      security:
+        - CSRF-Token: []
+      tags:
+        - Countries
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+        "4XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SingleError"
+                  - $ref: "#/components/schemas/MultipleErrors"
+        "5XX":
+          description: Error in the requesting end
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"

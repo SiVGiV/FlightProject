@@ -3,7 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { APIContext } from "../contexts/api_contexts";
 import { RefreshLoginContext } from "../contexts/auth_contexts";
-import { ParseErrorObjects } from "../utils";
+import { ParseErrorObjects } from "../utilities/helpers";
 
 export default function LoginPage() {
     const API = useContext(APIContext);

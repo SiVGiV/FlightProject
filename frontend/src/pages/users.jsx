@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { LoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
 import { Tabs, Tab, Spinner } from "react-bootstrap";
-import { ParseErrorObjects, ValidationButton } from "../utils";
+import { ParseErrorObjects, ValidationButton } from "../utilities/helpers";
 import "../css/usersPage.css";
 
 export default function UsersPage() {
@@ -19,8 +19,6 @@ export default function UsersPage() {
         API.users
             .get(userType)
             .then(res => {
-                console.log(userType);
-                console.log(res.data.data);
                 setUsers(res.data.data);
             })
             .catch(err => {

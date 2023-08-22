@@ -6,7 +6,7 @@ import { APIContext } from "../contexts/api_contexts";
 
 import "../css/airlinesPage.css";
 
-import { makePagination } from "../utils";
+import { makePagination } from "../utilities/helpers";
 
 export default function AirlinesPage() {
     const API = useContext(APIContext);

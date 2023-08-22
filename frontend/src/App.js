@@ -5,7 +5,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { useState } from "react";
 
 // Import components
-import MyNavBar from "./components/navigation/navbar";
+import MyNavBar from "./components/navbar";
 
 // Import pages
 import HomePage from "./pages";
@@ -14,14 +14,14 @@ import AirlinesPage from "./pages/airlines";
 import TicketsPage from "./pages/tickets";
 import UsersPage from "./pages/users";
 
-import Welcome from "./components/navigation/loginbar";
+import Welcome from "./components/loginbar";
 
 import RegisterPage from "./pages/register";
 import LoginPage from "./pages/login";
 
 import { LoginContext, RefreshLoginContext } from "./contexts/auth_contexts";
 import { APIContext } from "./contexts/api_contexts";
-import API from "./api";
+import API from "./utilities/api";
 
 const homepage = {
     "/": (
@@ -75,7 +75,7 @@ const pages = {
 function App() {
     const [login, setLogin] = useState({});
     const APIClient = new API(
-        process.env.BACKEND_URL ?? "http://localhost:8000"
+        `http://${window.location.hostname}:8000`
     );
 
     function refreshLogin() {

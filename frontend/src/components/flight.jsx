@@ -13,7 +13,7 @@ import Datetime from "react-datetime";
 
 import { APIContext } from "../contexts/api_contexts";
 import { LoginContext } from "../contexts/auth_contexts";
-import { formatDate, ParseErrorObjects, ValidationButton } from "../utils";
+import { formatDate, ParseErrorObjects, ValidationButton } from "../utilities/helpers";
 
 import { Typeahead } from "react-bootstrap-typeahead";
 
@@ -157,7 +157,6 @@ function CustomerFlightActions({ flightData }) {
             .then(response => {
                 setMessage("Purchased ticket");
                 setError("");
-                console.log(response);
             })
             .catch(err => {
                 setMessage("");

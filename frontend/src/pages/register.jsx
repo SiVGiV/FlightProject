@@ -4,8 +4,8 @@ import { Typeahead } from "react-bootstrap-typeahead";
 import { useNavigate } from "react-router-dom";
 import { LoginContext, RefreshLoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
-import { ParseErrorObjects } from "../../utilities/helpers";
-import { Validations } from "../../utilities/validations";
+import { ParseErrorObjects } from "../utilities/helpers";
+import { Validations } from "../utilities/validations";
 
 export default function Register() {
     const API = useContext(APIContext);

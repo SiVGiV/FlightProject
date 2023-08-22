@@ -7,8 +7,6 @@ axios.defaults.withCredentials = true;
 
 export default class API {
     identity = undefined;
-    BASE_URL = "localhost:8000";
-    API_URL = "localhost:8000/api";
     constructor(base_url) {
         this.BASE_URL = base_url;
         this.API_URL = base_url + "/api";

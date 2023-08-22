@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Spinner } from "react-bootstrap";
 import { APIContext } from "../contexts/api_contexts";
-import { ValidationButton } from "../../utilities/helpers";
+import { ValidationButton } from "../utilities/helpers";
 
 export default function Ticket({ ticket, forceReload }) {
     const API = useContext(APIContext);
@@ -25,7 +25,6 @@ export default function Ticket({ ticket, forceReload }) {
                     .then(([originResponse, destinationResponse]) => {
                         setOrigin(originResponse?.data?.data);
                         setDestination(destinationResponse?.data?.data);
-                        // console.log(originResponse);
                         setLoading(false);
                     })
                     .catch(err => {
@@ -54,7 +53,6 @@ export default function Ticket({ ticket, forceReload }) {
                 );
             });
     }
-    console.log(ticket);
 
     return (
         <div

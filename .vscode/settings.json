@@ -2,5 +2,9 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.python"
     },
-    "python.formatting.provider": "none"
+    "python.formatting.provider": "none",
+    "swaggerViewer.previewInBrowser": true,
+    "swaggerViewer.showOnlyFileName": false,
+    "openapi.codeLens": false,
+    "openapi.defaultPreviewRenderer": "swaggerui"
 }

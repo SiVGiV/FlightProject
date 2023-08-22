@@ -18,10 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.schemas import get_schema_view
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('schema/', get_schema_view(title="Flights API Schema", description="Guide for the REST API"), name='schema'),
     path('api/', include('FlightsApi.urls')),
-    path('healthcheck/', csrf_exempt(lambda r: HttpResponse())),
+    path('admin/', admin.site.urls),
+    path('healthcheck/', csrf_exempt(lambda r: HttpResponse(status=204))),
 ]
