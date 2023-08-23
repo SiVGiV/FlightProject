@@ -482,7 +482,6 @@ components:
       name: X-CSRFToken
 
 paths:
-  # DONE
   /healthcheck/:
     get:
       summary: Checks the service's health
@@ -493,7 +492,6 @@ paths:
         "204":
           description: Service Alive
   
-  # DONE
   /api/csrf/:
     get:
       summary: Fetches a csrf token
@@ -521,7 +519,6 @@ paths:
                         description: A CSRF token
                         example: "OWY4NmQwODE4ODRjN2Q2NTlhMmZlYWEwYzU1YWQwMTVhM2"
   
-  # DONE
   /api/login/:
     post:
       summary: Logs a user in using their credentials
@@ -557,7 +554,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/logout/:
     post:
       summary: Logs out current user
@@ -573,7 +569,6 @@ paths:
         403:
           description: User was not logged in
   
-  # DONE
   /api/whoami/:
     get:
       summary: Get the logged in user's identity
@@ -593,7 +588,6 @@ paths:
                   data:
                     $ref: "#/components/schemas/Identity"
   
-  # DONE
   /api/users/admin/:
     get:
       summary: Fetches all of the admin users
@@ -629,7 +623,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/users/airline/:
     get:
       summary: Fetches all of the airline users
@@ -665,7 +658,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/users/customer/:
     get:
       summary: Fetches all of the customer users
@@ -701,7 +693,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/admins/:
     post:
       summary: Creates a new admin user
@@ -761,7 +752,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/admin/{adminid}/:
     parameters:
       - in: path
@@ -797,7 +787,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/airlines/:
     get:
       summary: Fetches all of the airline users
@@ -902,7 +891,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/airline/{airlineid}/:
     parameters:
       - in: path
@@ -1007,7 +995,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/customers/:
     get:
       summary: Fetches all of the customers
@@ -1108,7 +1095,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/customer/{customerid}/:
     parameters:
       - in: path
@@ -1218,7 +1204,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/flights/:
     get:
       summary: Fetches all of the flights
@@ -1330,7 +1315,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/flight/{flightid}/:
     parameters:
       - in: path
@@ -1439,7 +1423,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/tickets/:
     get:
       summary: Fetches tickets
@@ -1529,7 +1512,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/ticket/{ticketid}/:
     parameters:
       - in: path
@@ -1564,7 +1546,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/countries/:
     get:
       summary: Fetches countries
@@ -1606,7 +1587,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerError"
   
-  # DONE
   /api/country/{countryid}/:
     parameters:
       - in: path

@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.schemas import get_schema_view
-
+from .views import openapi_schema
+from drf_spectacular.views import SpectacularSwaggerView
 
 urlpatterns = [
-    path('schema/', get_schema_view(title="Flights API Schema", description="Guide for the REST API"), name='schema'),
     path('api/', include('FlightsApi.urls')),
     path('admin/', admin.site.urls),
+    path('schema/', csrf_exempt(openapi_schema), name='openapi-schema'),
+    path('swagger/', csrf_exempt(SpectacularSwaggerView.as_view(url_name='openapi-schema')), name='swagger'),
     path('healthcheck/', csrf_exempt(lambda r: HttpResponse(status=204))),
 ]
