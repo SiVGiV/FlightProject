@@ -6,14 +6,14 @@ services:
       - db:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=$$MYSQL_ROOT_PASSWORD"]
-      start_period: 20s
-      interval: 5s
+      start_period: 60s
+      interval: 30s
       retries: 5
-      timeout: 5s
+      timeout: 20s
 # ---------------------------------------------
   backend:
     build: ./backend
-    # image: sivgiv/flight-project-backend:latest
+    image: sivgiv/flightproject-backend:latest
     ports:
       - "8000:8000"
     volumes:
@@ -25,14 +25,14 @@ services:
     env_file: ./.env
     healthcheck:
       test: curl -f --insecure http://127.0.0.1:8000/healthcheck/
-      start_period: 20s
-      interval: 5s
-      retries: 3
-      timeout: 5s
+      start_period: 60s
+      interval: 30s
+      retries: 5
+      timeout: 20s
 # ---------------------------------------------
   frontend:
-    build: ./frontend
-    # image sivgiv/flight-project-frontend:latest
+    # build: ./frontend
+    image: sivgiv/flightproject-frontend:latest
     ports:
       - "3000:3000"
     volumes:
