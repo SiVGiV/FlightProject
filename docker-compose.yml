@@ -10,20 +10,10 @@ services:
       interval: 30s
       retries: 5
       timeout: 20s
-  # db:
-  #   image: mysql:latest
-  #   env_file: ./.env
-  #   volumes:
-  #     - db:/var/lib/mysql
-  #   healthcheck:
-  #     test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=$$MYSQL_ROOT_PASSWORD"]
-  #     start_period: 60s
-  #     interval: 30s
-  #     retries: 5
-  #     timeout: 20s
+
 # ---------------------------------------------
   backend:
-    build: ./backend
+    # build: ./backend
     image: sivgiv/flightproject-backend:latest
     ports:
       - "8000:8000"
