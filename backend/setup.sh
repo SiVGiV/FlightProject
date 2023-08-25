@@ -5,7 +5,6 @@ if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     mkdir -p ./exposed/logs
     mkdir -p ./exposed/generated_data
     touch ./exposed/logs/app.log
-    python setup_db.py
     python manage.py migrate
     python manage.py loaddata countries
     python manage.py collectstatic

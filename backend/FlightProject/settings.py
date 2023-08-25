@@ -93,18 +93,14 @@ APPEND_SLASH = False
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
-        'HOST': os.environ.get('MYSQL_HOST'),
-        'PORT': 3306,
-        'NAME': os.environ.get('MYSQL_NAME'),
-        'USER': 'root',
-        'PASSWORD': os.environ.get('MYSQL_ROOT_PASSWORD'),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"  
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': 5432,
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD')
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

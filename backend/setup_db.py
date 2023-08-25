@@ -10,52 +10,6 @@ logger = logging.getLogger('django')
 from FlightProject.settings import DATABASES
 DATABASE_SETTINGS = DATABASES['default']
 
-def get_connection():
-    """Creates and returns a Connection object (from mysql_connector_python) with the default django database settings
-
-    Returns:
-        PooledMySQLConnection | MySQLConnection | Any: A Connection object
-    """
-    from mysql.connector import connect
-    try:
-        connection = connect(
-        host=DATABASE_SETTINGS['HOST'],
-        port=DATABASE_SETTINGS['PORT'],
-        user='root',
-        password=os.getenv('MYSQL_ROOT_PASSWORD'),
-    )
-    except Exception as e:
-        logger.error(e)
-        print(f"failed to connect to { DATABASE_SETTINGS['HOST'] }:3306")
-        print(e)
-        raise
-    if connection:
-        logger.info(f"Successfully connected to database @ //{ DATABASE_SETTINGS['HOST'] }:3306/")
-    return connection
-
-
-def create_schema():
-    """Creates the main django schema
-    """
-    try:
-        connection = get_connection()
-    except ConnectionError as e:
-        logger.error(e)
-        logger.error("Failed to connect to database.", exc_info=e)    
-    
-    cursor = connection.cursor()
-    
-    try:
-        cursor.execute(
-            "CREATE DATABASE IF NOT EXISTS %s;" % DATABASE_SETTINGS['NAME']
-        )
-    except Exception as e:
-        logger.error(e)
-        logger.error("Schema creation failed.", exc_info=e)
-    else:
-        logger.info("%s schema creation successful." % DATABASE_SETTINGS['NAME'])
-    
-    
 def make_superuser_admin(*args):
     """
     Makes the 1st superuser an admin.
@@ -84,8 +38,6 @@ def redirect_cmdline(cmd_name: str):
         cmd_name (str): The name of the command to redirect to
     """
     match cmd_name:
-        case 'create_schema' | 'create_database':
-            return create_schema
         case 'make_superuser_admin':
             return make_superuser_admin
         case other:
@@ -95,7 +47,5 @@ def redirect_cmdline(cmd_name: str):
 if __name__ == "__main__":
     import sys
     match len(sys.argv):
-        case 1:
-            create_schema()
         case 2:
             redirect_cmdline(sys.argv[1])(sys.argv[2:])
