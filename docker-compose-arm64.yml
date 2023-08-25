@@ -1,0 +1,49 @@
+services:
+  db:
+    image: arm64v8/postgres:latest
+    env_file: ./.env
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
+      start_period: 30s
+      interval: 30s
+      retries: 5
+      timeout: 20s
+
+# ---------------------------------------------
+  backend:
+    # build: ./backend
+    image: sivgiv/flightproject-backend:arm64
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend:/app/exposed/
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    env_file: ./.env
+    healthcheck:
+      test: curl -f --insecure http://127.0.0.1:8000/healthcheck/
+      start_period: 60s
+      interval: 30s
+      retries: 5
+      timeout: 20s
+# ---------------------------------------------
+  frontend:
+    # build: ./frontend
+    image: sivgiv/flightproject-frontend:arm64
+    ports:
+      - "3000:3000"
+    volumes:
+      - frontend:/app/exposed/
+    depends_on:
+      backend:
+        condition: service_healthy
+        restart: true
+    env_file: ./.env
+volumes:
+  db:
+  backend:
+  frontend:
