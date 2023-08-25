@@ -81,8 +81,8 @@ def generate_data(admins, airlines, customers, flights, tickets):
         response = client.post(API_URL + "admins/", data={**request_body, 'csrftoken': client.cookies.get('csrftoken')}, headers={'X-CSRFToken': client.cookies.get('csrftoken')})
         if response.status_code == 201:
             admins_list.append(response.json()['data'])
-            admins_list[index]['user']['password'] = password
-            print(f'Created admin {index + 1}/{admins}...')
+            admins_list[-1]['user']['password'] = password
+            print(f'Created admin {len(admins_list)}/{admins}...')
         else:
             print(response.json())
             
@@ -105,8 +105,8 @@ def generate_data(admins, airlines, customers, flights, tickets):
         response = client.post(API_URL + "airlines/", data={**request_body, 'csrftoken': client.cookies.get('csrftoken')}, headers={'X-CSRFToken': client.cookies.get('csrftoken')})
         if response.status_code == 201:
             airlines_list.append(response.json()['data'])
-            airlines_list[index]['user']['password'] = password
-            print(f'Created airline {index + 1}/{airlines}...')
+            airlines_list[-1]['user']['password'] = password
+            print(f'Created airline {len(airlines_list)}/{airlines}...')
         else:
             print(response.json())
             
@@ -131,8 +131,8 @@ def generate_data(admins, airlines, customers, flights, tickets):
         response = client.post(API_URL + "customers/", data={**request_body, 'csrftoken': client.cookies.get('csrftoken')}, headers={'X-CSRFToken': client.cookies.get('csrftoken')})
         if response.status_code == 201:
             customers_list.append(response.json()['data'])
-            customers_list[index]['user']['password'] = password
-            print(f'Created customer {index + 1}/{customers}...')
+            customers_list[-1]['user']['password'] = password
+            print(f'Created customer {len(customers_list)}/{customers}...')
         else:
             print(response.json())
 
