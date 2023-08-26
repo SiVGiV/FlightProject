@@ -1,4 +1,10 @@
+import { useEffect } from "react";
+import settings from "../settings";
 export default function HomePage() {
+    useEffect(() => {
+        document.title = settings.base_title;
+    }, []);
+
     return (
         <div>
             <h1 id="flight-manager-project">Flight Manager Project</h1>
@@ -16,7 +22,7 @@ export default function HomePage() {
                 <li>
                     Simple API creation (with the help of Django REST framework)
                 </li>
-                <li>BasicAuth for API access</li>
+                <li>Built in authentication handling</li>
                 <li>Ready made ORM for database access</li>
                 <li>Fixture imports for easy database seeding</li>
                 <li>
@@ -27,18 +33,25 @@ export default function HomePage() {
             <h3 id="choices">Choices</h3>
             <h4 id="authentication">Authentication</h4>
             <p>
-                I chose to use BasicAuth for API access, as it is a simple and
-                easy to use authentication method, is supported by djagno rest
-                framework out of the box, and does not require users to generate
-                tokens.
+                I initially chose to use BasicAuth for API access, as it is as
+                its name suggests - basic. However - I decided that session
+                authentication would be better suited for my needs. Therefore, I
+                implemented a simple login and logout views. In addition to
+                those views, I wanted to create a way for the front end to find
+                out what type of user is viewing the page, so I can display the
+                right menus and features. For this I created the
+                &#39;whoami&#39; endpoint, which returns some very basic
+                information about the user - so that I know to display
+                everything properly.
             </p>
             <h4 id="authorization">Authorization</h4>
             <p>
                 Despite the requirement being a user_role table in the database,
-                I chose to pass on it and use Django&#39;s built in group
-                system. This is since the functionality would&#39;ve been the
-                same, and Django&#39;s group system is already integrated with
-                the authentication system.
+                I chose to use Django&#39;s built in group system instead. This
+                is since the functionality would&#39;ve been the same, and
+                Django&#39;s group system is already integrated with the
+                authentication system and has some ready functions to support
+                the group functionality.{" "}
             </p>
             <h4 id="credit-card-number">Credit Card Number</h4>
             <h5 id="omition">Omition</h5>
@@ -63,11 +76,11 @@ export default function HomePage() {
                 Get All Flights &amp; Get All Airlines
             </h4>
             <p>
-                A clever choice I made in the implementation of these functions
-                was to use the filtration methods (Flights by parameters &amp;
-                Airline by name) to implement these functions. This allowed me
-                to reuse code in its entirety, and not have to write any
-                additional code for these functions.{" "}
+                A choice I made in the implementation of these functions was to
+                use the filtration methods (Flights by parameters &amp; Airline
+                by name) to implement these functions. This allowed me to reuse
+                code in its entirety, and not have to write any additional code
+                for these functions.{" "}
             </p>
             <h4 id="testing-data-and-fixtures">Testing data and fixtures</h4>
             <p>
@@ -75,10 +88,10 @@ export default function HomePage() {
                 chose to use it for the Countries table, since it&#39;s static
                 information that wouldn&#39;t change very often. However, since
                 I wanted the testing data to be meaningful data that can be used
-                to demonstrate a production environmentm I chose to use a Python
+                to demonstrate a production environment, I chose to use a Python
                 script to generate the data, and since I built an API for the
-                project, I chose to use the API to seed the database with the
-                generated data.
+                project, I used the API to seed the database with the generated
+                data.
             </p>
             <h3 id="built-with">Built With</h3>
             <ul>
@@ -117,23 +130,6 @@ export default function HomePage() {
                     script
                 </li>
             </ul>
-            <h2 id="frontend">Frontend</h2>
-            <h3 id="choices">Choices</h3>
-            <h4 id="role-based-access">Role Based Access</h4>
-            <p>
-                When deciding how to display pages and components suited for
-                some roles, I had to consider the security limitations presented
-                by React. Since React is a client side framework, it is not
-                possible to hide components from the user, as the user can
-                simply inspect the page and see the code. Instead of keeping the
-                user&#39;s role in the state, I chose to ask the server for the
-                user&#39;s role on every role based render, to make sure the
-                user can&#39;t change their role by changing the state. This
-                method reminds me of the TCP handshake, where the client and
-                server exchange information before starting the connection.
-                While it makes my code more redundant, I feel it&#39;s the right
-                method to use in this case.
-            </p>
             <h2 id="author">Author</h2>
             <ul>
                 <li>

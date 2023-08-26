@@ -6,11 +6,15 @@ import { LoginContext, RefreshLoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
 import { ParseErrorObjects } from "../utilities/helpers";
 import { Validations } from "../utilities/validations";
+import settings from "../settings";
 
 export default function Register() {
+    useEffect(() => {
+        document.title = settings.base_title + settings.title_separator + "Register";
+    }, []);
+
     const API = useContext(APIContext);
     const loginData = useContext(LoginContext);
-    const refreshLoginData = useContext(RefreshLoginContext);
 
     const [fields, setFields] = useState({});
     const [fieldErrors, setFieldErrors] = useState({});

@@ -3,12 +3,18 @@ import Airline from "../components/airline";
 import { Form, Spinner, Button } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { APIContext } from "../contexts/api_contexts";
+import settings from "../settings";
 
 import "../css/airlinesPage.css";
 
 import { makePagination } from "../utilities/helpers";
 
 export default function AirlinesPage() {
+    useEffect(() => {
+        document.title = settings.base_title + settings.title_separator + "Airlines";
+    }, []);
+
+
     const API = useContext(APIContext);
     const [filters, setFilters] = useState({});
 

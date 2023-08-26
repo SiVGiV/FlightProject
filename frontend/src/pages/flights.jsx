@@ -6,10 +6,15 @@ import { Typeahead } from "react-bootstrap-typeahead";
 import { APIContext } from "../contexts/api_contexts";
 import { LoginContext } from "../contexts/auth_contexts";
 import Datetime from "react-datetime";
+import settings from "../settings";
 
 import { makePagination } from "../utilities/helpers";
 
 export default function FlightsPage() {
+    useEffect(() => {
+        document.title =
+            settings.base_title + settings.title_separator + "Flights";
+    }, []);
     const API = useContext(APIContext);
     const login = useContext(LoginContext);
     const [filters, setFilters] = useState({});

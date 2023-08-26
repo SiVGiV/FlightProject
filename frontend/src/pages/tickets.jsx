@@ -3,8 +3,13 @@ import { LoginContext } from "../contexts/auth_contexts";
 import { APIContext } from "../contexts/api_contexts";
 import "../css/ticketsPage.css";
 import Ticket from "../components/Ticket";
+import settings from "../settings";
 
 export default function TicketsPage() {
+    useEffect(() => {
+        document.title = settings.base_title + settings.title_separator + "Tickets";
+    }, []);
+
     const login = useContext(LoginContext);
     const API = useContext(APIContext);
     const [tickets, setTickets] = useState([]);

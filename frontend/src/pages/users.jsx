@@ -4,8 +4,13 @@ import { APIContext } from "../contexts/api_contexts";
 import { Tabs, Tab, Spinner } from "react-bootstrap";
 import { ParseErrorObjects, ValidationButton } from "../utilities/helpers";
 import "../css/usersPage.css";
+import settings from "../settings";
 
 export default function UsersPage() {
+    useEffect(() => {
+        document.title = settings.base_title + settings.title_separator + "Users";
+    }, []);
+
     const login = useContext(LoginContext);
     const API = useContext(APIContext);
     const [userType, setUserType] = useState("customers");
