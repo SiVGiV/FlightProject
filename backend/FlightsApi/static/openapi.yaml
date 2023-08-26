@@ -733,10 +733,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  admin:
-                    $ref: "#/components/schemas/Admin"
-                  user:
-                    $ref: "#/components/schemas/User"
+                  data:
+                    type: object
+                    properties:
+                      admin:
+                        $ref: "#/components/schemas/Admin"
+                      user:
+                        $ref: "#/components/schemas/User"
         "4XX":
           description: Error in the requesting end
           content:
@@ -872,10 +875,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  airline:
-                    $ref: "#/components/schemas/Airline"
-                  user:
-                    $ref: "#/components/schemas/User"
+                  data:
+                    type: object
+                    properties:
+                      airline:
+                        $ref: "#/components/schemas/Airline"
+                      user:
+                        $ref: "#/components/schemas/User"
         "4XX":
           description: Error in the requesting end
           content:
@@ -913,7 +919,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Airline"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Airline"
         "4XX":
           description: Error in the requesting end
           content:
@@ -979,7 +988,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Airline"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Airline"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1076,10 +1088,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  customer:
-                    $ref: "#/components/schemas/Customer"
-                  user:
-                    $ref: "#/components/schemas/User"
+                  data:
+                    type: object
+                    properties:
+                      customer:
+                        $ref: "#/components/schemas/Customer"
+                      user:
+                        $ref: "#/components/schemas/User"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1118,7 +1133,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Customer"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Customer"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1188,7 +1206,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Customer"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Customer"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1298,7 +1319,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  flight:
+                  data:
                     $ref: "#/components/schemas/Flight"
         "4XX":
           description: Error in the requesting end
@@ -1335,7 +1356,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Flight"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Flight"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1381,7 +1405,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Flight"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Flight"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1496,7 +1523,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Ticket"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Ticket"
         "4XX":
           description: Error in the requesting end
           content:
@@ -1608,7 +1638,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Country"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Country"
         "4XX":
           description: Error in the requesting end
           content:
