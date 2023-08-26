@@ -17,20 +17,21 @@ In order to run this container you'll need docker installed.
 
 #### Database requirements
 
-This image requires a MYSQL container running in the same network on the port 3306, and some environment variables from that database.
+This image requires a database, it's recommended to run postgres in the same network on port 5432.
 
 ## Usage
 
 It is recommended to run this image as part of [this docker-compose](https://github.com/SiVGiV/FlightProject/blob/b07030804af6e818783ecc9a5074f65708b4f17b/docker-compose.yml), but it is also possible (although not recommended) to run it without it.
 
-#### [API Documentation](http://project-docs.sivgiv.com/) (Might be unavailable at some point)
+#### [API Documentation](http://sivgiv.com/) (Might be unavailable at some point)
 
 #### Required environment variables
 
 ##### Database Settings
-* `MYSQL_HOST` - The MySQL network address
-* `MYSQL_NAME` - The MySQL scheme name to be created and used
-* `MYSQL_ROOT_PASSWORD` - Password for the MySQL 'root' user
+* `POSTGRES_HOST` - Postgres hostname
+* `POSTGRES_DB` - Postgres schema name
+* `POSTGRES_USER` - Username for the postgres database
+* `POSTGRES_PASSWORD` - Password for the postgres database
 
 ##### Django superuser settings
 * `DJANGO_SUPERUSER_USERNAME` - The Backend's superuser username
